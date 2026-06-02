@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 100 100" role="img" aria-label="Studio Vetrina">
+  <title>Studio Vetrina — marchio</title>
+  <clipPath id="glass"><rect x="25.5" y="11.5" width="49" height="77" rx="10.5"/></clipPath>
+  <rect x="22" y="8" width="56" height="84" rx="14" fill="#FBF9F3" stroke="#1B1A18" stroke-width="6"/>
+  <g clip-path="url(#glass)">
+    <path d="M25 11 L75 11 L75 34 L52 47 Q50 49 48 47 L25 34 Z" fill="#BF4D2C"/>
+  </g>
+  <rect x="36" y="78" width="28" height="4.5" rx="2.25" fill="#1B1A18"/>
+</svg>

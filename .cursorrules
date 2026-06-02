@@ -1,0 +1,15 @@
+Stai costruendo il sito di Studio Vetrina.
+
+STACK: Next.js 14 App Router, TypeScript, Tailwind CSS, Framer Motion
+
+COLORI: travertino #F3EEE4, inchiostro #1B1A18, cotto #BF4D2C, ocra #DA9A47, pietra #8A8578, glass #FBF9F3
+
+FONT: Fraunces = font-display (titoli), Inter = font-sans (corpo/UI)
+
+VOCE: italiano sempre. sito/su misura/consegna — mai website/custom/deadline
+
+TONO: accogliente, curato, diretto. Sempre "tu".
+
+ANIMAZIONI: Framer Motion stile Apple — ease-out naturale [0.25,0.46,0.45,0.94], mai linear
+
+RIFERIMENTI: vedi /docs/ per brand foundation, guidelines e prompt completo
