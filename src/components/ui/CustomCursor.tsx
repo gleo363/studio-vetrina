@@ -52,7 +52,7 @@ export default function CustomCursor() {
         animate={{
           width: isPointer ? 36 : 12,
           height: isPointer ? 36 : 12,
-          backgroundColor: isPointer ? "rgba(191,77,44,0.15)" : "transparent",
+          backgroundColor: isPointer ? "rgba(191,77,44,0.15)" : "rgba(191,77,44,0)",
         }}
         transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
         style={{

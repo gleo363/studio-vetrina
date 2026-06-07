@@ -1,15 +1,12 @@
 "use client";
-import { useState } from "react";
+
+import { useActionState } from "react";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import { inviaContatto } from "@/app/actions/segnalazioni";
 
 export default function ContattiPage() {
-  const [inviato, setInviato] = useState(false);
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setInviato(true);
-  }
+  const [state, action, pending] = useActionState(inviaContatto, null);
 
   return (
     <div className="min-h-screen bg-travertino pt-32 pb-24 px-6">
@@ -32,7 +29,7 @@ export default function ContattiPage() {
         <div className="grid md:grid-cols-[1fr_320px] gap-16">
           {/* Form */}
           <AnimatedSection delay={0.1}>
-            {inviato ? (
+            {state?.successo ? (
               <motion.div
                 className="bg-glass rounded-2xl p-12 text-center"
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -54,7 +51,18 @@ export default function ContattiPage() {
                 </p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <form action={action} className="flex flex-col gap-5">
+                {state?.errore && (
+                  <div className="bg-[#fdf0ed] border border-cotto/20 rounded-xl px-4 py-3">
+                    <p
+                      className="text-sm text-cotto"
+                      style={{ fontFamily: "var(--font-inter)" }}
+                    >
+                      {state.errore}
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
                     <label
@@ -66,6 +74,7 @@ export default function ContattiPage() {
                     </label>
                     <input
                       id="nome"
+                      name="nome"
                       type="text"
                       required
                       placeholder="Mario Rossi"
@@ -83,6 +92,7 @@ export default function ContattiPage() {
                     </label>
                     <input
                       id="attivita"
+                      name="attivita"
                       type="text"
                       required
                       placeholder="Trattoria da Mario"
@@ -103,6 +113,7 @@ export default function ContattiPage() {
                     </label>
                     <input
                       id="email"
+                      name="email"
                       type="email"
                       required
                       placeholder="mario@trattoria.it"
@@ -120,6 +131,7 @@ export default function ContattiPage() {
                     </label>
                     <input
                       id="telefono"
+                      name="telefono"
                       type="tel"
                       placeholder="+39 06 1234567"
                       className="w-full bg-glass border border-inchiostro/10 rounded-xl px-4 py-3.5 text-sm text-inchiostro placeholder:text-pietra/50 outline-none focus:border-inchiostro/30 transition-colors"
@@ -138,6 +150,7 @@ export default function ContattiPage() {
                   </label>
                   <textarea
                     id="messaggio"
+                    name="messaggio"
                     rows={6}
                     required
                     placeholder="Raccontaci la tua attività e cosa vorresti dal tuo sito…"
@@ -148,14 +161,15 @@ export default function ContattiPage() {
 
                 <motion.button
                   type="submit"
-                  className="self-start inline-flex items-center gap-2 bg-cotto text-travertino rounded-[10px] px-7 py-4 text-sm font-medium cursor-pointer"
+                  disabled={pending}
+                  className="self-start inline-flex items-center gap-2 bg-cotto text-travertino rounded-[10px] px-7 py-4 text-sm font-medium cursor-pointer disabled:opacity-60"
                   style={{ fontFamily: "var(--font-inter)" }}
-                  whileHover={{ scale: 1.03, backgroundColor: "#a8431f" }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={pending ? {} : { scale: 1.03, backgroundColor: "#a8431f" }}
+                  whileTap={pending ? {} : { scale: 0.97 }}
                   transition={{ duration: 0.2 }}
                   data-cursor="pointer"
                 >
-                  Apriamo la tua vetrina →
+                  {pending ? "Invio in corso…" : "Apriamo la tua vetrina →"}
                 </motion.button>
               </form>
             )}

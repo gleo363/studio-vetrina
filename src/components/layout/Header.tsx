@@ -8,6 +8,8 @@ import Button from "@/components/ui/Button";
 const navLinks = [
   { href: "/lavori", label: "Lavori" },
   { href: "/studio", label: "Studio" },
+  { href: "/perche-sceglierci", label: "Perché noi" },
+  { href: "/partner", label: "Partner" },
 ];
 
 export default function Header() {

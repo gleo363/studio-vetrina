@@ -5,6 +5,9 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/lavori", label: "Lavori" },
   { href: "/studio", label: "Studio" },
+  { href: "/perche-sceglierci", label: "Perché noi" },
+  { href: "/partner", label: "Partner" },
+  { href: "/partner/accedi", label: "Accedi" },
   { href: "/contatti", label: "Contatti" },
 ];
 
