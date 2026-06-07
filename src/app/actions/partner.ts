@@ -24,8 +24,8 @@ export async function registraPartner(
   if (!nome || !email || !password) {
     return { errore: "Tutti i campi sono obbligatori." };
   }
-  if (password.length < 6) {
-    return { errore: "La password deve essere di almeno 6 caratteri." };
+  if (password.length < 8) {
+    return { errore: "La password deve essere di almeno 8 caratteri." };
   }
 
   const supabase = await createClient();

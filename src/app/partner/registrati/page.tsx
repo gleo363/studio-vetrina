@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import PasswordInput from "@/components/ui/PasswordInput";
 import { registraPartner } from "@/app/actions/partner";
 import Link from "next/link";
 
@@ -97,13 +98,12 @@ export default function RegistratiPage() {
               >
                 Password
               </label>
-              <input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 required
-                minLength={6}
-                placeholder="Almeno 6 caratteri"
+                minLength={8}
+                placeholder="Almeno 8 caratteri"
                 className={inputCls}
                 style={{ fontFamily: "var(--font-inter)" }}
               />

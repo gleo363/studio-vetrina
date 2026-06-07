@@ -9,6 +9,7 @@ export function proxy(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 90,
       path: "/",
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
     });
   }
 

@@ -21,6 +21,22 @@ export async function inviaContatto(
     return { errore: "Nome, attività e email sono obbligatori." };
   }
 
+  // Honeypot: i bot riempiono questo campo, gli umani no
+  const honeypot = (formData.get("website") as string) ?? "";
+  if (honeypot) return { errore: "Errore di rete. Riprova." };
+
+  // Rate limiting: max 3 invii per email nelle ultime 24 ore
+  const adminCheck = createAdminClient();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count } = await adminCheck
+    .from("segnalazione")
+    .select("*", { count: "exact", head: true })
+    .eq("email", email)
+    .gte("creato_il", since);
+  if ((count ?? 0) >= 3) {
+    return { errore: "Hai già inviato troppi messaggi oggi. Riprova domani o scrivici direttamente." };
+  }
+
   const cookieStore = await cookies();
   const ref = cookieStore.get("vetrina_ref")?.value;
 

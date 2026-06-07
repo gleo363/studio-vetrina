@@ -1,0 +1,78 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+export default function PasswordInput({ className, ...props }: PasswordInputProps) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="relative w-full">
+      <input
+        {...props}
+        type={visible ? "text" : "password"}
+        className={`${className ?? ""} pr-11`.trim()}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        tabIndex={-1}
+        aria-label={visible ? "Nascondi password" : "Mostra password"}
+        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-pietra/50 hover:text-inchiostro transition-colors duration-200 focus:outline-none cursor-pointer"
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={visible ? "open" : "closed"}
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.15 }}
+            className="flex items-center justify-center"
+          >
+            {visible ? <EyeOffIcon /> : <EyeIcon />}
+          </motion.span>
+        </AnimatePresence>
+      </button>
+    </div>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <path d="m14.12 14.12a3 3 0 0 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}

@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import PasswordInput from "@/components/ui/PasswordInput";
 import { createClient } from "@/lib/supabase/client";
 
 const inputCls =
@@ -49,8 +50,8 @@ function AggiornaPasswordForm() {
       setLoading(false);
       return;
     }
-    if (password.length < 6) {
-      setErrore("La password deve essere di almeno 6 caratteri.");
+    if (password.length < 8) {
+      setErrore("La password deve essere di almeno 8 caratteri.");
       setLoading(false);
       return;
     }
@@ -89,13 +90,12 @@ function AggiornaPasswordForm() {
             <label htmlFor="password" className={labelCls} style={{ fontFamily: "var(--font-inter)" }}>
               Nuova password
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
-              minLength={6}
-              placeholder="Almeno 6 caratteri"
+              minLength={8}
+              placeholder="Almeno 8 caratteri"
               className={inputCls}
               style={{ fontFamily: "var(--font-inter)" }}
             />
@@ -105,10 +105,9 @@ function AggiornaPasswordForm() {
             <label htmlFor="conferma" className={labelCls} style={{ fontFamily: "var(--font-inter)" }}>
               Conferma password
             </label>
-            <input
+            <PasswordInput
               id="conferma"
               name="conferma"
-              type="password"
               required
               placeholder="Ripeti la password"
               className={inputCls}
