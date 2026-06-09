@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader, SiteFooter } from "@/components/layout/SiteChrome";
 import CustomCursor from "@/components/ui/CustomCursor";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { Analytics } from "@vercel/analytics/next";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -71,6 +72,7 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );
