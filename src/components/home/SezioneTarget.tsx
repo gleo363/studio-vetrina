@@ -2,25 +2,27 @@
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 import { motion } from "framer-motion";
+import { UtensilsCrossed, Scissors, ShoppingBag, Wrench } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const categorie = [
+const categorie: { icon: LucideIcon; nome: string; bisogno: string }[] = [
   {
-    emoji: "🍕",
+    icon: UtensilsCrossed,
     nome: "Ristoranti e bar",
     bisogno: "Essere trovati su Google e mostrare il menu online.",
   },
   {
-    emoji: "💇",
+    icon: Scissors,
     nome: "Saloni e centri estetici",
     bisogno: "Prenotazioni online e calendario sempre aggiornato.",
   },
   {
-    emoji: "🛍️",
+    icon: ShoppingBag,
     nome: "Boutique e negozi",
     bisogno: "Una presenza digitale all'altezza del negozio fisico.",
   },
   {
-    emoji: "🔧",
+    icon: Wrench,
     nome: "Artigiani e professionisti",
     bisogno: "Credibilità online per acquisire nuovi clienti.",
   },
@@ -50,7 +52,7 @@ export default function SezioneTarget() {
                 }}
                 transition={{ duration: 0.3 }}
               >
-                <span className="text-4xl mb-5 block">{cat.emoji}</span>
+                <cat.icon size={32} strokeWidth={1.5} className="mb-5 text-inchiostro/70" />
                 <h3
                   className="text-lg font-medium text-inchiostro mb-3"
                   style={{ fontFamily: "var(--font-fraunces)" }}

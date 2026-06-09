@@ -29,28 +29,22 @@ export async function registraPartner(
     return { errore: "La password deve essere di almeno 8 caratteri." };
   }
 
-  const supabase = await createClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://studio-vetrina.vercel.app";
-  const { data: authData, error: authError } = await supabase.auth.signUp({
+  const admin = createAdminClient();
+
+  // Crea utente con email già confermata — bypassa SMTP di Supabase completamente
+  const { data: adminData, error: adminError } = await admin.auth.admin.createUser({
     email,
     password,
-    options: {
-      emailRedirectTo: `${siteUrl}/auth/callback`,
-    },
+    email_confirm: true,
   });
 
-  if (authError) {
-    if (authError.message.includes("already registered")) {
+  if (adminError || !adminData?.user) {
+    if (adminError?.message.toLowerCase().includes("already")) {
       return { errore: "Questa email è già registrata. Prova ad accedere." };
     }
-    return { errore: authError.message };
+    return { errore: adminError?.message ?? "Errore durante la registrazione. Riprova." };
   }
 
-  if (!authData.user) {
-    return { errore: "Errore durante la registrazione. Riprova." };
-  }
-
-  const admin = createAdminClient();
   let codice = generaCodiceBase(nome);
 
   for (let i = 0; i < 10; i++) {
@@ -64,16 +58,22 @@ export async function registraPartner(
   }
 
   const { error: partnerError } = await admin.from("partner").insert({
-    user_id: authData.user.id,
+    user_id: adminData.user.id,
     nome,
     email,
     codice,
   });
 
   if (partnerError) {
+    await admin.auth.admin.deleteUser(adminData.user.id);
     return { errore: "Errore durante la creazione del profilo. Riprova." };
   }
 
+  // Logga l'utente subito — nessuna email di conferma necessaria
+  const supabase = await createClient();
+  await supabase.auth.signInWithPassword({ email, password });
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://studio-vetrina.vercel.app";
   await inviaEmailBenvenutoPartner({
     nome,
     email,

@@ -29,7 +29,11 @@ export default function ResetPasswordPage() {
     });
 
     if (error) {
-      setErrore(error.message);
+      setErrore(
+        error.message.toLowerCase().includes("security purposes") || error.message.toLowerCase().includes("after")
+          ? "Attendi qualche secondo e riprova."
+          : error.message
+      );
       setLoading(false);
       return;
     }
