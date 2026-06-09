@@ -1,12 +1,22 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { inviaContatto } from "@/app/actions/segnalazioni";
 
+const EMAIL = "studiovetrinaweb@gmail.com";
+
 export default function ContattiPage() {
   const [state, action, pending] = useActionState(inviaContatto, null);
+  const [copied, setCopied] = useState(false);
+
+  function copyEmail() {
+    navigator.clipboard.writeText(EMAIL).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
 
   return (
     <div className="min-h-screen bg-travertino pt-32 pb-24 px-6">
@@ -189,14 +199,20 @@ export default function ContattiPage() {
                 >
                   Email
                 </p>
-                <a
-                  href="mailto:ciao@vetrina.it"
-                  className="text-inchiostro font-medium hover:text-cotto transition-colors"
+                <button
+                  onClick={copyEmail}
+                  className="text-left text-inchiostro font-medium hover:text-cotto transition-colors cursor-pointer"
                   style={{ fontFamily: "var(--font-fraunces)" }}
                   data-cursor="pointer"
                 >
-                  ciao@vetrina.it
-                </a>
+                  {EMAIL}
+                  <span
+                    className={`ml-2 text-xs font-medium transition-opacity duration-300 ${copied ? "opacity-100 text-cotto" : "opacity-0"}`}
+                    style={{ fontFamily: "var(--font-inter)" }}
+                  >
+                    Copiata!
+                  </span>
+                </button>
               </div>
 
               <div>
@@ -221,16 +237,20 @@ export default function ContattiPage() {
                 >
                   Instagram
                 </p>
-                <a
-                  href="https://instagram.com/studiovetrina"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-inchiostro font-medium hover:text-cotto transition-colors"
-                  style={{ fontFamily: "var(--font-fraunces)" }}
-                  data-cursor="pointer"
-                >
-                  @studiovetrina
-                </a>
+                <div className="flex flex-col gap-1">
+                  <span
+                    className="text-inchiostro/30 font-medium cursor-default"
+                    style={{ fontFamily: "var(--font-fraunces)" }}
+                  >
+                    @studiovetrina
+                  </span>
+                  <span
+                    className="text-[10px] font-semibold tracking-[0.18em] text-cotto/50 uppercase leading-none"
+                    style={{ fontFamily: "var(--font-inter)" }}
+                  >
+                    coming soon
+                  </span>
+                </div>
               </div>
 
               <div className="border-t border-inchiostro/10 pt-8">

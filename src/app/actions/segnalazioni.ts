@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { calcolaCommissione } from "@/lib/commissioni";
-import { inviaEmailContatto } from "@/lib/email";
+import { inviaEmailContatto, inviaEmailStatoSegnalazione } from "@/lib/email";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -99,6 +99,8 @@ export async function aggiornaSegnalazione(
     aggiornamento.firmato_il = new Date().toISOString();
   }
 
+  let commissioneMaturata: number | undefined;
+
   if (data.stato === "pagato") {
     const { data: seg } = await admin
       .from("segnalazione")
@@ -112,10 +114,11 @@ export async function aggiornaSegnalazione(
         : seg.partner;
       const partnerCommissione =
         (rawPartner as { commissione: number } | null)?.commissione ?? 0.1;
-      aggiornamento.commissione_maturata = calcolaCommissione(
+      commissioneMaturata = calcolaCommissione(
         data.valore_progetto ?? seg.valore_progetto,
         partnerCommissione
       );
+      aggiornamento.commissione_maturata = commissioneMaturata;
       aggiornamento.pagato_il = new Date().toISOString();
     }
   }
@@ -126,6 +129,29 @@ export async function aggiornaSegnalazione(
     .eq("id", id);
 
   if (error) return { errore: error.message };
+
+  // Notifica email al partner se lo stato è cambiato a firmato/pagato/rifiutato
+  if (data.stato && ["firmato", "pagato", "rifiutato"].includes(data.stato)) {
+    const { data: seg } = await admin
+      .from("segnalazione")
+      .select("nome_attivita, partner:partner_id(email, nome)")
+      .eq("id", id)
+      .single();
+
+    if (seg) {
+      const rawPartner = Array.isArray(seg.partner) ? seg.partner[0] : seg.partner;
+      const partnerInfo = rawPartner as { email: string; nome: string } | null;
+      if (partnerInfo?.email && partnerInfo?.nome) {
+        await inviaEmailStatoSegnalazione({
+          partnerEmail: partnerInfo.email,
+          partnerNome: partnerInfo.nome,
+          nomeAttivita: seg.nome_attivita,
+          statoNuovo: data.stato,
+          commissioneMaturata,
+        });
+      }
+    }
+  }
 
   revalidatePath("/admin");
   return { successo: true };

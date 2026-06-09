@@ -3,7 +3,7 @@ import Logo from "@/components/ui/Logo";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/lavori", label: "Lavori" },
+  { href: "/lavori", label: "Lavori", comingSoon: true },
   { href: "/studio", label: "Studio" },
   { href: "/perche-sceglierci", label: "Perché noi" },
   { href: "/partner", label: "Partner" },
@@ -29,16 +29,26 @@ export default function Footer() {
 
           {/* Nav */}
           <nav className="flex flex-wrap gap-x-8 gap-y-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm text-travertino/50 hover:text-travertino transition-colors duration-200"
-                style={{ fontFamily: "var(--font-inter)" }}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) =>
+              link.comingSoon ? (
+                <span
+                  key={link.href}
+                  className="text-sm text-travertino/25 cursor-default"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                >
+                  {link.label}
+                </span>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-travertino/50 hover:text-travertino transition-colors duration-200"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </nav>
 
           {/* Copyright */}
@@ -46,7 +56,7 @@ export default function Footer() {
             className="text-sm text-travertino/40 whitespace-nowrap"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            © 2026 Studio Vetrina · Roma
+            © {new Date().getFullYear()} Studio Vetrina · Roma
           </p>
         </div>
 

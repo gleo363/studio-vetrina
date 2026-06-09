@@ -7,6 +7,7 @@ import CardGuadagni from "@/components/partner/CardGuadagni";
 import TabellaSegnalazioni from "@/components/partner/TabellaSegnalazioni";
 import LogoutButton from "./LogoutButton";
 import CopiaCodiceClient from "./CopiaCodiceClient";
+import Link from "next/link";
 
 export default async function AreaPartnerPage() {
   const supabase = await createClient();
@@ -70,7 +71,16 @@ export default async function AreaPartnerPage() {
               Ciao, {partner.nome.split(" ")[0]}.
             </h1>
           </div>
-          <LogoutButton />
+          <div className="flex items-center gap-3">
+            <Link
+              href="/partner/area-partner/profilo"
+              className="text-sm text-pietra hover:text-inchiostro transition-colors duration-200"
+              style={{ fontFamily: "var(--font-inter)" }}
+            >
+              Modifica profilo →
+            </Link>
+            <LogoutButton />
+          </div>
         </AnimatedSection>
 
         {/* Il tuo codice */}

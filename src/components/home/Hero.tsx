@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useScroll, useTransform, motion } from "framer-motion";
 import Logo from "@/components/ui/Logo";
 import Button from "@/components/ui/Button";
@@ -47,14 +46,15 @@ export default function Hero() {
           <Button href="/contatti" variant="primary" className="text-base px-7 py-4">
             Apriamo la tua vetrina →
           </Button>
-          <Link
-            href="/lavori"
-            className="text-sm font-medium text-inchiostro underline underline-offset-4 decoration-inchiostro/30 hover:decoration-inchiostro transition-all duration-200"
+          <span
+            className="flex flex-col gap-1 cursor-default"
             style={{ fontFamily: "var(--font-inter)" }}
-            data-cursor="pointer"
           >
-            Guarda i nostri lavori
-          </Link>
+            <span className="text-sm font-medium text-inchiostro/25">Guarda i nostri lavori</span>
+            <span className="text-[9px] font-semibold tracking-[0.18em] text-cotto/50 uppercase leading-none">
+              coming soon
+            </span>
+          </span>
         </div>
       </motion.div>
 

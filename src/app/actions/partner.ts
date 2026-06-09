@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { inviaEmailBenvenutoPartner } from "@/lib/email";
 import { redirect } from "next/navigation";
 
 function generaCodiceBase(nome: string): string {
@@ -29,9 +30,13 @@ export async function registraPartner(
   }
 
   const supabase = await createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://studio-vetrina.vercel.app";
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: `${siteUrl}/auth/callback`,
+    },
   });
 
   if (authError) {
@@ -69,6 +74,13 @@ export async function registraPartner(
     return { errore: "Errore durante la creazione del profilo. Riprova." };
   }
 
+  await inviaEmailBenvenutoPartner({
+    nome,
+    email,
+    codice,
+    linkPartner: `${siteUrl}/partner/area-partner`,
+  });
+
   redirect("/partner/area-partner");
 }
 
@@ -86,6 +98,44 @@ export async function getPartnerCorrente() {
     .single();
 
   return data;
+}
+
+export async function aggiornaProfilo(
+  _prevState: { errore?: string; successo?: boolean } | null,
+  formData: FormData
+): Promise<{ errore?: string; successo?: boolean }> {
+  const nome = (formData.get("nome") as string)?.trim();
+  const iban = (formData.get("iban") as string)?.trim().replace(/\s/g, "");
+
+  if (!nome) return { errore: "Il nome è obbligatorio." };
+
+  if (iban) {
+    if (iban.length < 15 || iban.length > 34) {
+      return { errore: "IBAN non valido. Verifica il formato." };
+    }
+    if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/.test(iban)) {
+      return { errore: "IBAN non valido. Deve iniziare con il codice paese (es. IT)." };
+    }
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { errore: "Non autorizzato." };
+
+  const admin = createAdminClient();
+  const aggiornamento: Record<string, string> = { nome };
+  if (iban) aggiornamento.iban = iban;
+
+  const { error } = await admin
+    .from("partner")
+    .update(aggiornamento)
+    .eq("user_id", user.id);
+
+  if (error) return { errore: "Errore durante il salvataggio. Riprova." };
+
+  return { successo: true };
 }
 
 export async function logoutPartner() {
