@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import { SiteHeader, SiteFooter } from "@/components/layout/SiteChrome";
 import CustomCursor from "@/components/ui/CustomCursor";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
@@ -23,7 +22,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://studio-vetrina.vercel.app"),
   title: {
-    default: "Studio Vetrina — Siti web su misura per Roma",
+    default: "Studio Vetrina · Siti web su misura per Roma",
     template: "%s | Studio Vetrina",
   },
   description:
@@ -33,14 +32,14 @@ export const metadata: Metadata = {
     locale: "it_IT",
     url: "/",
     siteName: "Studio Vetrina",
-    title: "Studio Vetrina — Siti web su misura per Roma",
+    title: "Studio Vetrina · Siti web su misura per Roma",
     description:
       "Siti web su misura per le piccole attività di Roma. Design curato, consegna in 21 giorni.",
     images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: "Studio Vetrina" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Studio Vetrina — Siti web su misura per Roma",
+    title: "Studio Vetrina · Siti web su misura per Roma",
     description: "Siti web su misura per le piccole attività di Roma.",
     images: ["/opengraph-image.png"],
   },
@@ -69,9 +68,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-travertino text-inchiostro">
         <GoogleAnalytics />
         <CustomCursor />
-        <Header />
+        <SiteHeader />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <SiteFooter />
       </body>
     </html>
   );

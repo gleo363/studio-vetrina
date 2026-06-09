@@ -111,9 +111,9 @@ export async function inviaEmailBenvenutoPartner({
 
         <div style="border-top: 1px solid rgba(27,26,24,0.1); padding-top: 24px;">
           <p style="font-size: 11px; color: #8A8578; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 14px 0;">Come funziona</p>
-          <p style="font-size: 14px; color: #1B1A18; margin: 0 0 10px 0; line-height: 1.5;">01 — Condividi il tuo codice o QR con le attività che conosci</p>
-          <p style="font-size: 14px; color: #1B1A18; margin: 0 0 10px 0; line-height: 1.5;">02 — Le attività ci contattano, noi facciamo il lavoro</p>
-          <p style="font-size: 14px; color: #1B1A18; margin: 0; line-height: 1.5;">03 — Quando il progetto viene pagato, guadagni il 10%</p>
+          <p style="font-size: 14px; color: #1B1A18; margin: 0 0 10px 0; line-height: 1.5;">01 · Condividi il tuo codice o QR con le attività che conosci</p>
+          <p style="font-size: 14px; color: #1B1A18; margin: 0 0 10px 0; line-height: 1.5;">02 · Le attività ci contattano, noi facciamo il lavoro</p>
+          <p style="font-size: 14px; color: #1B1A18; margin: 0; line-height: 1.5;">03 · Quando il progetto viene pagato, guadagni il 10%</p>
         </div>
       `),
     });
@@ -190,7 +190,7 @@ export async function inviaEmailStatoSegnalazione({
         Aggiornamento, ${escHtml(primoNome)}.
       </h1>
       <p style="font-size: 15px; color: #8A8578; line-height: 1.7; margin: 0 0 28px 0;">
-        La segnalazione <strong style="color: #1B1A18;">${attivitaEsc}</strong> non è andata a buon fine questa volta. Non preoccuparti — continua a condividere il tuo codice, ogni nuova segnalazione è una nuova opportunità.
+        La segnalazione <strong style="color: #1B1A18;">${attivitaEsc}</strong> non è andata a buon fine questa volta. Non preoccuparti: continua a condividere il tuo codice, ogni nuova segnalazione è una nuova opportunità.
       </p>
       <div style="text-align: center;">
         <a href="${siteUrl}/partner/area-partner" style="display: inline-block; background: #1B1A18; color: #F3EEE4; text-decoration: none; padding: 14px 28px; border-radius: 10px; font-size: 14px; font-weight: 500;">

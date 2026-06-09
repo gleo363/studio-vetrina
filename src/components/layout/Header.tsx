@@ -6,7 +6,7 @@ import Logo from "@/components/ui/Logo";
 import Button from "@/components/ui/Button";
 
 const navLinks = [
-  { href: "/lavori", label: "Lavori", comingSoon: true },
+  { href: "/esempi", label: "Esempi" },
   { href: "/studio", label: "Studio" },
   { href: "/perche-sceglierci", label: "Perché noi" },
   { href: "/partner", label: "Partner" },
@@ -52,30 +52,17 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) =>
-              link.comingSoon ? (
-                <span
-                  key={link.href}
-                  className="flex flex-col items-start gap-0.5 cursor-default"
-                  style={{ fontFamily: "var(--font-inter)" }}
-                >
-                  <span className="text-sm text-inchiostro/25">{link.label}</span>
-                  <span className="text-[9px] font-semibold tracking-[0.18em] text-cotto/50 uppercase leading-none">
-                    coming soon
-                  </span>
-                </span>
-              ) : (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm text-inchiostro/60 hover:text-inchiostro transition-colors duration-200"
-                  style={{ fontFamily: "var(--font-inter)" }}
-                  data-cursor="pointer"
-                >
-                  {link.label}
-                </Link>
-              )
-            )}
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-inchiostro/60 hover:text-inchiostro transition-colors duration-200"
+                style={{ fontFamily: "var(--font-inter)" }}
+                data-cursor="pointer"
+              >
+                {link.label}
+              </Link>
+            ))}
             <Button href="/contatti" variant="primary">
               Parliamone
             </Button>
@@ -128,38 +115,18 @@ export default function Header() {
               exit={{ x: "100%" }}
               transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              {navLinks.map((link) =>
-                link.comingSoon ? (
-                  <span
-                    key={link.href}
-                    className="flex flex-col gap-1.5 py-5 border-b border-inchiostro/10"
-                  >
-                    <span
-                      className="text-3xl text-inchiostro/25 leading-none"
-                      style={{ fontFamily: "var(--font-fraunces)" }}
-                    >
-                      {link.label}
-                    </span>
-                    <span
-                      className="text-[10px] font-semibold tracking-[0.2em] text-cotto/50 uppercase"
-                      style={{ fontFamily: "var(--font-inter)" }}
-                    >
-                      coming soon
-                    </span>
-                  </span>
-                ) : (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="text-3xl text-inchiostro py-5 border-b border-inchiostro/10 leading-none"
-                    style={{ fontFamily: "var(--font-fraunces)" }}
-                    onClick={() => setMenuOpen(false)}
-                    data-cursor="pointer"
-                  >
-                    {link.label}
-                  </Link>
-                )
-              )}
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-3xl text-inchiostro py-5 border-b border-inchiostro/10 leading-none"
+                  style={{ fontFamily: "var(--font-fraunces)" }}
+                  onClick={() => setMenuOpen(false)}
+                  data-cursor="pointer"
+                >
+                  {link.label}
+                </Link>
+              ))}
               <div className="mt-10">
                 <Button
                   href="/contatti"

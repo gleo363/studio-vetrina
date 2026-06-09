@@ -46,15 +46,9 @@ export default function Hero() {
           <Button href="/contatti" variant="primary" className="text-base px-7 py-4">
             Apriamo la tua vetrina →
           </Button>
-          <span
-            className="flex flex-col gap-1 cursor-default"
-            style={{ fontFamily: "var(--font-inter)" }}
-          >
-            <span className="text-sm font-medium text-inchiostro/25">Guarda i nostri lavori</span>
-            <span className="text-[9px] font-semibold tracking-[0.18em] text-cotto/50 uppercase leading-none">
-              coming soon
-            </span>
-          </span>
+          <Button href="/esempi" variant="ghost" className="text-base px-7 py-4">
+            Guarda gli esempi
+          </Button>
         </div>
       </motion.div>
 

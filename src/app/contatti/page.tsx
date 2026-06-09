@@ -32,7 +32,7 @@ export default function ContattiPage() {
             className="text-4xl md:text-5xl lg:text-[60px] font-medium text-inchiostro leading-[0.95] tracking-tight max-w-2xl"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Raccontaci la tua attività — al resto pensiamo noi.
+            Raccontaci la tua attività: al resto pensiamo noi.
           </h1>
         </AnimatedSection>
 

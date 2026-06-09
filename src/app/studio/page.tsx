@@ -24,7 +24,7 @@ const processo = [
     titolo: "Proposta",
     tempo: "Giorno 3–5",
     descrizione:
-      "Ti presentiamo una proposta visiva: palette, font, struttura delle pagine. Niente codice ancora — prima vogliamo che tu dica sì.",
+      "Ti presentiamo una proposta visiva: palette, font, struttura delle pagine. Niente codice ancora, prima vogliamo che tu dica sì.",
   },
   {
     step: "03",
@@ -68,7 +68,7 @@ export default function StudioPage() {
               Studio Vetrina è uno studio di web design di Roma. Curiamo la
               presenza online delle piccole attività con la stessa attenzione
               con cui un negoziante cura la sua vetrina: con gusto, ordine e un
-              po&apos; di orgoglio. Niente paroloni, niente inglese inutile —
+              po&apos; di orgoglio. Niente paroloni, niente inglese inutile:
               solo siti su misura, belli e facili da usare.
             </p>
           </AnimatedSection>
