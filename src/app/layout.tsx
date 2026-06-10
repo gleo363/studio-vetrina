@@ -5,6 +5,7 @@ import { SiteHeader, SiteFooter } from "@/components/layout/SiteChrome";
 import CustomCursor from "@/components/ui/CustomCursor";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Analytics } from "@vercel/analytics/next";
+import { SITE_URL } from "@/lib/site";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -21,7 +22,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://studio-vetrina.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Studio Vetrina · Siti web su misura per Roma",
     template: "%s | Studio Vetrina",

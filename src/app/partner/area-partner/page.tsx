@@ -8,6 +8,7 @@ import TabellaSegnalazioni from "@/components/partner/TabellaSegnalazioni";
 import LogoutButton from "./LogoutButton";
 import CopiaCodiceClient from "./CopiaCodiceClient";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site";
 
 export default async function AreaPartnerPage() {
   const supabase = await createClient();
@@ -32,7 +33,7 @@ export default async function AreaPartnerPage() {
     .eq("partner_id", partner.id)
     .order("creato_il", { ascending: false });
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vetrina.it";
+  const siteUrl = SITE_URL;
   const linkPartner = `${siteUrl}/?ref=${partner.codice}`;
 
   const lista = segnalazioni ?? [];

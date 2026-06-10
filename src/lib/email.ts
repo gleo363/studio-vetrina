@@ -1,4 +1,11 @@
 import { Resend } from "resend";
+import { SITE_URL, SITE_HOST } from "@/lib/site";
+
+// Mittente configurabile: finché il dominio studiovetrina.it non è verificato
+// su Resend, resta onboarding@resend.dev (che consegna solo all'owner).
+// Dopo la verifica: impostare RESEND_FROM="Studio Vetrina <noreply@studiovetrina.it>"
+const MITTENTE =
+  process.env.RESEND_FROM ?? "Studio Vetrina <onboarding@resend.dev>";
 
 function escHtml(str: string | null): string {
   if (!str) return "";
@@ -20,7 +27,7 @@ function emailWrapper(content: string): string {
       </div>
       <div style="background: rgba(27,26,24,0.06); padding: 18px 32px; text-align: center;">
         <p style="font-size: 12px; color: #8A8578; margin: 0;">
-          Studio Vetrina · Roma · <a href="https://vetrina.it" style="color: #8A8578; text-decoration: underline;">vetrina.it</a>
+          Studio Vetrina · Roma · <a href="${SITE_URL}" style="color: #8A8578; text-decoration: underline;">${SITE_HOST}</a>
         </p>
       </div>
     </div>
@@ -48,7 +55,7 @@ export async function inviaEmailContatto({
 
   try {
     await resend.emails.send({
-      from: "Vetrina <onboarding@resend.dev>",
+      from: MITTENTE,
       to: process.env.RESEND_TO_EMAIL ?? process.env.ADMIN_EMAIL!,
       subject: `Nuovo contatto: ${escHtml(attivita)}`,
       html: emailWrapper(`
@@ -86,7 +93,7 @@ export async function inviaEmailBenvenutoPartner({
 
   try {
     await resend.emails.send({
-      from: "Studio Vetrina <onboarding@resend.dev>",
+      from: MITTENTE,
       to: email,
       subject: `Benvenuto nel Programma Partner, ${escHtml(primoNome)}!`,
       html: emailWrapper(`
@@ -139,7 +146,7 @@ export async function inviaEmailStatoSegnalazione({
   if (!["firmato", "pagato", "rifiutato"].includes(statoNuovo)) return;
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://vetrina.it";
+  const siteUrl = SITE_URL;
   const primoNome = partnerNome.split(" ")[0];
   const attivitaEsc = escHtml(nomeAttivita);
 
@@ -202,7 +209,7 @@ export async function inviaEmailStatoSegnalazione({
 
   try {
     await resend.emails.send({
-      from: "Studio Vetrina <onboarding@resend.dev>",
+      from: MITTENTE,
       to: partnerEmail,
       subject: subjects[statoNuovo],
       html: emailWrapper(bodies[statoNuovo]),

@@ -83,7 +83,7 @@ export default async function Image() {
             letterSpacing: "0.03em",
           }}
         >
-          vetrina.it
+          studiovetrina.it
         </div>
       </div>
     ),

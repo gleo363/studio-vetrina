@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { inviaEmailBenvenutoPartner } from "@/lib/email";
+import { SITE_URL } from "@/lib/site";
 import { redirect } from "next/navigation";
 
 function generaCodiceBase(nome: string): string {
@@ -73,7 +74,7 @@ export async function registraPartner(
   const supabase = await createClient();
   await supabase.auth.signInWithPassword({ email, password });
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://studio-vetrina.vercel.app";
+  const siteUrl = SITE_URL;
   await inviaEmailBenvenutoPartner({
     nome,
     email,
