@@ -10,7 +10,6 @@ const navLinks = [
   { href: "/studio", label: "Studio" },
   { href: "/perche-sceglierci", label: "Perché noi" },
   { href: "/partner", label: "Partner" },
-  { href: "/contatti", label: "Contatti" },
 ];
 
 export default function Header() {

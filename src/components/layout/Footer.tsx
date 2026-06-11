@@ -8,7 +8,6 @@ const navLinks = [
   { href: "/perche-sceglierci", label: "Perché noi" },
   { href: "/partner", label: "Partner" },
   { href: "/partner/accedi", label: "Accedi" },
-  { href: "/contatti", label: "Contatti" },
 ];
 
 export default function Footer() {
