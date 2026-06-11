@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isAdminEmail } from "@/lib/admin";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import ListaSegnalazioni, { type Segnalazione } from "./ListaSegnalazioni";
 
@@ -11,7 +12,7 @@ export default async function AdminPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/partner/accedi");
-  if (user.email !== process.env.ADMIN_EMAIL) notFound();
+  if (!isAdminEmail(user.email)) notFound();
 
   const admin = createAdminClient();
   const { data: segnalazioni = [] } = await admin

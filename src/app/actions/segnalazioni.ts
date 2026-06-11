@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { calcolaCommissione } from "@/lib/commissioni";
 import { inviaEmailContatto, inviaEmailStatoSegnalazione } from "@/lib/email";
+import { consentiRichiesta, ipClient } from "@/lib/ratelimit";
+import { isAdminEmail } from "@/lib/admin";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -25,6 +27,13 @@ export async function inviaContatto(
   const honeypot = (formData.get("website") as string) ?? "";
   if (honeypot) return { errore: "Errore di rete. Riprova." };
 
+  // Rate limiting per IP: max 5 invii l'ora (l'email è dichiarata dal mittente
+  // e quindi aggirabile; l'IP no)
+  const ip = await ipClient();
+  if (!consentiRichiesta(`contatto:${ip}`, 5, 60 * 60 * 1000)) {
+    return { errore: "Troppi invii ravvicinati. Attendi qualche minuto e riprova." };
+  }
+
   // Rate limiting: max 3 invii per email nelle ultime 24 ore
   const adminCheck = createAdminClient();
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -35,6 +44,16 @@ export async function inviaContatto(
     .gte("creato_il", since);
   if ((count ?? 0) >= 3) {
     return { errore: "Hai già inviato troppi messaggi oggi. Riprova domani o scrivici direttamente." };
+  }
+
+  // Tetto globale: max 30 segnalazioni nelle ultime 24 ore (anti-flood,
+  // protegge quota Resend e tabella anche da attacchi distribuiti)
+  const { count: totale24h } = await adminCheck
+    .from("segnalazione")
+    .select("*", { count: "exact", head: true })
+    .gte("creato_il", since);
+  if ((totale24h ?? 0) >= 30) {
+    return { errore: "Servizio momentaneamente non disponibile. Scrivici direttamente via email." };
   }
 
   const cookieStore = await cookies();
@@ -87,7 +106,7 @@ export async function aggiornaSegnalazione(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user || user.email !== process.env.ADMIN_EMAIL) {
+  if (!user || !isAdminEmail(user.email)) {
     return { errore: "Non autorizzato." };
   }
 
@@ -162,7 +181,7 @@ export async function getSegnalazioniAdmin() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user || user.email !== process.env.ADMIN_EMAIL) return null;
+  if (!user || !isAdminEmail(user.email)) return null;
 
   const admin = createAdminClient();
   const { data } = await admin

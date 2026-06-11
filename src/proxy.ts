@@ -11,6 +11,7 @@ export function proxy(request: NextRequest) {
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
     });
   }
 

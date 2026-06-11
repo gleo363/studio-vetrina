@@ -41,6 +41,10 @@ export default function RegistratiPage() {
 
         <AnimatedSection delay={0.1}>
           <form action={action} className="flex flex-col gap-5">
+            {/* honeypot — non visibile agli utenti, intercetta i bot */}
+            <div style={{ position: "absolute", left: "-9999px", opacity: 0, pointerEvents: "none" }} aria-hidden="true">
+              <input name="website" type="text" autoComplete="off" tabIndex={-1} />
+            </div>
             {state?.errore && (
               <div className="bg-[#fdf0ed] border border-cotto/20 rounded-xl px-4 py-3">
                 <p

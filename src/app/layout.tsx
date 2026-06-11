@@ -3,7 +3,7 @@ import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteHeader, SiteFooter } from "@/components/layout/SiteChrome";
 import CustomCursor from "@/components/ui/CustomCursor";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
+import CookieConsent from "@/components/CookieConsent";
 import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 
@@ -68,7 +68,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-travertino text-inchiostro">
-        <GoogleAnalytics />
+        <CookieConsent />
         <CustomCursor />
         <SiteHeader />
         <main className="flex-1">{children}</main>

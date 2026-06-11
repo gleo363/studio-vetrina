@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { inviaEmailBenvenutoPartner } from "@/lib/email";
 import { SITE_URL } from "@/lib/site";
+import { consentiRichiesta, ipClient } from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
 
 function generaCodiceBase(nome: string): string {
@@ -30,7 +31,27 @@ export async function registraPartner(
     return { errore: "La password deve essere di almeno 8 caratteri." };
   }
 
+  // Honeypot: i bot riempiono questo campo, gli umani no
+  const honeypot = (formData.get("website") as string) ?? "";
+  if (honeypot) return { errore: "Errore di rete. Riprova." };
+
+  // Max 3 registrazioni l'ora dallo stesso IP
+  const ip = await ipClient();
+  if (!consentiRichiesta(`registrazione:${ip}`, 3, 60 * 60 * 1000)) {
+    return { errore: "Troppi tentativi. Riprova tra qualche minuto." };
+  }
+
   const admin = createAdminClient();
+
+  // Tetto globale: max 20 registrazioni nelle ultime 24 ore (anti-flood)
+  const da24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count: registrazioniRecenti } = await admin
+    .from("partner")
+    .select("*", { count: "exact", head: true })
+    .gte("creato_il", da24h);
+  if ((registrazioniRecenti ?? 0) >= 20) {
+    return { errore: "Registrazioni momentaneamente sospese. Riprova più tardi." };
+  }
 
   // Crea utente con email già confermata — bypassa SMTP di Supabase completamente
   const { data: adminData, error: adminError } = await admin.auth.admin.createUser({
