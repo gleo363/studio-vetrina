@@ -1,6 +1,11 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
 
 export function ContainerScroll({
   titleComponent,
@@ -12,8 +17,14 @@ export function ContainerScroll({
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
   const [isMobile, setIsMobile] = useState(false);
+  // La guardia si attiva solo dopo il mount: la card parte ruotata,
+  // quindi decidere in fase di hydration creerebbe un mismatch col server.
+  const sistemaRiduci = useReducedMotion();
+  const [montato, setMontato] = useState(false);
+  const riduciMovimento = montato && sistemaRiduci;
 
   useEffect(() => {
+    setMontato(true);
     const check = () => setIsMobile(window.innerWidth <= 768);
     check();
     window.addEventListener("resize", check);
@@ -39,21 +50,22 @@ export function ContainerScroll({
       >
         {/* Titolo che sale mentre scorri */}
         <motion.div
-          style={{ translateY }}
+          style={riduciMovimento ? undefined : { translateY }}
           className="max-w-5xl mx-auto text-center mb-8"
         >
           {titleComponent}
         </motion.div>
 
-        {/* Card con prospettiva 3D */}
+        {/* Card con prospettiva 3D — piatta se il movimento è ridotto */}
         <motion.div
           style={{
-            rotateX: rotate,
-            scale,
+            ...(riduciMovimento
+              ? { rotateX: 0, scale: 1 }
+              : { rotateX: rotate, scale }),
             boxShadow:
-              "0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003",
+              "0 0 rgba(27,26,24,0.30), 0 9px 20px rgba(27,26,24,0.29), 0 37px 37px rgba(27,26,24,0.26), 0 84px 50px rgba(27,26,24,0.15), 0 149px 60px rgba(27,26,24,0.04), 0 233px 65px rgba(27,26,24,0.01)",
           }}
-          className="max-w-5xl -mt-12 mx-auto h-[30rem] md:h-[40rem] w-full border-4 border-[#6C6C6C] p-2 md:p-4 bg-[#222222] rounded-[30px]"
+          className="max-w-5xl -mt-12 mx-auto h-[30rem] md:h-[40rem] w-full border-4 border-inchiostro/65 p-2 md:p-4 bg-inchiostro rounded-[30px]"
         >
           <div className="h-full w-full overflow-hidden rounded-2xl bg-glass">
             {children}

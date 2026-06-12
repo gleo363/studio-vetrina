@@ -42,11 +42,20 @@ di pagina via `template.tsx` (scelta: continuità con entrate per-pagina coerent
 - Autocritica: l'ingresso è sobrio e coerente col concept "in mostra nella
   vetrina"; l'alone ocra dà profondità senza sporcare il travertino.
 
+### Fase 1.2-1.3 — TransizioneScroll e SezioneProblema (fatto)
+- [x] ContainerScroll: card piatta con `prefers-reduced-motion` (guardia
+  attivata dopo il mount per evitare mismatch di hydration: la card parte
+  ruotata), bezel e ombre riallineati alla palette (inchiostro al posto
+  di grigi e neri fuori palette).
+- [x] TransizioneScroll: titolo con reveal mascherato condiviso (stessa
+  regia della hero).
+- [x] SezioneProblema: CountUp con guardia reduced-motion (valore finale
+  immediato) e durata da token `scena`; motivo "mensola" ocra sotto i
+  numeri (riveloLinea in stagger); alone-cotto tenue sulla sezione scura.
+- Verificato: screenshot desktop su entrambe le sezioni, contatori e
+  mensole corretti, zero errori console.
+
 ## Da fare
-- [ ] Fase 1.2 — TransizioneScroll/ContainerScroll: guardia reduced-motion,
-  bezel e ombre in palette inchiostro, titolo con reveal mascherato.
-- [ ] Fase 1.3 — SezioneProblema: CountUp con guardia, motivo "mensola" ocra,
-  alone-cotto.
 - [ ] Fase 1.4-1.6 — Card homepage: border-linea, hover caratterizzati
   (numeri, icone), listino servizi che "si compone", Check lucide.
 - [ ] Fase 1.7 — CtaFinale: vignetta, freccia slide. Verifica homepage completa

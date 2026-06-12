@@ -1,5 +1,7 @@
 "use client";
+import { motion } from "framer-motion";
 import { ContainerScroll } from "@/components/ui/ContainerScroll";
+import { riveloMascherato, fadeUp, VIEWPORT_ONCE } from "@/lib/motion";
 
 function MockupSito() {
   return (
@@ -52,20 +54,35 @@ export default function TransizioneScroll() {
   return (
     <ContainerScroll
       titleComponent={
-        <div className="flex flex-col items-center gap-3">
+        <motion.div
+          className="flex flex-col items-center gap-3"
+          initial="hidden"
+          whileInView="visible"
+          viewport={VIEWPORT_ONCE}
+        >
           <h2
             className="text-4xl md:text-6xl font-medium text-inchiostro leading-[0.95] tracking-tight"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Ogni attività<br />ha una storia.
+            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+              <motion.span className="block" variants={riveloMascherato(0)}>
+                Ogni attività
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+              <motion.span className="block" variants={riveloMascherato(0.12)}>
+                ha una storia.
+              </motion.span>
+            </span>
           </h2>
-          <p
+          <motion.p
+            variants={fadeUp(16, 0.6, 0.4)}
             className="text-xl md:text-2xl text-pietra mt-1"
             style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
           >
             Il tuo sito deve saperla raccontare.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       }
     >
       <MockupSito />
