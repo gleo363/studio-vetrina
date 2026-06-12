@@ -65,6 +65,15 @@ body {
   );
 }
 
+/* Vignetta scura per i campi pieni (es. CTA su fondo cotto). */
+.vignetta-inchiostro {
+  background-image: radial-gradient(
+    ellipse 90% 70% at 50% 115%,
+    rgba(27, 26, 24, 0.16),
+    transparent 70%
+  );
+}
+
 /* Sottolineatura che si disegna da sinistra, su hover e focus. */
 .link-sottolineato {
   position: relative;

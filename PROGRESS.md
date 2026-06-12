@@ -68,9 +68,19 @@ di pagina via `template.tsx` (scelta: continuità con entrate per-pagina coerent
 - Nota: label "Più scelto" cotto su inchiostro ≈3.7:1 a 12px — borderline,
   preesistente; segnalato qui, non tocco i colori (vincolo di palette).
 
+### Fase 1.7 — CtaFinale + verifica homepage (fatto)
+- [x] Vignetta inchiostro tenue sul campo cotto (utility `.vignetta-inchiostro`),
+  freccia con micro-slide nel bottone, easing/durate dai token.
+- [x] **Bug preesistente trovato e corretto**: il reveal in clip-path del
+  titolo non partiva mai — l'IntersectionObserver di Chrome calcola il
+  ratio sull'area visibile dopo il clip, quindi un elemento clippato al
+  100% con `amount: 0.4` resta in deadlock. Trigger spostato sul
+  contenitore, titolo e bottone come varianti figlie.
+- Verifica homepage completa: CLS 0.00 su scroll completo (trace), nessun
+  long task, zero errori console, focus cotto visibile da tastiera,
+  nessun overflow orizzontale a 390px.
+
 ## Da fare
-- [ ] Fase 1.7 — CtaFinale: vignetta, freccia slide. Verifica homepage completa
-  (screenshot 1440/390, reduced-motion, tastiera, console, trace).
 - [ ] Fase 2 — Header (sottolineature, stato attivo, hairline) e Footer (reveal).
 - [ ] Fase 3 — Pagine secondarie: studio, perché-sceglierci, galleria esempi,
   partner, contatti (solo presentazione), 404.
