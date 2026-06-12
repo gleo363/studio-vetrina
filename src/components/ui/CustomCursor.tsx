@@ -1,8 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useReducedMotion,
+} from "framer-motion";
+import { EASE_VETRINA } from "@/lib/motion";
 
 export default function CustomCursor() {
+  const riduciMovimento = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [isPointer, setIsPointer] = useState(false);
@@ -35,7 +42,7 @@ export default function CustomCursor() {
     };
   }, [mouseX, mouseY]);
 
-  if (!mounted) return null;
+  if (!mounted || riduciMovimento) return null;
 
   return (
     <motion.div
@@ -54,7 +61,7 @@ export default function CustomCursor() {
           height: isPointer ? 36 : 12,
           backgroundColor: isPointer ? "rgba(191,77,44,0.15)" : "rgba(191,77,44,0)",
         }}
-        transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{ duration: 0.25, ease: EASE_VETRINA }}
         style={{
           border: "1.5px solid #BF4D2C",
           borderRadius: "50%",

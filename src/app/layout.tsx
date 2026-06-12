@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteHeader, SiteFooter } from "@/components/layout/SiteChrome";
+import MotionProvider from "@/components/providers/MotionProvider";
 import CustomCursor from "@/components/ui/CustomCursor";
 import CookieConsent from "@/components/CookieConsent";
 import { Analytics } from "@vercel/analytics/next";
@@ -68,11 +69,13 @@ export default function RootLayout({
       className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-travertino text-inchiostro">
-        <CookieConsent />
-        <CustomCursor />
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <MotionProvider>
+          <CookieConsent />
+          <CustomCursor />
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+        </MotionProvider>
         <Analytics />
       </body>
     </html>

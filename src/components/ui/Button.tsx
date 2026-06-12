@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { EASE_VETRINA, DURATA } from "@/lib/motion";
 
 interface ButtonProps {
   href?: string;
@@ -8,6 +9,22 @@ interface ButtonProps {
   variant?: "primary" | "ghost";
   children: React.ReactNode;
   className?: string;
+}
+
+/* Se il testo termina con "→", la freccia scivola in avanti su hover. */
+function conFreccia(children: React.ReactNode): React.ReactNode {
+  if (typeof children === "string" && children.trimEnd().endsWith("→")) {
+    const testo = children.trimEnd().slice(0, -1).trimEnd();
+    return (
+      <>
+        {testo}
+        <span className="freccia" aria-hidden="true">
+          →
+        </span>
+      </>
+    );
+  }
+  return children;
 }
 
 export default function Button({
@@ -24,18 +41,19 @@ export default function Button({
     ghost: "border border-inchiostro/20 text-inchiostro hover:bg-inchiostro/5",
   };
   const cls = `${base} ${styles[variant]} ${className}`;
+  const transizione = { duration: DURATA.micro, ease: EASE_VETRINA };
 
   if (href) {
     return (
       <motion.div
         className="inline-flex"
-        whileHover={{ scale: 1.03 }}
+        whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
-        transition={{ duration: 0.2 }}
+        transition={transizione}
         data-cursor="pointer"
       >
         <Link href={href} className={cls}>
-          {children}
+          {conFreccia(children)}
         </Link>
       </motion.div>
     );
@@ -45,12 +63,12 @@ export default function Button({
     <motion.button
       className={cls}
       onClick={onClick}
-      whileHover={{ scale: 1.03 }}
+      whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
-      transition={{ duration: 0.2 }}
+      transition={transizione}
       data-cursor="pointer"
     >
-      {children}
+      {conFreccia(children)}
     </motion.button>
   );
 }
