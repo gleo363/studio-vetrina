@@ -2,6 +2,7 @@
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 import { motion } from "framer-motion";
+import { EASE_VETRINA } from "@/lib/motion";
 import { UtensilsCrossed, Scissors, ShoppingBag, Wrench } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -45,14 +46,18 @@ export default function SezioneTarget() {
           {categorie.map((cat) => (
             <StaggerItem key={cat.nome}>
               <motion.div
-                className="bg-travertino rounded-2xl p-7 h-full cursor-default"
+                className="group bg-travertino border border-linea rounded-2xl p-7 h-full cursor-default"
                 whileHover={{
                   y: -6,
                   boxShadow: "0 24px 48px -16px rgba(27,26,24,0.18)",
                 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: EASE_VETRINA }}
               >
-                <cat.icon size={32} strokeWidth={1.5} className="mb-5 text-inchiostro/70" />
+                <cat.icon
+                  size={32}
+                  strokeWidth={1.5}
+                  className="mb-5 text-inchiostro/70 transition-all duration-300 group-hover:text-cotto motion-safe:group-hover:-translate-y-0.5"
+                />
                 <h3
                   className="text-lg font-medium text-inchiostro mb-3"
                   style={{ fontFamily: "var(--font-fraunces)" }}

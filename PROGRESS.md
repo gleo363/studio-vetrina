@@ -55,9 +55,20 @@ di pagina via `template.tsx` (scelta: continuità con entrate per-pagina coerent
 - Verificato: screenshot desktop su entrambe le sezioni, contatori e
   mensole corretti, zero errori console.
 
+### Fase 1.4-1.6 — Card homepage (fatto)
+- [x] SezioneSoluzione: `border-linea` a riposo (profondità "cornice"),
+  numero 01/02/03 pietra→cotto su hover (CSS group-hover, solo colore).
+- [x] SezioneTarget: `border-linea`, icona lucide che sale di 2px e passa
+  a cotto su hover (motion-safe).
+- [x] SezioneServizi: card "Completa" entra con scale 0.985→1; voci del
+  listino che "si compongono" in stagger 0.04; "✓" testuale → icona Check
+  di lucide; bordo linea sulle card chiare; easing/durate dai token.
+- Verificato: screenshot desktop, controllo programmatico di classi hover,
+  15 icone Check, 4 frecce con micro-slide.
+- Nota: label "Più scelto" cotto su inchiostro ≈3.7:1 a 12px — borderline,
+  preesistente; segnalato qui, non tocco i colori (vincolo di palette).
+
 ## Da fare
-- [ ] Fase 1.4-1.6 — Card homepage: border-linea, hover caratterizzati
-  (numeri, icone), listino servizi che "si compone", Check lucide.
 - [ ] Fase 1.7 — CtaFinale: vignetta, freccia slide. Verifica homepage completa
   (screenshot 1440/390, reduced-motion, tastiera, console, trace).
 - [ ] Fase 2 — Header (sottolineature, stato attivo, hairline) e Footer (reveal).

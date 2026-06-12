@@ -2,6 +2,7 @@
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 import { motion } from "framer-motion";
+import { EASE_VETRINA } from "@/lib/motion";
 
 const cards = [
   {
@@ -41,15 +42,15 @@ export default function SezioneSoluzione() {
           {cards.map((card) => (
             <StaggerItem key={card.numero}>
               <motion.div
-                className="bg-glass rounded-2xl p-8 h-full cursor-default"
+                className="group bg-glass border border-linea rounded-2xl p-8 h-full cursor-default"
                 whileHover={{
                   y: -6,
                   boxShadow: "0 24px 48px -16px rgba(27,26,24,0.18)",
                 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: EASE_VETRINA }}
               >
                 <span
-                  className="text-sm font-medium text-pietra block mb-6"
+                  className="text-sm font-medium text-pietra block mb-6 transition-colors duration-300 group-hover:text-cotto"
                   style={{ fontFamily: "var(--font-inter)" }}
                 >
                   {card.numero}
