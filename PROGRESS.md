@@ -27,10 +27,22 @@ di pagina via `template.tsx` (scelta: continuità con entrate per-pagina coerent
   freccia con micro-slide automatica sui testi che terminano con "→").
 - [x] `CustomCursor`: disattivato con `prefers-reduced-motion`.
 
-## Da fare
+### Fase 1.1 — Hero (fatto)
+- [x] Ingresso orchestrato: eyebrow (0s) → righe h1 con reveal mascherato
+  "nella cornice" (0.15/0.27s) → subline corsiva (0.65s) → CTA in stagger
+  (0.85s) → watermark in sola dissolvenza (0.3→1.5s).
+- [x] Parallasse di uscita con range collassati sotto `prefers-reduced-motion`
+  (i range condizionali evitano il mismatch di hydration — bug trovato e
+  corretto in verifica: lo `style` condizionale produceva HTML diverso
+  tra server e client).
+- [x] Texture `.alone-ocra` sulla sezione.
+- Verificato: screenshot 1440/390, reduced-motion emulato (contenuto sempre
+  visibile, zero errori console), solo avviso CSP report-only preesistente
+  dello script Analytics in dev.
+- Autocritica: l'ingresso è sobrio e coerente col concept "in mostra nella
+  vetrina"; l'alone ocra dà profondità senza sporcare il travertino.
 
-- [ ] Fase 1.1 — Hero: ingresso orchestrato (eyebrow → righe h1 mascherate →
-  subline → CTA → watermark), parallasse dietro guardia, texture alone-ocra.
+## Da fare
 - [ ] Fase 1.2 — TransizioneScroll/ContainerScroll: guardia reduced-motion,
   bezel e ombre in palette inchiostro, titolo con reveal mascherato.
 - [ ] Fase 1.3 — SezioneProblema: CountUp con guardia, motivo "mensola" ocra,
