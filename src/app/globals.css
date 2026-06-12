@@ -7,8 +7,10 @@
   --color-ocra: #DA9A47;
   --color-pietra: #8A8578;
   --color-glass: #FBF9F3;
+  --color-linea: rgba(27, 26, 24, 0.15);
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-inter);
+  --ease-vetrina: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 *,
@@ -21,9 +23,92 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   background-color: #F3EEE4;
   color: #1B1A18;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus da tastiera sempre visibile, nel colore dell'azione. */
+:focus-visible {
+  outline: 2px solid var(--color-cotto);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Selezione del testo nella palette. */
+::selection {
+  background: rgba(218, 154, 71, 0.35);
+}
+
+/* Aloni radiali tenui — profondità con misura, mai effetti. */
+.alone-ocra {
+  background-image: radial-gradient(
+    ellipse 60% 50% at 78% 18%,
+    rgba(218, 154, 71, 0.10),
+    transparent 70%
+  );
+}
+
+.alone-cotto {
+  background-image: radial-gradient(
+    ellipse 55% 45% at 18% 85%,
+    rgba(191, 77, 44, 0.07),
+    transparent 70%
+  );
+}
+
+/* Sottolineatura che si disegna da sinistra, su hover e focus. */
+.link-sottolineato {
+  position: relative;
+}
+
+.link-sottolineato::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s var(--ease-vetrina);
+}
+
+.link-sottolineato:hover::after,
+.link-sottolineato:focus-visible::after,
+.link-sottolineato[data-attivo="true"]::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-sottolineato::after {
+    transition: none;
+  }
+}
+
+/* Freccia che scivola in avanti dentro un gruppo interattivo. */
+.freccia {
+  display: inline-block;
+  transition: transform 0.2s var(--ease-vetrina);
+}
+
+.group:hover .freccia,
+a:hover > .freccia,
+button:hover > .freccia {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .freccia {
+    transition: none;
+  }
 }
