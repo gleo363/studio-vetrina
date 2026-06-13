@@ -109,12 +109,30 @@ di pagina via `template.tsx` (scelta: continuità con entrate per-pagina coerent
   rivelata), galleria, partner, contatti, 404; tsc + eslint puliti sui file
   toccati.
 
-## Da fare
-- [ ] Verifica finale: build, lighthouse, riepilogo prima/dopo.
+### Verifica finale (fatto)
+- [x] `npm run build`: pulito. 25 route, TypeScript ok, 0 errori, 0 warning di
+  lint. Homepage prerenderizzata statica.
+- [x] Performance (trace su build di produzione, server `next start`):
+  **LCP 1543 ms** (fascia "buono", <2500 ms), **CLS 0.00**. Il render delay
+  è quasi tutto l'ingresso orchestrato della hero (effetto richiesto dal
+  brief). Leva se servisse abbassarlo: accorciare delay/durata del reveal
+  del titolo, o renderlo già visibile in SSR.
+- [x] **Lighthouse desktop**: Accessibilità **96**, Best Practices **96**,
+  SEO **100**.
+- [x] Reduced-motion sul build di produzione: hero ferma e visibile,
+  contatori al valore finale immediato, CTA in clip-path rivelata (opacity 1).
 
-## Note e autocritica
+## Note e autocritica (questioni preesistenti, fuori scope animazioni)
 
-- Contrasto pietra su travertino ≈3:1: problema preesistente sul testo
-  secondario, fuori scope animazioni — da valutare a parte.
-- Cotto su travertino ≈4.2:1: ok per testo grande e icone, da evitare su
-  testo sotto i 16px.
+I due audit Lighthouse non superati NON derivano da questo lavoro:
+- **errors-in-console**: 404 su `/_vercel/insights/script.js` — artefatto
+  solo locale (`next start` fuori da Vercel non serve lo script Analytics
+  iniettato dall'edge). Sul deploy reale non si verifica.
+- **color-contrast**: travertino su cotto = **4.21:1** a 14px (bottoni
+  primari), appena sotto il 4.5:1 AA per testo piccolo. È la tensione
+  intrinseca tra i due colori del marchio (bloccati dal brief, che la segnala
+  esplicitamente). Possibili leve, da decidere con il cliente: testo dei
+  bottoni ≥18px (passa come "testo grande") oppure cotto leggermente più
+  scuro solo per lo sfondo dei bottoni. Non modificato senza via libera.
+- Contrasto pietra su travertino ≈3:1 sul testo secondario: preesistente,
+  da valutare a parte.
