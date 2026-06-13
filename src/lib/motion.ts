@@ -19,7 +19,11 @@ export const DURATA = {
 export const VIEWPORT_ONCE = { once: true, margin: "-80px" } as const;
 
 /** Comparsa morbida dal basso. */
-export const fadeUp = (y = 24, duration = DURATA.base, delay = 0): Variants => ({
+export const fadeUp = (
+  y: number = 24,
+  duration: number = DURATA.base,
+  delay: number = 0
+): Variants => ({
   hidden: { opacity: 0, y },
   visible: {
     opacity: 1,

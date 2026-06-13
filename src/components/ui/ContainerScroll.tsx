@@ -1,11 +1,13 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useSyncExternalStore } from "react";
 import {
   motion,
   useScroll,
   useTransform,
   useReducedMotion,
 } from "framer-motion";
+
+const nessunaSottoscrizione = () => () => {};
 
 export function ContainerScroll({
   titleComponent,
@@ -20,11 +22,14 @@ export function ContainerScroll({
   // La guardia si attiva solo dopo il mount: la card parte ruotata,
   // quindi decidere in fase di hydration creerebbe un mismatch col server.
   const sistemaRiduci = useReducedMotion();
-  const [montato, setMontato] = useState(false);
+  const montato = useSyncExternalStore(
+    nessunaSottoscrizione,
+    () => true,
+    () => false
+  );
   const riduciMovimento = montato && sistemaRiduci;
 
   useEffect(() => {
-    setMontato(true);
     const check = () => setIsMobile(window.innerWidth <= 768);
     check();
     window.addEventListener("resize", check);

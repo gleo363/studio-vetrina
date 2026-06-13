@@ -80,10 +80,36 @@ di pagina via `template.tsx` (scelta: continuità con entrate per-pagina coerent
   long task, zero errori console, focus cotto visibile da tastiera,
   nessun overflow orizzontale a 390px.
 
+### Fase 2 — Header e Footer (fatto)
+- [x] Header: link desktop con `.link-sottolineato` + stato attivo via
+  `usePathname` (sottolineatura ferma sul percorso corrente, animata su
+  hover/focus), fade del lockup al mount (solo opacity), hairline
+  `border-b border-linea` allo scroll, voci drawer mobile in stagger 0.05,
+  `aria-expanded` sull'hamburger.
+- [x] Footer: resta server component, contenuto avvolto in `AnimatedSection`
+  (reveal morbido), link `.link-sottolineato` (CSS puro), hairline superiore,
+  alone-cotto tenue; tagline come ultimo elemento a comparire (delay 0.3).
+
+### Fase 3 — Pagine secondarie (fatto)
+- [x] /studio: h1 con reveal mascherato per riga, processo 01–04 da
+  `delay={i*0.1}` a StaggerContainer + linea "mensola" animata; alone-ocra.
+- [x] /perche-sceglierci: righe tabella in stagger 0.06; mockup confronto
+  convertiti a varianti figlie di un contenitore (fix clip-path/observer);
+  CTA finale con stesso fix + vignetta + freccia.
+- [x] GalleriaEsempi: hover "cornice" (ring linea→inchiostro/30 + scale 1.02
+  della sola anteprima dentro overflow-hidden), freccia su "Visita la
+  vetrina"; CTA finale con fix clip-path + vignetta.
+- [x] /partner: convertito a client component; h1 reveal mascherato (incluso
+  l'`<em>`), step 01–03 con motivo mensola + border-linea, alone-ocra,
+  vignetta sulla CTA, link "Accedi" sottolineato.
+- [x] /contatti: SOLO presentazione (logica `useActionState`/action intatta);
+  h1 reveal mascherato, eyebrow in fade; emoji "☕" → icona lucide `Coffee`.
+- [x] /not-found: watermark logo opacità 0.05 + alone-ocra.
+- Verificato: screenshot desktop di studio, perché-sceglierci (CTA finale
+  rivelata), galleria, partner, contatti, 404; tsc + eslint puliti sui file
+  toccati.
+
 ## Da fare
-- [ ] Fase 2 — Header (sottolineature, stato attivo, hairline) e Footer (reveal).
-- [ ] Fase 3 — Pagine secondarie: studio, perché-sceglierci, galleria esempi,
-  partner, contatti (solo presentazione), 404.
 - [ ] Verifica finale: build, lighthouse, riepilogo prima/dopo.
 
 ## Note e autocritica

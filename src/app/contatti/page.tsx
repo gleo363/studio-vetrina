@@ -2,8 +2,10 @@
 
 import { useActionState, useState } from "react";
 import { motion } from "framer-motion";
+import { Coffee } from "lucide-react";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { inviaContatto } from "@/app/actions/segnalazioni";
+import { EASE_VETRINA, DURATA, fadeUp, riveloMascherato } from "@/lib/motion";
 
 const EMAIL = "studiovetrinaweb@gmail.com";
 
@@ -21,32 +23,42 @@ export default function ContattiPage() {
   return (
     <div className="min-h-screen bg-travertino pt-32 pb-24 px-6">
       <div className="max-w-6xl mx-auto">
-        <AnimatedSection className="mb-16">
-          <p
+        <motion.div className="mb-16" initial="hidden" animate="visible">
+          <motion.p
+            variants={fadeUp(12, DURATA.base)}
             className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-4"
             style={{ fontFamily: "var(--font-inter)" }}
           >
             Contatti
-          </p>
+          </motion.p>
           <h1
             className="text-4xl md:text-5xl lg:text-[60px] font-medium text-inchiostro leading-[0.95] tracking-tight max-w-2xl"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Raccontaci la tua attività: al resto pensiamo noi.
+            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+              <motion.span className="block" variants={riveloMascherato(0.12)}>
+                Raccontaci la tua attività: al resto pensiamo noi.
+              </motion.span>
+            </span>
           </h1>
-        </AnimatedSection>
+        </motion.div>
 
         <div className="grid md:grid-cols-[1fr_320px] gap-16">
           {/* Form */}
           <AnimatedSection delay={0.1}>
             {state?.successo ? (
               <motion.div
-                className="bg-glass rounded-2xl p-12 text-center"
+                className="bg-glass border border-linea rounded-2xl p-12 text-center"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: DURATA.base, ease: EASE_VETRINA }}
               >
-                <p className="text-5xl mb-4">☕</p>
+                <Coffee
+                  size={48}
+                  strokeWidth={1.5}
+                  className="text-cotto mx-auto mb-5"
+                  aria-hidden="true"
+                />
                 <h2
                   className="text-2xl font-medium text-inchiostro mb-3"
                   style={{ fontFamily: "var(--font-fraunces)" }}

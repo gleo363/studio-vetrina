@@ -91,8 +91,8 @@ export default function SezioneProblema() {
             className="text-3xl md:text-4xl lg:text-[44px] font-medium leading-[1.1] text-travertino"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Il 68% delle piccole attività italiane non ha un sito. O ce l'ha,
-            ma fa più danno che bene.
+            Il 68% delle piccole attività italiane non ha un sito. O ce
+            l&apos;ha, ma fa più danno che bene.
           </h2>
         </AnimatedSection>
 
