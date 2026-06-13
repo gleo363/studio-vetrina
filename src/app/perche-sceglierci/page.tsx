@@ -3,8 +3,7 @@ import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 import Button from "@/components/ui/Button";
-
-const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
+import { EASE_VETRINA as ease, VIEWPORT_ONCE } from "@/lib/motion";
 
 // ─── Barra del browser ──────────────────────────────────────────────────────
 
@@ -88,10 +87,14 @@ function MockupStampino() {
     <motion.div
       className="rounded-xl overflow-hidden shadow-md flex-1 min-w-0"
       style={{ border: "1px solid rgba(27,26,24,0.10)" }}
-      initial={{ opacity: 0, x: -40 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.7, ease }}
-      viewport={{ once: true, margin: "-80px" }}
+      variants={{
+        hidden: { opacity: 0, x: -40 },
+        visible: {
+          opacity: 1,
+          x: 0,
+          transition: { duration: 0.7, ease },
+        },
+      }}
     >
       <div
         className="px-4 py-2 text-[10px] font-medium uppercase tracking-[0.18em]"
@@ -127,15 +130,22 @@ function MockupStampino() {
 
 // ─── Mockup confronto: Su misura (Sezione 4) ────────────────────────────────
 
+// Il clip-path vive su una variante figlia: se fosse sul target osservato,
+// l'elemento clippato al 100% non supererebbe mai la soglia di visibilità
+// (Chrome calcola il ratio sull'area visibile dopo il clip).
 function MockupSuMisura() {
   return (
     <motion.div
       className="rounded-xl overflow-hidden shadow-2xl flex-1 min-w-0"
       style={{ border: "1.5px solid rgba(191,77,44,0.3)" }}
-      initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-      whileInView={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
-      transition={{ duration: 1.0, ease, delay: 0.25 }}
-      viewport={{ once: true, margin: "-80px" }}
+      variants={{
+        hidden: { opacity: 0, clipPath: "inset(0 100% 0 0)" },
+        visible: {
+          opacity: 1,
+          clipPath: "inset(0 0% 0 0)",
+          transition: { duration: 1.0, ease, delay: 0.25 },
+        },
+      }}
     >
       <div
         className="px-4 py-2 text-[10px] font-medium uppercase tracking-[0.18em]"
@@ -344,10 +354,15 @@ export default function PercheScegliercPage() {
             </h2>
           </AnimatedSection>
 
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+          <motion.div
+            className="flex flex-col md:flex-row gap-6 md:gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT_ONCE}
+          >
             <MockupStampino />
             <MockupSuMisura />
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -394,7 +409,7 @@ export default function PercheScegliercPage() {
               </div>
 
               {/* Righe con stagger */}
-              <StaggerContainer className="flex flex-col">
+              <StaggerContainer className="flex flex-col" stagger={0.06}>
                 {righeTabella.map((riga) => (
                   <StaggerItem key={riga.aspetto}>
                     <div
@@ -507,46 +522,69 @@ export default function PercheScegliercPage() {
       </section>
 
       {/* ─── 8. CTA FINALE ───────────────────────────────────────────────── */}
+      {/* Il trigger è la sezione (mai clippata); il sipario cotto e i
+          contenuti sono varianti figlie — stesso fix del reveal in home. */}
       <motion.section
-        className="bg-cotto px-6 py-32 overflow-hidden"
-        initial={{ clipPath: "inset(100% 0 0 0)" }}
-        whileInView={{ clipPath: "inset(0% 0 0 0)" }}
-        transition={{ duration: 1.0, ease }}
+        className="overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-6xl mx-auto text-center">
-          <motion.h2
-            className="text-4xl md:text-5xl lg:text-6xl font-medium text-travertino leading-[1.05] mb-8 max-w-2xl mx-auto"
-            style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.3, ease }}
-            viewport={{ once: true }}
-          >
-            La tua vetrina, diversa da tutte le altre.
-          </motion.h2>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease }}
-            viewport={{ once: true }}
-          >
-            <motion.div
-              className="inline-flex"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ duration: 0.2 }}
+        <motion.div
+          className="bg-cotto vignetta-inchiostro px-6 py-32"
+          variants={{
+            hidden: { clipPath: "inset(100% 0 0 0)" },
+            visible: {
+              clipPath: "inset(0% 0 0 0)",
+              transition: { duration: 1.0, ease },
+            },
+          }}
+        >
+          <div className="max-w-6xl mx-auto text-center">
+            <motion.h2
+              className="text-4xl md:text-5xl lg:text-6xl font-medium text-travertino leading-[1.05] mb-8 max-w-2xl mx-auto"
+              style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.9, delay: 0.3, ease },
+                },
+              }}
             >
-              <a
-                href="/contatti"
-                className="inline-flex items-center gap-2 bg-travertino text-inchiostro rounded-[10px] px-8 py-4 text-base font-medium hover:bg-glass transition-colors"
-                style={{ fontFamily: "var(--font-inter)" }}
+              La tua vetrina, diversa da tutte le altre.
+            </motion.h2>
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.8, delay: 0.5, ease },
+                },
+              }}
+            >
+              <motion.div
+                className="inline-flex"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.2, ease }}
               >
-                Parliamone →
-              </a>
+                <a
+                  href="/contatti"
+                  className="inline-flex items-center gap-2 bg-travertino text-inchiostro rounded-[10px] px-8 py-4 text-base font-medium hover:bg-glass transition-colors"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                >
+                  Parliamone
+                  <span className="freccia" aria-hidden="true">
+                    →
+                  </span>
+                </a>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </motion.section>
     </div>
   );

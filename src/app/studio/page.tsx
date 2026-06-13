@@ -2,6 +2,13 @@
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 import { motion } from "framer-motion";
+import {
+  EASE_VETRINA,
+  DURATA,
+  fadeUp,
+  riveloMascherato,
+  riveloLinea,
+} from "@/lib/motion";
 
 const valori = [
   "Accogliente",
@@ -46,33 +53,46 @@ export default function StudioPage() {
   return (
     <div className="min-h-screen bg-travertino">
       {/* Hero */}
-      <section className="pt-36 pb-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <AnimatedSection>
-            <p
-              className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-6"
-              style={{ fontFamily: "var(--font-inter)" }}
-            >
-              Chi siamo
-            </p>
-            <h1
-              className="text-4xl md:text-5xl lg:text-[64px] font-medium text-inchiostro leading-[0.92] tracking-tight mb-12"
-              style={{ fontFamily: "var(--font-fraunces)" }}
-            >
-              Siamo a Roma.<br />Facciamo siti.
-            </h1>
-            <p
-              className="text-lg md:text-xl text-pietra leading-relaxed max-w-2xl"
-              style={{ fontFamily: "var(--font-inter)" }}
-            >
-              Studio Vetrina è uno studio di web design di Roma. Curiamo la
-              presenza online delle piccole attività con la stessa attenzione
-              con cui un negoziante cura la sua vetrina: con gusto, ordine e un
-              po&apos; di orgoglio. Niente paroloni, niente inglese inutile:
-              solo siti su misura, belli e facili da usare.
-            </p>
-          </AnimatedSection>
-        </div>
+      <section className="pt-36 pb-24 px-6 alone-ocra">
+        <motion.div
+          className="max-w-6xl mx-auto"
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.p
+            variants={fadeUp(12, DURATA.base)}
+            className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-6"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Chi siamo
+          </motion.p>
+          <h1
+            className="text-4xl md:text-5xl lg:text-[64px] font-medium text-inchiostro leading-[0.92] tracking-tight mb-12"
+            style={{ fontFamily: "var(--font-fraunces)" }}
+          >
+            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+              <motion.span className="block" variants={riveloMascherato(0.12)}>
+                Siamo a Roma.
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+              <motion.span className="block" variants={riveloMascherato(0.24)}>
+                Facciamo siti.
+              </motion.span>
+            </span>
+          </h1>
+          <motion.p
+            variants={fadeUp(16, 0.6, 0.55)}
+            className="text-lg md:text-xl text-pietra leading-relaxed max-w-2xl"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Studio Vetrina è uno studio di web design di Roma. Curiamo la
+            presenza online delle piccole attività con la stessa attenzione
+            con cui un negoziante cura la sua vetrina: con gusto, ordine e un
+            po&apos; di orgoglio. Niente paroloni, niente inglese inutile:
+            solo siti su misura, belli e facili da usare.
+          </motion.p>
+        </motion.div>
       </section>
 
       {/* Valori */}
@@ -98,7 +118,7 @@ export default function StudioPage() {
                     color: "#F3EEE4",
                     borderColor: "#1B1A18",
                   }}
-                  transition={{ duration: 0.25 }}
+                  transition={{ duration: 0.25, ease: EASE_VETRINA }}
                 >
                   {v}
                 </motion.span>
@@ -120,10 +140,16 @@ export default function StudioPage() {
             </h2>
           </AnimatedSection>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {processo.map((p, i) => (
-              <AnimatedSection key={p.step} delay={i * 0.1}>
-                <div className="border-t-2 border-inchiostro/10 pt-6">
+          <StaggerContainer className="grid md:grid-cols-2 gap-8">
+            {processo.map((p) => (
+              <StaggerItem key={p.step}>
+                <div className="pt-6 relative">
+                  {/* La "mensola" che si disegna da sinistra */}
+                  <motion.div
+                    className="absolute top-0 left-0 right-0 h-0.5 bg-inchiostro/10 origin-left"
+                    variants={riveloLinea()}
+                    aria-hidden="true"
+                  />
                   <div className="flex items-baseline justify-between mb-4">
                     <span
                       className="text-sm font-medium text-pietra"
@@ -151,9 +177,9 @@ export default function StudioPage() {
                     {p.descrizione}
                   </p>
                 </div>
-              </AnimatedSection>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
     </div>
