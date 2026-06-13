@@ -3,8 +3,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
-
-const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
+import { EASE_VETRINA as ease } from "@/lib/motion";
 
 interface Vetrina {
   href: string;
@@ -84,9 +83,14 @@ const vetrine: Vetrina[] = [
 function Anteprima({ v }: { v: Vetrina }) {
   const { sfondo, primario, testo, accento, serif } = v.anteprima;
   return (
+    // La cornice: su hover il bordo si accende e il contenuto si avvicina
+    // appena, come se ci si affacciasse alla vetrina.
     <div
-      className="relative w-full aspect-[4/3] rounded-xl overflow-hidden p-4 flex flex-col gap-2.5"
-      style={{ backgroundColor: sfondo }}
+      className="relative w-full aspect-[4/3] rounded-xl overflow-hidden ring-1 ring-linea transition-all duration-300 group-hover:ring-inchiostro/30 p-4 flex flex-col gap-2.5 motion-safe:group-hover:scale-[1.02] origin-center"
+      style={{
+        backgroundColor: sfondo,
+        transitionTimingFunction: "var(--ease-vetrina)",
+      }}
       aria-hidden="true"
     >
       {/* barra di navigazione finta */}
@@ -174,7 +178,7 @@ export default function GalleriaEsempi() {
               <StaggerItem key={v.href}>
                 <Link href={v.href} className="block h-full" data-cursor="pointer">
                   <motion.article
-                    className="bg-glass rounded-2xl p-6 h-full flex flex-col"
+                    className="group bg-glass border border-linea rounded-2xl p-6 h-full flex flex-col"
                     whileHover={{
                       y: -6,
                       boxShadow: "0 24px 48px -16px rgba(27,26,24,0.18)",
@@ -203,10 +207,13 @@ export default function GalleriaEsempi() {
                       </p>
                       <div className="flex items-center justify-between">
                         <span
-                          className="text-sm font-medium text-inchiostro"
+                          className="text-sm font-medium text-inchiostro inline-flex items-center gap-1.5"
                           style={{ fontFamily: "var(--font-inter)" }}
                         >
-                          Visita la vetrina →
+                          Visita la vetrina
+                          <span className="freccia" aria-hidden="true">
+                            →
+                          </span>
                         </span>
                         <span
                           className="text-[10px] text-pietra/80"
@@ -237,48 +244,72 @@ export default function GalleriaEsempi() {
       </section>
 
       {/* Chiusura / CTA */}
+      {/* Il trigger è la sezione (mai clippata); il sipario cotto e i
+          contenuti sono varianti figlie — il clip-path sul target osservato
+          impedirebbe all'IntersectionObserver di scattare. */}
       <motion.section
-        className="bg-cotto px-6 py-32 overflow-hidden"
-        initial={{ clipPath: "inset(100% 0 0 0)" }}
-        whileInView={{ clipPath: "inset(0% 0 0 0)" }}
-        transition={{ duration: 1.0, ease }}
+        className="overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
       >
-        <div className="max-w-6xl mx-auto text-center">
-          <motion.h2
-            className="text-4xl md:text-5xl lg:text-6xl font-medium text-travertino leading-[1.05] mb-8 max-w-2xl mx-auto"
-            style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.3, ease }}
-            viewport={{ once: true }}
-          >
-            La tua vetrina sarà diversa da tutte queste. Sarà la tua.
-          </motion.h2>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease }}
-            viewport={{ once: true }}
-          >
-            <motion.div
-              className="inline-flex"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ duration: 0.2 }}
+        <motion.div
+          className="bg-cotto vignetta-inchiostro px-6 py-32"
+          variants={{
+            hidden: { clipPath: "inset(100% 0 0 0)" },
+            visible: {
+              clipPath: "inset(0% 0 0 0)",
+              transition: { duration: 1.0, ease },
+            },
+          }}
+        >
+          <div className="max-w-6xl mx-auto text-center">
+            <motion.h2
+              className="text-4xl md:text-5xl lg:text-6xl font-medium text-travertino leading-[1.05] mb-8 max-w-2xl mx-auto"
+              style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.9, delay: 0.3, ease },
+                },
+              }}
             >
-              <Link
-                href="/contatti"
-                className="inline-flex items-center gap-2 bg-travertino text-inchiostro rounded-[10px] px-8 py-4 text-base font-medium hover:bg-glass transition-colors"
-                style={{ fontFamily: "var(--font-inter)" }}
-                data-cursor="pointer"
+              La tua vetrina sarà diversa da tutte queste. Sarà la tua.
+            </motion.h2>
+
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.8, delay: 0.5, ease },
+                },
+              }}
+            >
+              <motion.div
+                className="inline-flex"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.2, ease }}
               >
-                Apriamo la tua vetrina →
-              </Link>
+                <Link
+                  href="/contatti"
+                  className="inline-flex items-center gap-2 bg-travertino text-inchiostro rounded-[10px] px-8 py-4 text-base font-medium hover:bg-glass transition-colors"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                  data-cursor="pointer"
+                >
+                  Apriamo la tua vetrina
+                  <span className="freccia" aria-hidden="true">
+                    →
+                  </span>
+                </Link>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </motion.section>
     </div>
   );
