@@ -9,7 +9,6 @@ import { EASE_VETRINA, DURATA } from "@/lib/motion";
 const pacchetti = [
   {
     nome: "Vetrina Essenziale",
-    prezzo: "€ 990",
     descrizione: "Il punto di partenza perfetto per chi vuole farsi trovare online.",
     voci: [
       "Fino a 5 pagine su misura",
@@ -22,7 +21,6 @@ const pacchetti = [
   },
   {
     nome: "Vetrina Completa",
-    prezzo: "€ 1.890",
     descrizione: "Per chi vuole una presenza online completa e strumenti per crescere.",
     voci: [
       "Fino a 10 pagine su misura",
@@ -35,7 +33,6 @@ const pacchetti = [
   },
   {
     nome: "Vetrina su Misura",
-    prezzo: "Su misura",
     descrizione: "Soluzioni complesse per chi ha esigenze specifiche o vuole crescere.",
     voci: [
       "E-commerce",
@@ -127,13 +124,6 @@ export default function SezioneServizi() {
                   style={{ fontFamily: "var(--font-inter)" }}
                 >
                   {p.descrizione}
-                </p>
-
-                <p
-                  className="text-4xl font-medium mb-8"
-                  style={{ fontFamily: "var(--font-fraunces)" }}
-                >
-                  {p.prezzo}
                 </p>
 
                 <motion.ul

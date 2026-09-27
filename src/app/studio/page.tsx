@@ -150,18 +150,12 @@ export default function StudioPage() {
                     variants={riveloLinea()}
                     aria-hidden="true"
                   />
-                  <div className="flex items-baseline justify-between mb-4">
+                  <div className="flex items-baseline mb-4">
                     <span
                       className="text-sm font-medium text-pietra"
                       style={{ fontFamily: "var(--font-inter)" }}
                     >
                       {p.step}
-                    </span>
-                    <span
-                      className="text-xs text-cotto font-medium"
-                      style={{ fontFamily: "var(--font-inter)" }}
-                    >
-                      {p.tempo}
                     </span>
                   </div>
                   <h3
