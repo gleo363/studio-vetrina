@@ -1,19 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Manrope, Playfair_Display } from "next/font/google";
 
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "800"],
-  display: "swap",
-});
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  style: ["italic"],
-  display: "swap",
-});
 
 const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
@@ -101,13 +89,15 @@ function Marker({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function VetrinaSalone() {
+interface VetrinaSaloneProps { fontBase: string; fontSecondary: string; }
+
+export default function VetrinaSalone({ fontBase, fontSecondary }: VetrinaSaloneProps) {
   const [inviato, setInviato] = useState(false);
   const [fascia, setFascia] = useState("");
 
   return (
     <div
-      className={manrope.className}
+      className={fontBase}
       style={{ backgroundColor: C.bianco, color: C.carbone }}
     >
       {/* Testata da rivista */}
@@ -144,7 +134,7 @@ export default function VetrinaSalone() {
             capelli, pelle,
             <br />
             <span
-              className={`${playfair.className} italic font-medium`}
+              className={`${fontSecondary} italic font-medium`}
               style={{ color: C.malva }}
             >
               e un&apos;ora tutta per te.
@@ -224,7 +214,7 @@ export default function VetrinaSalone() {
                     >
                       <span className="text-base md:text-lg font-medium">{s.nome}</span>
                       <span
-                        className={`${playfair.className} italic hidden sm:block text-sm`}
+                        className={`${fontSecondary} italic hidden sm:block text-sm`}
                         style={{ color: C.grigio }}
                       >
                         {s.nota}
@@ -259,7 +249,7 @@ export default function VetrinaSalone() {
             tempo è <Marker>solo tuo</Marker>.
           </p>
           <p
-            className={`${playfair.className} italic text-lg mt-10`}
+            className={`${fontSecondary} italic text-lg mt-10`}
             style={{ color: C.grigio }}
           >
             Sofia, Martina ed Elena: fondatrice e colorista, parrucchiera,
@@ -297,7 +287,7 @@ export default function VetrinaSalone() {
                   style={{ background: `linear-gradient(165deg, ${l.da} 0%, ${l.a} 100%)` }}
                 />
                 <figcaption className="flex items-baseline justify-between pt-3">
-                  <span className={`${playfair.className} italic text-base`}>{l.etichetta}</span>
+                  <span className={`${fontSecondary} italic text-base`}>{l.etichetta}</span>
                   <span className="text-[11px] tabular-nums" style={{ color: C.grigio }}>
                     {String(i + 1).padStart(2, "0")} / {String(lavori.length).padStart(2, "0")}
                   </span>
@@ -317,7 +307,7 @@ export default function VetrinaSalone() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-[1fr_1.3fr] gap-14 items-start">
           <Rivela className="md:sticky md:top-10">
             <h2
-              className={`${playfair.className} italic text-[clamp(36px,5vw,64px)] leading-tight mb-6`}
+              className={`${fontSecondary} italic text-[clamp(36px,5vw,64px)] leading-tight mb-6`}
             >
               Il tuo
               <br />
@@ -333,7 +323,7 @@ export default function VetrinaSalone() {
             {inviato ? (
               <div className="py-10">
                 <p
-                  className={`${playfair.className} italic text-3xl mb-4`}
+                  className={`${fontSecondary} italic text-3xl mb-4`}
                   style={{ color: C.malva }}
                 >
                   Che bello.

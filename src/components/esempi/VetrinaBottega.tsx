@@ -1,19 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Cormorant_Garamond, Mulish } from "next/font/google";
 
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-const mulish = Mulish({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  display: "swap",
-});
 
 const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
@@ -225,7 +213,7 @@ function FioreDisegnato({ f, size = 96 }: { f: Fiore; size?: number }) {
 }
 
 /** Cartellino da fioraio appeso al filo, leggermente storto. */
-function Cartellino({ f, indice }: { f: Fiore; indice: number }) {
+function Cartellino({ f, indice, fontSecondary }: { f: Fiore; indice: number; fontSecondary: string }) {
   const inclinazione = indice % 3 === 0 ? -2.2 : indice % 3 === 1 ? 1.6 : -1;
   return (
     <motion.div
@@ -269,7 +257,7 @@ function Cartellino({ f, indice }: { f: Fiore; indice: number }) {
           {f.nome}
         </h3>
         <p
-          className={`${mulish.className} mt-1.5 text-[13px] leading-relaxed`}
+          className={`${fontSecondary} mt-1.5 text-[13px] leading-relaxed`}
           style={{ color: C.terra }}
         >
           {f.nota}
@@ -286,7 +274,7 @@ function Cartellino({ f, indice }: { f: Fiore; indice: number }) {
 }
 
 /** Insegna circolare con scritta che gira piano. */
-function InsegnaRotonda() {
+function InsegnaRotonda({ fontSecondary }: { fontSecondary: string }) {
   const riduci = useReducedMotion();
   return (
     <div className="relative w-[150px] h-[150px] md:w-[176px] md:h-[176px]">
@@ -315,7 +303,7 @@ function InsegnaRotonda() {
           />
         </defs>
         {/* nome e anno in due semicerchi ancorati: il testo non si taglia mai */}
-        <text className={mulish.className} style={{ fill: C.bosco, fontWeight: 600 }}>
+        <text className={fontSecondary} style={{ fill: C.bosco, fontWeight: 600 }}>
           <textPath
             href="#cerchio-insegna"
             startOffset="0%"
@@ -426,7 +414,9 @@ function MappaDisegnata() {
   );
 }
 
-export default function VetrinaBottega() {
+interface VetrinaBottegaProps { fontBase: string; fontSecondary: string; }
+
+export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBottegaProps) {
   const [inviato, setInviato] = useState(false);
   const [nome, setNome] = useState("");
   const [occasione, setOccasione] = useState("");
@@ -435,14 +425,14 @@ export default function VetrinaBottega() {
 
   return (
     <div
-      className={cormorant.className}
+      className={fontBase}
       style={{ backgroundColor: C.perla, color: C.bosco }}
     >
       {/* ── Insegna: niente barra, un timpano centrato come sulla porta della bottega ── */}
       <header className="px-6 pt-12 pb-4 flex flex-col items-center text-center">
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 items-center gap-6">
           <p
-            className={`${mulish.className} hidden md:block text-[11px] uppercase tracking-[0.28em] text-left`}
+            className={`${fontSecondary} hidden md:block text-[11px] uppercase tracking-[0.28em] text-left`}
             style={{ color: C.terra }}
           >
             Bottega di fiori
@@ -450,10 +440,10 @@ export default function VetrinaBottega() {
             in Trastevere
           </p>
           <div className="flex justify-center">
-            <InsegnaRotonda />
+            <InsegnaRotonda fontSecondary={fontSecondary} />
           </div>
           <p
-            className={`${mulish.className} hidden md:block text-[11px] uppercase tracking-[0.28em] text-right`}
+            className={`${fontSecondary} hidden md:block text-[11px] uppercase tracking-[0.28em] text-right`}
             style={{ color: C.terra }}
           >
             Vicolo del Cinque 12
@@ -462,7 +452,7 @@ export default function VetrinaBottega() {
           </p>
         </div>
         <nav
-          className={`${mulish.className} mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.22em]`}
+          className={`${fontSecondary} mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.22em]`}
           aria-label="Navigazione Fiori di Trastevere"
         >
           {[
@@ -506,7 +496,7 @@ export default function VetrinaBottega() {
         </Rivela>
         <Rivela delay={0.2}>
           <p
-            className={`${mulish.className} mt-8 text-[15px] md:text-base leading-relaxed max-w-xl mx-auto`}
+            className={`${fontSecondary} mt-8 text-[15px] md:text-base leading-relaxed max-w-xl mx-auto`}
             style={{ color: C.terra }}
           >
             Dal 1962 leghiamo mazzi dietro lo stesso bancone di marmo. Entra,
@@ -528,7 +518,7 @@ export default function VetrinaBottega() {
         <div className="max-w-5xl mx-auto">
           <Rivela className="text-center mb-4">
             <p
-              className={`${mulish.className} text-[11px] uppercase tracking-[0.3em] mb-3`}
+              className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
               style={{ color: C.rosso }}
             >
               Il banco di oggi
@@ -537,7 +527,7 @@ export default function VetrinaBottega() {
               Ogni mazzo ha il suo cartellino
             </h2>
             <p
-              className={`${mulish.className} mt-4 text-sm max-w-lg mx-auto leading-relaxed`}
+              className={`${fontSecondary} mt-4 text-sm max-w-lg mx-auto leading-relaxed`}
               style={{ color: C.terra }}
             >
               Prezzi scritti a mano, come si è sempre fatto. Quello che vedi al
@@ -546,7 +536,7 @@ export default function VetrinaBottega() {
           </Rivela>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 mt-12">
             {banco.map((f, i) => (
-              <Cartellino key={f.nome} f={f} indice={i} />
+              <Cartellino key={f.nome} f={f} indice={i} fontSecondary={fontSecondary} />
             ))}
           </div>
         </div>
@@ -561,7 +551,7 @@ export default function VetrinaBottega() {
         <div className="max-w-3xl mx-auto">
           <Rivela className="text-center mb-16">
             <p
-              className={`${mulish.className} text-[11px] uppercase tracking-[0.3em] mb-3`}
+              className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
               style={{ color: C.rosso }}
             >
               La storia
@@ -610,7 +600,7 @@ export default function VetrinaBottega() {
                     {tappa.titolo}
                   </h3>
                   <p
-                    className={`${mulish.className} mt-2.5 text-sm leading-relaxed`}
+                    className={`${fontSecondary} mt-2.5 text-sm leading-relaxed`}
                     style={{ color: C.terra }}
                   >
                     {tappa.testo}
@@ -628,7 +618,7 @@ export default function VetrinaBottega() {
           <div id="orari" className="scroll-mt-12">
             <Rivela>
               <p
-                className={`${mulish.className} text-[11px] uppercase tracking-[0.3em] mb-3`}
+                className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
                 style={{ color: C.rosso }}
               >
                 Orari
@@ -661,7 +651,7 @@ export default function VetrinaBottega() {
                       className={
                         riga.ore === "riposo"
                           ? "text-lg italic"
-                          : `${mulish.className} text-[13px]`
+                          : `${fontSecondary} text-[13px]`
                       }
                       style={{ color: riga.ore === "riposo" ? C.rosso : C.terra }}
                     >
@@ -670,7 +660,7 @@ export default function VetrinaBottega() {
                   </div>
                 ))}
                 <p
-                  className={`${mulish.className} mt-5 text-xs leading-relaxed`}
+                  className={`${fontSecondary} mt-5 text-xs leading-relaxed`}
                   style={{ color: C.terra }}
                 >
                   La mattina presto trovi i fiori appena arrivati dal mercato. Se
@@ -682,7 +672,7 @@ export default function VetrinaBottega() {
           <div id="dove" className="scroll-mt-12">
             <Rivela delay={0.15}>
               <p
-                className={`${mulish.className} text-[11px] uppercase tracking-[0.3em] mb-3`}
+                className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
                 style={{ color: C.rosso }}
               >
                 Dove siamo
@@ -702,7 +692,7 @@ export default function VetrinaBottega() {
                 <MappaDisegnata />
               </div>
               <p
-                className={`${mulish.className} mt-4 text-sm leading-relaxed`}
+                className={`${fontSecondary} mt-4 text-sm leading-relaxed`}
                 style={{ color: C.terra }}
               >
                 <strong style={{ color: C.bosco }}>Vicolo del Cinque 12, Roma</strong>, a
@@ -719,7 +709,7 @@ export default function VetrinaBottega() {
         <div className="max-w-xl mx-auto">
           <Rivela className="text-center mb-10">
             <p
-              className={`${mulish.className} text-[11px] uppercase tracking-[0.3em] mb-3`}
+              className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
               style={{ color: C.rosso }}
             >
               Ordina un mazzo
@@ -746,7 +736,7 @@ export default function VetrinaBottega() {
                   Grazie{nome ? `, ${nome}` : ""}.
                 </p>
                 <p
-                  className={`${mulish.className} mt-3 text-sm leading-relaxed`}
+                  className={`${fontSecondary} mt-3 text-sm leading-relaxed`}
                   style={{ color: C.terra }}
                 >
                   In una bottega vera il mazzo sarebbe già sul bancone. Questa è
@@ -787,7 +777,7 @@ export default function VetrinaBottega() {
                   <div>
                     <label
                       htmlFor="bottega-nome"
-                      className={`${mulish.className} block text-[11px] uppercase tracking-[0.22em] mb-2`}
+                      className={`${fontSecondary} block text-[11px] uppercase tracking-[0.22em] mb-2`}
                       style={{ color: C.terra }}
                     >
                       Il tuo nome
@@ -798,7 +788,7 @@ export default function VetrinaBottega() {
                       required
                       value={nome}
                       onChange={(e) => setNome(e.target.value)}
-                      className={`${mulish.className} w-full bg-transparent text-[15px] py-2 outline-none transition-colors`}
+                      className={`${fontSecondary} w-full bg-transparent text-[15px] py-2 outline-none transition-colors`}
                       style={{
                         borderBottom: `1.5px solid ${C.terra}66`,
                         color: C.bosco,
@@ -810,7 +800,7 @@ export default function VetrinaBottega() {
                   <div>
                     <label
                       htmlFor="bottega-telefono"
-                      className={`${mulish.className} block text-[11px] uppercase tracking-[0.22em] mb-2`}
+                      className={`${fontSecondary} block text-[11px] uppercase tracking-[0.22em] mb-2`}
                       style={{ color: C.terra }}
                     >
                       Telefono
@@ -819,7 +809,7 @@ export default function VetrinaBottega() {
                       id="bottega-telefono"
                       type="tel"
                       required
-                      className={`${mulish.className} w-full bg-transparent text-[15px] py-2 outline-none transition-colors`}
+                      className={`${fontSecondary} w-full bg-transparent text-[15px] py-2 outline-none transition-colors`}
                       style={{
                         borderBottom: `1.5px solid ${C.terra}66`,
                         color: C.bosco,
@@ -830,7 +820,7 @@ export default function VetrinaBottega() {
                   </div>
                   <fieldset>
                     <legend
-                      className={`${mulish.className} text-[11px] uppercase tracking-[0.22em] mb-3`}
+                      className={`${fontSecondary} text-[11px] uppercase tracking-[0.22em] mb-3`}
                       style={{ color: C.terra }}
                     >
                       L&apos;occasione
@@ -868,7 +858,7 @@ export default function VetrinaBottega() {
                   <div>
                     <label
                       htmlFor="bottega-messaggio"
-                      className={`${mulish.className} block text-[11px] uppercase tracking-[0.22em] mb-2`}
+                      className={`${fontSecondary} block text-[11px] uppercase tracking-[0.22em] mb-2`}
                       style={{ color: C.terra }}
                     >
                       Cosa scriviamo sul bigliettino
@@ -890,7 +880,7 @@ export default function VetrinaBottega() {
 
                 <button
                   type="submit"
-                  className={`${mulish.className} mt-8 w-full py-4 text-[12px] uppercase tracking-[0.28em] font-bold transition-colors cursor-pointer`}
+                  className={`${fontSecondary} mt-8 w-full py-4 text-[12px] uppercase tracking-[0.28em] font-bold transition-colors cursor-pointer`}
                   style={{ backgroundColor: C.bosco, color: C.perla, borderRadius: "3px" }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = C.rosso)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.bosco)}
@@ -898,7 +888,7 @@ export default function VetrinaBottega() {
                   Prenota il mazzo
                 </button>
                 <p
-                  className={`${mulish.className} mt-4 text-[11px] text-center leading-relaxed`}
+                  className={`${fontSecondary} mt-4 text-[11px] text-center leading-relaxed`}
                   style={{ color: C.terra }}
                 >
                   Modulo dimostrativo: non viene inviato nulla, nessun dato viene
@@ -932,13 +922,13 @@ export default function VetrinaBottega() {
             <em style={{ color: "#A9B89B" }}>Basta chiederli a chi li conosce.</em>
           </h2>
           <p
-            className={`${mulish.className} mt-9 text-[12px] uppercase tracking-[0.26em]`}
+            className={`${fontSecondary} mt-9 text-[12px] uppercase tracking-[0.26em]`}
             style={{ color: `${C.perla}99` }}
           >
             Vicolo del Cinque 12, Roma · 06 580 0000
           </p>
           <p
-            className={`${mulish.className} mt-10 text-[11px]`}
+            className={`${fontSecondary} mt-10 text-[11px]`}
             style={{ color: `${C.perla}59` }}
           >
             Fiori di Trastevere è una vetrina dimostrativa · attività di fantasia

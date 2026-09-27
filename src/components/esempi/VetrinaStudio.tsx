@@ -1,18 +1,7 @@
 "use client";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
 
-const archivo = Archivo({
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "500"],
-  display: "swap",
-});
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-});
 
 const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
@@ -132,7 +121,7 @@ function Rivela({
 }
 
 /** Quota da disegno tecnico: linea con frecce e misura. */
-function QuotaMisura({ etichetta, className = "" }: { etichetta: string; className?: string }) {
+function QuotaMisura({ etichetta, className = "", fontSecondary }: { etichetta: string; className?: string; fontSecondary: string }) {
   return (
     <div className={`flex items-center gap-3 ${className}`} aria-hidden="true">
       <svg width="11" height="10" viewBox="0 0 11 10" fill="none">
@@ -140,7 +129,7 @@ function QuotaMisura({ etichetta, className = "" }: { etichetta: string; classNa
       </svg>
       <span className="h-px flex-1" style={{ backgroundColor: `${C.legno}66` }} />
       <span
-        className={`${mono.className} text-[10px] tracking-[0.18em] uppercase shrink-0`}
+        className={`${fontSecondary} text-[10px] tracking-[0.18em] uppercase shrink-0`}
         style={{ color: C.legno }}
       >
         {etichetta}
@@ -214,10 +203,12 @@ function RigaLavoro({
   lavoro,
   aperto,
   onToggle,
+  fontSecondary,
 }: {
   lavoro: Lavoro;
   aperto: boolean;
   onToggle: () => void;
+  fontSecondary: string;
 }) {
   return (
     <div style={{ borderTop: `1px solid ${C.osso}1F` }}>
@@ -228,7 +219,7 @@ function RigaLavoro({
         style={{ backgroundColor: aperto ? C.nerochiaro : "transparent" }}
       >
         <span
-          className={`${mono.className} text-xs md:text-sm transition-colors duration-300`}
+          className={`${fontSecondary} text-xs md:text-sm transition-colors duration-300`}
           style={{ color: aperto ? C.legno : C.grigio }}
         >
           {lavoro.numero}
@@ -241,7 +232,7 @@ function RigaLavoro({
             {lavoro.nome}
           </span>
           <span
-            className={`${mono.className} mt-2 block text-[10px] md:text-[11px] uppercase tracking-[0.2em]`}
+            className={`${fontSecondary} mt-2 block text-[10px] md:text-[11px] uppercase tracking-[0.2em]`}
             style={{ color: C.grigio }}
           >
             {lavoro.luogo} · {lavoro.anno}
@@ -288,7 +279,7 @@ function RigaLavoro({
               >
                 {lavoro.descrizione}
               </p>
-              <div className={`${mono.className} grid grid-cols-1 sm:grid-cols-3 gap-5 content-start`}>
+              <div className={`${fontSecondary} grid grid-cols-1 sm:grid-cols-3 gap-5 content-start`}>
                 {[
                   { voce: "Essenza", valore: lavoro.essenza },
                   { voce: "Finitura", valore: lavoro.finitura },
@@ -315,7 +306,12 @@ function RigaLavoro({
   );
 }
 
-export default function VetrinaStudio() {
+interface VetrinaStudioProps {
+  fontBase: string;
+  fontSecondary: string;
+}
+
+export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudioProps) {
   const [apertoIdx, setApertoIdx] = useState<number | null>(null);
   const [inviato, setInviato] = useState(false);
   const [tipo, setTipo] = useState("");
@@ -329,7 +325,7 @@ export default function VetrinaStudio() {
 
   return (
     <div
-      className={archivo.className}
+      className={fontBase}
       style={{ backgroundColor: C.nero, color: C.osso }}
     >
       {/* ── Testata da cartiglio tecnico: nome + indice numerato ── */}
@@ -339,14 +335,14 @@ export default function VetrinaStudio() {
             Falegnameria Marini
           </p>
           <p
-            className={`${mono.className} hidden md:block text-[10px] uppercase tracking-[0.2em]`}
+            className={`${fontSecondary} hidden md:block text-[10px] uppercase tracking-[0.2em]`}
             style={{ color: C.grigio }}
           >
             Bottega in San Frediano, Firenze · dal 1974
           </p>
         </div>
         <nav
-          className={`${mono.className} px-6 md:px-12 flex items-center gap-6 md:gap-10 overflow-x-auto`}
+          className={`${fontSecondary} px-6 md:px-12 flex items-center gap-6 md:gap-10 overflow-x-auto`}
           style={{ borderTop: `1px solid ${C.osso}14` }}
           aria-label="Indice delle sezioni"
         >
@@ -371,7 +367,7 @@ export default function VetrinaStudio() {
         <div className="max-w-6xl">
           <Rivela>
             <p
-              className={`${mono.className} text-[11px] uppercase tracking-[0.3em] mb-10`}
+              className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-10`}
               style={{ color: C.legno }}
             >
               Falegnami da tre generazioni
@@ -391,7 +387,7 @@ export default function VetrinaStudio() {
             </h1>
           </Rivela>
           <Rivela delay={0.25} className="mt-14 max-w-md">
-            <QuotaMisura etichetta="dal rilievo alla posa · 51 anni di banco" />
+            <QuotaMisura etichetta="dal rilievo alla posa · 51 anni di banco" fontSecondary={fontSecondary} />
           </Rivela>
         </div>
         <Rivela delay={0.3}>
@@ -402,7 +398,7 @@ export default function VetrinaStudio() {
       {/* ── 01 · I lavori: righe full-bleed che si aprono come cassetti ── */}
       <section id="lavori" className="pb-24 md:pb-32 scroll-mt-4">
         <Rivela className="px-6 md:px-12 mb-10">
-          <p className={`${mono.className} text-[11px] uppercase tracking-[0.3em]`}>
+          <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em]`}>
             <span style={{ color: C.legno }}>01</span>
             <span className="ml-3" style={{ color: C.grigio }}>
               Lavori scelti
@@ -416,11 +412,12 @@ export default function VetrinaStudio() {
               lavoro={lavoro}
               aperto={apertoIdx === i}
               onToggle={() => setApertoIdx(apertoIdx === i ? null : i)}
+              fontSecondary={fontSecondary}
             />
           ))}
         </div>
         <p
-          className={`${mono.className} px-6 md:px-12 mt-6 text-[10px] uppercase tracking-[0.2em]`}
+          className={`${fontSecondary} px-6 md:px-12 mt-6 text-[10px] uppercase tracking-[0.2em]`}
           style={{ color: `${C.grigio}99` }}
         >
           Premi una riga per aprire la scheda del lavoro
@@ -435,7 +432,7 @@ export default function VetrinaStudio() {
       >
         <div className="max-w-6xl mx-auto">
           <Rivela>
-            <p className={`${mono.className} text-[11px] uppercase tracking-[0.3em] mb-12`}>
+            <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-12`}>
               <span style={{ color: C.legnoscuro }}>02</span>
               <span className="ml-3" style={{ color: `${C.nero}80` }}>
                 Il mestiere
@@ -473,7 +470,7 @@ export default function VetrinaStudio() {
               <Rivela key={b.voce} delay={0.1 + i * 0.1}>
                 <div className="pt-5" style={{ borderTop: `1px solid ${C.nero}33` }}>
                   <p
-                    className={`${mono.className} text-[10px] uppercase tracking-[0.25em] mb-4`}
+                    className={`${fontSecondary} text-[10px] uppercase tracking-[0.25em] mb-4`}
                     style={{ color: C.legnoscuro }}
                   >
                     {b.voce}
@@ -492,7 +489,7 @@ export default function VetrinaStudio() {
       <section id="competenze" className="px-6 md:px-12 py-24 md:py-32 scroll-mt-4">
         <div className="max-w-6xl mx-auto">
           <Rivela>
-            <p className={`${mono.className} text-[11px] uppercase tracking-[0.3em] mb-12`}>
+            <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-12`}>
               <span style={{ color: C.legno }}>03</span>
               <span className="ml-3" style={{ color: C.grigio }}>
                 Cosa facciamo
@@ -506,7 +503,7 @@ export default function VetrinaStudio() {
                   className="py-7 md:py-8 grid md:grid-cols-[3rem_1fr_1.2fr] gap-2 md:gap-8 items-baseline"
                   style={{ borderTop: `1px solid ${C.osso}1F` }}
                 >
-                  <span className={`${mono.className} text-sm`} style={{ color: C.legno }}>
+                  <span className={`${fontSecondary} text-sm`} style={{ color: C.legno }}>
                     {c.codice}.
                   </span>
                   <h3 className="text-2xl md:text-3xl font-extralight tracking-tight">
@@ -530,7 +527,7 @@ export default function VetrinaStudio() {
       >
         <div className="max-w-3xl mx-auto">
           <Rivela>
-            <p className={`${mono.className} text-[11px] uppercase tracking-[0.3em] mb-6`}>
+            <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-6`}>
               <span style={{ color: C.legno }}>04</span>
               <span className="ml-3" style={{ color: C.grigio }}>
                 Richiedi un preventivo
@@ -553,7 +550,7 @@ export default function VetrinaStudio() {
                 className="px-8 py-14 text-center"
                 style={{ border: `1px solid ${C.legno}` }}
               >
-                <p className={`${mono.className} text-[10px] uppercase tracking-[0.3em] mb-5`} style={{ color: C.legno }}>
+                <p className={`${fontSecondary} text-[10px] uppercase tracking-[0.3em] mb-5`} style={{ color: C.legno }}>
                   Scheda ricevuta
                 </p>
                 <p className="text-2xl md:text-3xl font-extralight leading-snug">
@@ -576,7 +573,7 @@ export default function VetrinaStudio() {
                 <div className="grid md:grid-cols-[8rem_1fr]" style={{ borderBottom: `1px solid ${C.osso}26` }}>
                   <label
                     htmlFor="studio-nome"
-                    className={`${mono.className} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
+                    className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                   >
                     A. Nome
@@ -593,7 +590,7 @@ export default function VetrinaStudio() {
                 <div className="grid md:grid-cols-[8rem_1fr]" style={{ borderBottom: `1px solid ${C.osso}26` }}>
                   <label
                     htmlFor="studio-contatto"
-                    className={`${mono.className} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
+                    className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                   >
                     B. Telefono
@@ -610,7 +607,7 @@ export default function VetrinaStudio() {
                 <fieldset className="grid md:grid-cols-[8rem_1fr]" style={{ borderBottom: `1px solid ${C.osso}26` }}>
                   <legend className="sr-only">Tipo di lavoro</legend>
                   <span
-                    className={`${mono.className} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
+                    className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                     aria-hidden="true"
                   >
@@ -628,7 +625,7 @@ export default function VetrinaStudio() {
                           className="sr-only"
                         />
                         <span
-                          className={`${mono.className} inline-block px-4 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors`}
+                          className={`${fontSecondary} inline-block px-4 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors`}
                           style={{
                             border: `1px solid ${tipo === t ? C.legno : `${C.osso}33`}`,
                             backgroundColor: tipo === t ? C.legno : "transparent",
@@ -645,7 +642,7 @@ export default function VetrinaStudio() {
                 <div className="grid md:grid-cols-[8rem_1fr]" style={{ borderBottom: `1px solid ${C.osso}26` }}>
                   <label
                     htmlFor="studio-descrizione"
-                    className={`${mono.className} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-start pt-5`}
+                    className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-start pt-5`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                   >
                     D. Descrizione
@@ -661,7 +658,7 @@ export default function VetrinaStudio() {
                 </div>
                 <button
                   type="submit"
-                  className={`${mono.className} w-full px-5 py-5 text-[11px] uppercase tracking-[0.3em] font-medium transition-colors cursor-pointer flex items-center justify-center gap-4`}
+                  className={`${fontSecondary} w-full px-5 py-5 text-[11px] uppercase tracking-[0.3em] font-medium transition-colors cursor-pointer flex items-center justify-center gap-4`}
                   style={{ backgroundColor: C.legno, color: C.nero }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = C.osso)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.legno)}
@@ -674,7 +671,7 @@ export default function VetrinaStudio() {
               </form>
             )}
             {!inviato && (
-              <p className={`${mono.className} mt-4 text-[10px] tracking-[0.15em]`} style={{ color: `${C.grigio}99` }}>
+              <p className={`${fontSecondary} mt-4 text-[10px] tracking-[0.15em]`} style={{ color: `${C.grigio}99` }}>
                 Modulo dimostrativo: non viene inviato nulla e nessun dato viene salvato.
               </p>
             )}
@@ -689,13 +686,13 @@ export default function VetrinaStudio() {
             <p className="text-sm font-light uppercase tracking-[0.45em] mb-4">
               Falegnameria Marini
             </p>
-            <p className={`${mono.className} text-[10px] uppercase tracking-[0.2em] leading-loose`} style={{ color: C.grigio }}>
+            <p className={`${fontSecondary} text-[10px] uppercase tracking-[0.2em] leading-loose`} style={{ color: C.grigio }}>
               Via dell&apos;Orto 27, Firenze · 055 22 0000
               <br />
               Dal lunedì al venerdì, 7:30 – 17:30
             </p>
           </div>
-          <p className={`${mono.className} text-[10px] tracking-[0.15em]`} style={{ color: `${C.grigio}99` }}>
+          <p className={`${fontSecondary} text-[10px] tracking-[0.15em]`} style={{ color: `${C.grigio}99` }}>
             Vetrina dimostrativa · attività di fantasia
           </p>
         </div>

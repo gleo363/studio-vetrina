@@ -1,14 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Anton, Karla } from "next/font/google";
 
-const anton = Anton({ subsets: ["latin"], weight: "400", display: "swap" });
-const karla = Karla({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-});
 
 const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
@@ -189,12 +182,14 @@ function Polaroid({
   );
 }
 
-export default function VetrinaRistorante() {
+interface VetrinaRistoranteProps { fontBase: string; fontSecondary: string; }
+
+export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRistoranteProps) {
   const [inviato, setInviato] = useState(false);
 
   return (
     <div
-      className={karla.className}
+      className={fontBase}
       style={{ backgroundColor: C.crema, color: C.marrone }}
     >
       {/* keyframes del nastro che scorre */}
@@ -232,7 +227,7 @@ export default function VetrinaRistorante() {
           ✦ Trattoria romana ✦
         </motion.p>
         <motion.h1
-          className={`${anton.className} uppercase leading-[0.88] text-[clamp(64px,13vw,170px)] select-none`}
+          className={`${fontSecondary} uppercase leading-[0.88] text-[clamp(64px,13vw,170px)] select-none`}
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease }}
@@ -259,7 +254,7 @@ export default function VetrinaRistorante() {
           aria-hidden="true"
         >
           <span
-            className={`${anton.className} block uppercase text-sm px-4 py-2 tracking-[0.2em]`}
+            className={`${fontSecondary} block uppercase text-sm px-4 py-2 tracking-[0.2em]`}
             style={{
               border: `3px solid ${C.arancio}`,
               color: C.arancio,
@@ -296,7 +291,7 @@ export default function VetrinaRistorante() {
               {piattiMarquee.map((p) => (
                 <span
                   key={`${copia}-${p}`}
-                  className={`${anton.className} uppercase text-xl px-5`}
+                  className={`${fontSecondary} uppercase text-xl px-5`}
                   style={{ color: C.crema }}
                 >
                   {p} <span style={{ color: C.marrone }}>✦</span>
@@ -335,7 +330,7 @@ export default function VetrinaRistorante() {
                 ✦ ✦ ✦
               </p>
               <h2
-                className={`${anton.className} text-center uppercase text-4xl sm:text-5xl mb-2`}
+                className={`${fontSecondary} text-center uppercase text-4xl sm:text-5xl mb-2`}
               >
                 Il menù
               </h2>
@@ -349,7 +344,7 @@ export default function VetrinaRistorante() {
               {Object.entries(menu).map(([categoria, piatti]) => (
                 <div key={categoria} className="mb-9 last:mb-0">
                   <h3
-                    className={`${anton.className} uppercase text-lg tracking-[0.15em] mb-4 flex items-center gap-3`}
+                    className={`${fontSecondary} uppercase text-lg tracking-[0.15em] mb-4 flex items-center gap-3`}
                     style={{ color: C.arancio }}
                   >
                     <span className="h-px flex-1" style={{ backgroundColor: `${C.arancio}55` }} />
@@ -385,7 +380,7 @@ export default function VetrinaRistorante() {
 
               {/* timbro stampato sopra il foglio, ben leggibile */}
               <motion.span
-                className={`${anton.className} absolute -top-4 -right-2 sm:-right-7 uppercase text-xs sm:text-sm tracking-[0.2em] px-3 py-1.5 pointer-events-none select-none`}
+                className={`${fontSecondary} absolute -top-4 -right-2 sm:-right-7 uppercase text-xs sm:text-sm tracking-[0.2em] px-3 py-1.5 pointer-events-none select-none`}
                 style={{
                   border: `3px solid ${C.arancio}`,
                   color: C.arancio,
@@ -432,7 +427,7 @@ export default function VetrinaRistorante() {
         <div className="max-w-5xl mx-auto">
           <Rivela>
             <h2
-              className={`${anton.className} uppercase text-[clamp(32px,5vw,56px)] mb-12 text-center`}
+              className={`${fontSecondary} uppercase text-[clamp(32px,5vw,56px)] mb-12 text-center`}
               style={{ color: C.crema }}
             >
               L&apos;osteria, <span style={{ color: C.giallo }}>in tre scatti</span>
@@ -464,7 +459,7 @@ export default function VetrinaRistorante() {
       <section id="orari" className="px-6 py-24 scroll-mt-6">
         <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_1.1fr] gap-14 items-center">
           <Rivela>
-            <h2 className={`${anton.className} uppercase text-[clamp(30px,4vw,46px)] mb-8`}>
+            <h2 className={`${fontSecondary} uppercase text-[clamp(30px,4vw,46px)] mb-8`}>
               Quando <span style={{ color: C.arancio }}>ci trovi</span>
             </h2>
             <dl className="flex flex-col gap-5 text-base">
@@ -532,14 +527,14 @@ export default function VetrinaRistorante() {
               >
                 Biglietto di prenotazione
               </p>
-              <h2 className={`${anton.className} text-center uppercase text-3xl sm:text-4xl mb-8`}>
+              <h2 className={`${fontSecondary} text-center uppercase text-3xl sm:text-4xl mb-8`}>
                 Tieniti un tavolo
               </h2>
 
               {inviato ? (
                 <div className="text-center py-6">
                   <motion.p
-                    className={`${anton.className} inline-block uppercase text-2xl px-5 py-2 rotate-[-6deg] mb-6`}
+                    className={`${fontSecondary} inline-block uppercase text-2xl px-5 py-2 rotate-[-6deg] mb-6`}
                     style={{ border: `3px solid ${C.arancio}`, color: C.arancio, borderRadius: 4 }}
                     initial={{ opacity: 0, scale: 1.5 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -633,7 +628,7 @@ export default function VetrinaRistorante() {
                   </label>
                   <motion.button
                     type="submit"
-                    className={`${anton.className} uppercase text-xl px-8 py-3.5 mt-2 self-center tracking-[0.1em]`}
+                    className={`${fontSecondary} uppercase text-xl px-8 py-3.5 mt-2 self-center tracking-[0.1em]`}
                     style={{ backgroundColor: C.arancio, color: C.crema, borderRadius: 4 }}
                     whileHover={{ rotate: -2, scale: 1.05 }}
                     whileTap={{ scale: 0.96 }}
@@ -654,7 +649,7 @@ export default function VetrinaRistorante() {
         className="px-6 py-10 text-center text-xs"
         style={{ borderTop: `2px solid ${C.marrone}1A`, color: `${C.marrone}80` }}
       >
-        <span className={`${anton.className} uppercase text-base block mb-2`} style={{ color: C.arancio }}>
+        <span className={`${fontSecondary} uppercase text-base block mb-2`} style={{ color: C.arancio }}>
           Osteria del Vicolo
         </span>
         vetrina dimostrativa · attività di fantasia · nessuna prenotazione reale
