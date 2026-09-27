@@ -6,67 +6,56 @@ import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import PasswordInput from "@/components/ui/PasswordInput";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 const inputCls =
   "w-full bg-glass border border-inchiostro/10 rounded-xl px-4 py-3.5 text-sm text-inchiostro placeholder:text-pietra/50 outline-none focus:border-inchiostro/30 transition-colors";
 const labelCls =
   "block text-xs font-medium text-pietra mb-2 uppercase tracking-wider";
 
+type Stato = "verifica" | "form" | "successo" | "errore";
+
 function AggiornaPasswordForm() {
   const router = useRouter();
+  const [stato, setStato] = useState<Stato>("verifica");
   const [loading, setLoading] = useState(false);
-  const [errore, setErrore] = useState<string | null>(null);
-  const [pronto, setPronto] = useState(false);
+  const [erroreForm, setErroreForm] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
 
-    // La sessione viene stabilita dal server-side callback (/auth/callback)
-    // prima che l'utente arrivi qui. Basta verificarla.
+    // La sessione è già stata stabilita server-side da /auth/callback.
+    // Se non c'è sessione, il link è scaduto o non valido.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setPronto(true);
-      }
-      // Non mostrare errore subito: aspettiamo l'evento PASSWORD_RECOVERY
-      // nel caso in cui i cookie arrivino leggermente dopo il render.
+      setStato(session ? "form" : "errore");
     });
 
+    // Backup: ascolta l'evento PASSWORD_RECOVERY per flussi alternativi.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
-        setErrore(null);
-        setPronto(true);
+      if (event === "PASSWORD_RECOVERY") {
+        setStato("form");
       }
     });
 
-    const timer = setTimeout(() => {
-      setPronto((prev) => {
-        if (!prev) setErrore("Link non valido o scaduto. Richiedi un nuovo reset.");
-        return prev;
-      });
-    }, 3000);
-
-    return () => {
-      subscription.unsubscribe();
-      clearTimeout(timer);
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    setErrore(null);
+    setErroreForm(null);
 
     const formData = new FormData(e.currentTarget);
     const password = formData.get("password") as string;
     const conferma = formData.get("conferma") as string;
 
     if (password !== conferma) {
-      setErrore("Le password non coincidono.");
+      setErroreForm("Le password non coincidono.");
       setLoading(false);
       return;
     }
     if (password.length < 8) {
-      setErrore("La password deve essere di almeno 8 caratteri.");
+      setErroreForm("La password deve essere di almeno 8 caratteri.");
       setLoading(false);
       return;
     }
@@ -75,78 +64,129 @@ function AggiornaPasswordForm() {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      setErrore(error.message);
+      setErroreForm(error.message);
       setLoading(false);
       return;
     }
 
-    router.push("/partner/area-partner");
+    setStato("successo");
+    setTimeout(() => router.push("/partner/area-partner"), 2500);
   }
 
-  return (
-    <AnimatedSection delay={0.1}>
-      {errore && !pronto ? (
-        <div className="bg-[#fdf0ed] border border-cotto/20 rounded-xl px-4 py-3">
-          <p className="text-sm text-cotto" style={{ fontFamily: "var(--font-inter)" }}>
-            {errore}
-          </p>
-        </div>
-      ) : pronto ? (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {errore && (
-            <div className="bg-[#fdf0ed] border border-cotto/20 rounded-xl px-4 py-3">
-              <p className="text-sm text-cotto" style={{ fontFamily: "var(--font-inter)" }}>
-                {errore}
-              </p>
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="password" className={labelCls} style={{ fontFamily: "var(--font-inter)" }}>
-              Nuova password
-            </label>
-            <PasswordInput
-              id="password"
-              name="password"
-              required
-              minLength={8}
-              placeholder="Almeno 8 caratteri"
-              className={inputCls}
-              style={{ fontFamily: "var(--font-inter)" }}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="conferma" className={labelCls} style={{ fontFamily: "var(--font-inter)" }}>
-              Conferma password
-            </label>
-            <PasswordInput
-              id="conferma"
-              name="conferma"
-              required
-              placeholder="Ripeti la password"
-              className={inputCls}
-              style={{ fontFamily: "var(--font-inter)" }}
-            />
-          </div>
-
-          <motion.button
-            type="submit"
-            disabled={loading}
-            className="self-start inline-flex items-center gap-2 bg-cotto text-travertino rounded-[10px] px-7 py-4 text-sm font-medium cursor-pointer disabled:opacity-60"
-            style={{ fontFamily: "var(--font-inter)" }}
-            whileHover={loading ? {} : { scale: 1.03, backgroundColor: "#a8431f" }}
-            whileTap={loading ? {} : { scale: 0.97 }}
-            transition={{ duration: 0.2 }}
-          >
-            {loading ? "Salvataggio…" : "Salva password →"}
-          </motion.button>
-        </form>
-      ) : (
+  if (stato === "verifica") {
+    return (
+      <AnimatedSection delay={0.1}>
         <p className="text-sm text-pietra" style={{ fontFamily: "var(--font-inter)" }}>
           Verifica del link in corso…
         </p>
-      )}
+      </AnimatedSection>
+    );
+  }
+
+  if (stato === "errore") {
+    return (
+      <AnimatedSection delay={0.1}>
+        <div className="bg-glass rounded-2xl p-8">
+          <p className="text-3xl mb-4">⏱</p>
+          <h2
+            className="text-xl font-medium text-inchiostro mb-2"
+            style={{ fontFamily: "var(--font-fraunces)" }}
+          >
+            Link non valido o scaduto.
+          </h2>
+          <p
+            className="text-sm text-pietra mb-6"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Il link di reset è scaduto o è già stato usato. Richiedine uno nuovo.
+          </p>
+          <Link
+            href="/partner/reset-password"
+            className="inline-flex items-center gap-2 bg-cotto text-travertino rounded-[10px] px-6 py-3.5 text-sm font-medium hover:bg-[#a8431f] transition-colors"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Richiedi nuovo link →
+          </Link>
+        </div>
+      </AnimatedSection>
+    );
+  }
+
+  if (stato === "successo") {
+    return (
+      <AnimatedSection delay={0.1}>
+        <div className="bg-glass rounded-2xl p-8 text-center">
+          <p className="text-3xl mb-4">✓</p>
+          <h2
+            className="text-xl font-medium text-inchiostro mb-2"
+            style={{ fontFamily: "var(--font-fraunces)" }}
+          >
+            Password aggiornata.
+          </h2>
+          <p
+            className="text-sm text-pietra"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Stai per essere reindirizzato all'area partner…
+          </p>
+        </div>
+      </AnimatedSection>
+    );
+  }
+
+  // stato === "form"
+  return (
+    <AnimatedSection delay={0.1}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {erroreForm && (
+          <div className="bg-[#fdf0ed] border border-cotto/20 rounded-xl px-4 py-3">
+            <p className="text-sm text-cotto" style={{ fontFamily: "var(--font-inter)" }}>
+              {erroreForm}
+            </p>
+          </div>
+        )}
+
+        <div>
+          <label htmlFor="password" className={labelCls} style={{ fontFamily: "var(--font-inter)" }}>
+            Nuova password
+          </label>
+          <PasswordInput
+            id="password"
+            name="password"
+            required
+            minLength={8}
+            placeholder="Almeno 8 caratteri"
+            className={inputCls}
+            style={{ fontFamily: "var(--font-inter)" }}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="conferma" className={labelCls} style={{ fontFamily: "var(--font-inter)" }}>
+            Conferma password
+          </label>
+          <PasswordInput
+            id="conferma"
+            name="conferma"
+            required
+            placeholder="Ripeti la password"
+            className={inputCls}
+            style={{ fontFamily: "var(--font-inter)" }}
+          />
+        </div>
+
+        <motion.button
+          type="submit"
+          disabled={loading}
+          className="self-start inline-flex items-center gap-2 bg-cotto text-travertino rounded-[10px] px-7 py-4 text-sm font-medium cursor-pointer disabled:opacity-60"
+          style={{ fontFamily: "var(--font-inter)" }}
+          whileHover={loading ? {} : { scale: 1.03, backgroundColor: "#a8431f" }}
+          whileTap={loading ? {} : { scale: 0.97 }}
+          transition={{ duration: 0.2 }}
+        >
+          {loading ? "Salvataggio…" : "Salva password →"}
+        </motion.button>
+      </form>
     </AnimatedSection>
   );
 }
@@ -168,13 +208,21 @@ export default function AggiornaPasswordPage() {
           >
             Nuova password.
           </h1>
+          <p
+            className="text-sm text-inchiostro/60"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Scegli una password sicura di almeno 8 caratteri.
+          </p>
         </AnimatedSection>
 
-        <Suspense fallback={
-          <p className="text-sm text-pietra" style={{ fontFamily: "var(--font-inter)" }}>
-            Caricamento…
-          </p>
-        }>
+        <Suspense
+          fallback={
+            <p className="text-sm text-pietra" style={{ fontFamily: "var(--font-inter)" }}>
+              Caricamento…
+            </p>
+          }
+        >
           <AggiornaPasswordForm />
         </Suspense>
       </div>
