@@ -26,7 +26,7 @@ export default function ResetPasswordPage() {
     // a un dominio non ancora attivo, il che renderebbe il link nell'email inutilizzabile.
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/partner/aggiorna-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/partner/aggiorna-password`,
     });
 
     if (error) {

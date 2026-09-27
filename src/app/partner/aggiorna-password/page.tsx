@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import PasswordInput from "@/components/ui/PasswordInput";
@@ -14,38 +14,42 @@ const labelCls =
 
 function AggiornaPasswordForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
   const [pronto, setPronto] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
-    const code = searchParams.get("code");
 
-    if (code) {
-      // Flusso normale: Supabase ha reindirizzato direttamente a questa pagina
-      // con il codice PKCE nel query param.
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) {
-          setErrore("Link scaduto o già usato. Richiedi un nuovo reset.");
-        } else {
-          setPronto(true);
-        }
-      });
-      return;
-    }
-
-    // Flusso alternativo: il codice è già stato scambiato dal callback route
-    // e la sessione è attiva. Basta verificarla.
+    // La sessione viene stabilita dal server-side callback (/auth/callback)
+    // prima che l'utente arrivi qui. Basta verificarla.
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setPronto(true);
-      } else {
-        setErrore("Link non valido o scaduto. Richiedi un nuovo reset.");
+      }
+      // Non mostrare errore subito: aspettiamo l'evento PASSWORD_RECOVERY
+      // nel caso in cui i cookie arrivino leggermente dopo il render.
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+        setErrore(null);
+        setPronto(true);
       }
     });
-  }, [searchParams]);
+
+    const timer = setTimeout(() => {
+      setPronto((prev) => {
+        if (!prev) setErrore("Link non valido o scaduto. Richiedi un nuovo reset.");
+        return prev;
+      });
+    }, 3000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
