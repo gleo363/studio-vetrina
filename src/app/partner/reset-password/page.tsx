@@ -22,10 +22,11 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setErrore(null);
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
+    // Usa sempre window.location.origin: NEXT_PUBLIC_SITE_URL potrebbe puntare
+    // a un dominio non ancora attivo, il che renderebbe il link nell'email inutilizzabile.
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/partner/aggiorna-password`,
+      redirectTo: `${window.location.origin}/partner/aggiorna-password`,
     });
 
     if (error) {

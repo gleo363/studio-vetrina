@@ -20,18 +20,29 @@ function AggiornaPasswordForm() {
   const [pronto, setPronto] = useState(false);
 
   useEffect(() => {
+    const supabase = createClient();
     const code = searchParams.get("code");
-    if (!code) {
-      setErrore("Link non valido o scaduto. Richiedi un nuovo reset.");
+
+    if (code) {
+      // Flusso normale: Supabase ha reindirizzato direttamente a questa pagina
+      // con il codice PKCE nel query param.
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) {
+          setErrore("Link scaduto o già usato. Richiedi un nuovo reset.");
+        } else {
+          setPronto(true);
+        }
+      });
       return;
     }
 
-    const supabase = createClient();
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) {
-        setErrore("Link scaduto. Richiedi un nuovo reset.");
-      } else {
+    // Flusso alternativo: il codice è già stato scambiato dal callback route
+    // e la sessione è attiva. Basta verificarla.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setPronto(true);
+      } else {
+        setErrore("Link non valido o scaduto. Richiedi un nuovo reset.");
       }
     });
   }, [searchParams]);
