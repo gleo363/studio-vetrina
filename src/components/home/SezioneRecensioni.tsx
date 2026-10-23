@@ -1,61 +1,61 @@
 "use client";
+import { useRef } from "react";
+import Script from "next/script";
 import AnimatedSection from "@/components/ui/AnimatedSection";
-import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 
-// SEGNAPOSTO: queste recensioni sono INVENTATE. Sostituirle con recensioni
-// reali (testo, nome, attività) prima di pubblicare in produzione.
-const recensioni = [
-  {
-    testo:
-      "Mi hanno consegnato il sito nei tempi promessi e senza che dovessi occuparmi di niente. Finalmente una vetrina online che somiglia davvero al mio locale.",
-    nome: "Nome Cognome",
-    attivita: "Ristorante",
-  },
-  {
-    testo:
-      "Prima avevo un sito fatto con un modello, uguale a quello di tanti altri. Ora i clienti mi dicono che si vede la differenza, e mi trovano anche su Google.",
-    nome: "Nome Cognome",
-    attivita: "Salone",
-  },
-  {
-    testo:
-      "Prezzo chiaro fin dall'inizio, una persona sempre pronta a rispondere e un sito che è mio. Non chiedevo altro.",
-    nome: "Nome Cognome",
-    attivita: "Bottega",
-  },
-];
+declare global {
+  interface Window {
+    Trustpilot?: { loadFromElement: (el: HTMLElement, force?: boolean) => void };
+  }
+}
 
 export default function SezioneRecensioni() {
+  const widgetRef = useRef<HTMLDivElement>(null);
+
+  // Lo script di Trustpilot cerca i widget solo al primo caricamento:
+  // a ogni montaggio (anche dopo una navigazione client) lo riavviamo a mano.
+  const caricaWidget = () => {
+    if (window.Trustpilot && widgetRef.current) {
+      window.Trustpilot.loadFromElement(widgetRef.current, true);
+    }
+  };
+
   return (
     <section className="bg-glass px-6 py-28">
+      <Script
+        src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+        strategy="afterInteractive"
+        onReady={caricaWidget}
+      />
       <div className="max-w-6xl mx-auto">
-        <AnimatedSection className="mb-20 max-w-3xl">
-          <h2
-            className="text-3xl md:text-4xl lg:text-[44px] font-medium leading-[1.1] text-inchiostro"
-            style={{ fontFamily: "var(--font-fraunces)" }}
+        <AnimatedSection className="max-w-xl mx-auto text-center">
+          <p
+            className="text-lg md:text-xl text-pietra mb-8 leading-snug"
+            style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
           >
-            Cosa dicono di noi.
-          </h2>
-        </AnimatedSection>
+            Hai lavorato con noi? Raccontaci com&apos;è andata, con una recensione su Trustpilot.
+          </p>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {recensioni.map((r, i) => (
-            <StaggerItem key={i} className="h-full">
-              <figure className="border border-linea rounded-2xl p-6 md:p-8 h-full flex flex-col bg-travertino">
-                <blockquote
-                  className="text-lg leading-snug text-inchiostro mb-8 flex-1"
-                  style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
-                >
-                  &ldquo;{r.testo}&rdquo;
-                </blockquote>
-                <figcaption style={{ fontFamily: "var(--font-inter)" }}>
-                  <span className="block text-sm font-medium text-inchiostro">{r.nome}</span>
-                  <span className="block text-sm text-pietra">{r.attivita}</span>
-                </figcaption>
-              </figure>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+          {/* TrustBox widget - Review Collector */}
+          <div
+            ref={widgetRef}
+            className="trustpilot-widget"
+            data-locale="en-US"
+            data-template-id="56278e9abfbbba0bdcd568bc"
+            data-businessunit-id="6adb6bc791bd82e6106bf5c6"
+            data-style-height="52px"
+            data-style-width="100%"
+          >
+            <a
+              href="https://www.trustpilot.com/review/studiovetrina.it"
+              target="_blank"
+              rel="noopener"
+            >
+              Trustpilot
+            </a>
+          </div>
+          {/* End TrustBox widget */}
+        </AnimatedSection>
       </div>
     </section>
   );

@@ -6,40 +6,55 @@ import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { EASE_VETRINA, DURATA } from "@/lib/motion";
 
-const pacchetti = [
+// Bozza dei testi di Assistenza e Rinnovo: da rivedere prima della pubblicazione.
+const pacchetti: {
+  nome: string;
+  descrizione: string;
+  voci: string[];
+  extraTitolo?: string;
+  extra?: string[];
+  evidenziata: boolean;
+}[] = [
   {
-    nome: "Vetrina Essenziale",
-    descrizione: "Il punto di partenza perfetto per chi vuole farsi trovare online.",
+    nome: "Assistenza",
+    descrizione: "Per chi ha già un sito online e vuole che resti sempre in ordine.",
     voci: [
-      "Fino a 5 pagine su misura",
-      "Design personalizzato",
-      "Hosting incluso",
-      "Ottimizzazione SEO di base",
-      "Supporto 3 mesi",
+      "Modifiche a testi, foto e pagine",
+      "Aggiornamenti e controlli di sicurezza",
+      "Verifica di funzionamento e velocità",
+      "Risposta alle tue richieste",
+      "Una persona di riferimento",
     ],
     evidenziata: false,
   },
   {
-    nome: "Vetrina Completa",
-    descrizione: "Per chi vuole una presenza online completa e strumenti per crescere.",
+    nome: "Vetrina da zero",
+    descrizione: "Il tuo sito nasce da una pagina bianca, costruito attorno alla tua attività.",
     voci: [
-      "Fino a 10 pagine su misura",
+      "Hosting e un anno di dominio",
+      "Supporto per un mese",
+      "Ottimizzazione SEO",
+      "Design personalizzato",
+    ],
+    extraTitolo: "In base alle tue necessità aggiungiamo anche:",
+    extra: [
+      "Prenotazioni integrate",
       "Blog integrato",
-      "Prenotazioni online",
-      "SEO avanzata",
-      "Supporto 6 mesi",
+      "Aree riservate",
+      "Integrazioni personalizzate",
+      "...e molto altro ancora!",
     ],
     evidenziata: true,
   },
   {
-    nome: "Vetrina su Misura",
-    descrizione: "Soluzioni complesse per chi ha esigenze specifiche o vuole crescere.",
+    nome: "Rinnovo",
+    descrizione: "Per chi ha già un sito che non rappresenta più la sua attività.",
     voci: [
-      "E-commerce",
-      "Portali e aree riservate",
-      "Integrazioni personalizzate",
-      "App web",
-      "Supporto dedicato",
+      "Nuovo design su misura",
+      "Testi e immagini rinnovati",
+      "Contenuti esistenti mantenuti",
+      "SEO rivista per non perdere posizioni",
+      "Sito veloce e curato su ogni schermo",
     ],
     evidenziata: false,
   },
@@ -150,6 +165,44 @@ export default function SezioneServizi() {
                       </span>
                     </motion.li>
                   ))}
+
+                  {p.extra && (
+                    <>
+                      <motion.li
+                        variants={voceItem}
+                        className={`text-sm pt-3 mt-1 border-t ${
+                          p.evidenziata
+                            ? "text-travertino/60 border-travertino/15"
+                            : "text-pietra border-linea"
+                        }`}
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        {p.extraTitolo}
+                      </motion.li>
+                      {p.extra.map((voce) => (
+                        <motion.li
+                          key={voce}
+                          variants={voceItem}
+                          className="flex items-start gap-2.5 text-sm"
+                          style={{ fontFamily: "var(--font-inter)" }}
+                        >
+                          <Check
+                            size={16}
+                            strokeWidth={2.5}
+                            className={`mt-0.5 shrink-0 ${
+                              p.evidenziata ? "text-ocra" : "text-cotto"
+                            }`}
+                            aria-hidden="true"
+                          />
+                          <span
+                            className={p.evidenziata ? "text-travertino/80" : "text-pietra"}
+                          >
+                            {voce}
+                          </span>
+                        </motion.li>
+                      ))}
+                    </>
+                  )}
                 </motion.ul>
 
                 <Button
