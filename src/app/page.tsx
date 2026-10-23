@@ -3,6 +3,7 @@ import SezioneProblema from "@/components/home/SezioneProblema";
 import SezioneSoluzione from "@/components/home/SezioneSoluzione";
 import SezioneTarget from "@/components/home/SezioneTarget";
 import SezioneServizi from "@/components/home/SezioneServizi";
+import SezioneRecensioni from "@/components/home/SezioneRecensioni";
 import SezioneCtaFinale from "@/components/home/SezioneCtaFinale";
 import TransizioneScroll from "@/components/home/TransizioneScroll";
 
@@ -15,6 +16,7 @@ export default function HomePage() {
       <SezioneSoluzione />
       <SezioneTarget />
       <SezioneServizi />
+      <SezioneRecensioni />
       <SezioneCtaFinale />
     </>
   );

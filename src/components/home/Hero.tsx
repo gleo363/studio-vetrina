@@ -80,7 +80,7 @@ export default function Hero() {
             fontStyle: "italic",
           }}
         >
-          Siti web su misura per le piccole attività di Roma.
+          Siti web su misura per le piccole attività.
         </motion.p>
 
         <motion.div

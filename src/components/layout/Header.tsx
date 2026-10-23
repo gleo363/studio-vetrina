@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/esempi", label: "Esempi" },
   { href: "/studio", label: "Studio" },
   { href: "/perche-sceglierci", label: "Perché noi" },
+  { href: "/qa", label: "Q&A" },
   { href: "/partner", label: "Partner" },
 ];
 
