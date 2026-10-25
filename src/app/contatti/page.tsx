@@ -249,20 +249,15 @@ export default function ContattiPage() {
                 >
                   Instagram
                 </p>
-                <div className="flex flex-col gap-1">
-                  <span
-                    className="text-inchiostro/30 font-medium cursor-default"
-                    style={{ fontFamily: "var(--font-fraunces)" }}
-                  >
-                    @studiovetrina
-                  </span>
-                  <span
-                    className="text-[10px] font-semibold tracking-[0.18em] text-cotto/50 uppercase leading-none"
-                    style={{ fontFamily: "var(--font-inter)" }}
-                  >
-                    coming soon
-                  </span>
-                </div>
+                <a
+                  href="https://www.instagram.com/studiovetrina.it"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-inchiostro font-medium hover:text-cotto transition-colors"
+                  style={{ fontFamily: "var(--font-fraunces)" }}
+                >
+                  @studiovetrina.it
+                </a>
               </div>
 
               <div className="border-t border-inchiostro/10 pt-8">
