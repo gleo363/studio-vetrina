@@ -21,7 +21,7 @@ const cards = [
     numero: "03",
     titolo: "Consegniamo",
     testo:
-      "In tre settimane il tuo sito è online, ottimizzato, e pronto a lavorare per te. Con supporto incluso per i primi tre mesi.",
+      "In tre settimane il tuo sito è online, ottimizzato, e pronto a lavorare per te. Ti offriamo supporto per i primi 30 giorni.",
   },
 ];
 

@@ -15,7 +15,6 @@ const valori = [
   "Curato",
   "Chiaro",
   "Orgoglioso del mestiere",
-  "Romano",
 ];
 
 const processo = [
@@ -45,7 +44,7 @@ const processo = [
     titolo: "Consegna",
     tempo: "Giorno 19–21",
     descrizione:
-      "Il sito va online. Ti insegniamo come aggiornarlo. Restiamo disponibili per i primi tre mesi.",
+      "Il sito va online. Ti insegniamo come aggiornarlo, e ti offriamo supporto per i primi 30 giorni.",
   },
 ];
 

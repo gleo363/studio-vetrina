@@ -160,11 +160,10 @@ export default function GalleriaEsempi() {
               className="text-lg md:text-xl text-pietra max-w-2xl leading-relaxed"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              In attesa dei primi lavori veri, abbiamo allestito quattro vetrine
-              dimostrative, una per ciascuno dei settori che serviamo. Le
-              attività sono di fantasia, la cura è quella vera: ogni vetrina ha
-              colori, caratteri e atmosfera scelti su misura, perché è questo il
-              nostro mestiere.
+              Abbiamo allestito quattro vetrine dimostrative. Le attività sono
+              di fantasia, la cura è quella vera: ogni vetrina ha colori,
+              caratteri e atmosfera scelti su misura, perché è questo il nostro
+              mestiere.
             </p>
           </AnimatedSection>
         </div>
@@ -228,18 +227,6 @@ export default function GalleriaEsempi() {
               </StaggerItem>
             ))}
           </StaggerContainer>
-
-          <AnimatedSection delay={0.2} className="mt-12">
-            <p
-              className="text-sm text-pietra max-w-xl leading-relaxed"
-              style={{ fontFamily: "var(--font-inter)" }}
-            >
-              Una precisazione onesta: queste attività non esistono. Le abbiamo
-              inventate per mostrarti come lavoriamo, settore per settore. Quando
-              arriveranno i primi clienti veri, questa pagina ospiterà i loro
-              siti.
-            </p>
-          </AnimatedSection>
         </div>
       </section>
 
