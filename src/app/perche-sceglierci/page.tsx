@@ -204,11 +204,10 @@ function MockupSuMisura() {
 const righeTabella = [
   { aspetto: "Aspetto e unicità", faiDaTe: "Uguale a mille altri", vetrina: "Costruito su misura per te" },
   { aspetto: "Il tuo tempo", faiDaTe: "Ore o giorni a impararlo", vetrina: "Zero. Pensiamo a tutto noi" },
-  { aspetto: "Costo", faiDaTe: "Abbonamento mensile, per sempre", vetrina: "Un progetto una tantum" },
   { aspetto: "Velocità", faiDaTe: "Spesso pesante e lento", vetrina: "Ottimizzato per caricare in fretta" },
   { aspetto: "Trovarti su Google", faiDaTe: "Difficile emergere", vetrina: "Costruito per farti trovare" },
   { aspetto: "Testi e voce", faiDaTe: "Generici, spesso tradotti male", vetrina: "Scritti per la tua attività, in italiano" },
-  { aspetto: "Assistenza", faiDaTe: "Un forum e tanta pazienza", vetrina: "Una persona a Roma che ti risponde" },
+  { aspetto: "Assistenza", faiDaTe: "Un forum e tanta pazienza", vetrina: "Una persona vera che ti risponde" },
   { aspetto: "Proprietà", faiDaTe: "Vivi sulla piattaforma altrui", vetrina: "Il sito è tuo" },
   { aspetto: "Su misura per il telefono", faiDaTe: "A volte approssimativo", vetrina: "Curato su ogni schermo" },
   { aspetto: "Crescere nel tempo", faiDaTe: "Spesso da rifare da capo", vetrina: "Cresce insieme a te" },
