@@ -1,16 +1,23 @@
-import type { Metadata } from "next";
 import { BarraEsempi, ChiusuraEsempi } from "@/components/esempi/BarraEsempi";
 import VetrinaStudio from "@/components/esempi/VetrinaStudio";
+import { metadatiLocalizzati } from "@/lib/i18n/metadata";
 
 // Font caricati via link diretto per compatibilità con Turbopack
 const FONT_BASE_CLASS = "__font-archivo";
 const FONT_SECONDARY_CLASS = "__font-mono";
 
-export const metadata: Metadata = {
-  title: "Falegnameria Marini · esempio per artigiani e professionisti",
-  description:
-    "Vetrina dimostrativa di Studio Vetrina per artigiani e professionisti: una falegnameria di fantasia con i lavori scelti, le competenze e la richiesta di preventivo. Esempio, non un'attività reale.",
-};
+export const generateMetadata = metadatiLocalizzati({
+  it: {
+    title: "Falegnameria Marini · esempio per artigiani e professionisti",
+    description:
+      "Vetrina dimostrativa di Studio Vetrina per artigiani e professionisti: una falegnameria di fantasia con i lavori scelti, le competenze e la richiesta di preventivo. Esempio, non un'attività reale.",
+  },
+  en: {
+    title: "Falegnameria Marini · trades and craftspeople example",
+    description:
+      "A Studio Vetrina sample site for trades and craftspeople: a fictional carpentry workshop with selected work, services and a quote request. An example, not a real business.",
+  },
+});
 
 export default function EsempioStudioPage() {
   return (

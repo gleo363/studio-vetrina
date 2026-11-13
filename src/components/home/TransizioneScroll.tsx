@@ -2,6 +2,12 @@
 import { motion } from "framer-motion";
 import { ContainerScroll } from "@/components/ui/ContainerScroll";
 import { riveloMascherato, fadeUp, VIEWPORT_ONCE } from "@/lib/motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: { titolo: ["Ogni attività", "ha una storia."], sottotitolo: "Il tuo sito deve saperla raccontare." },
+  en: { titolo: ["Every business", "has a story."], sottotitolo: "Your website should tell it well." },
+};
 
 function MockupSito() {
   return (
@@ -51,6 +57,7 @@ function MockupSito() {
 }
 
 export default function TransizioneScroll() {
+  const t = useTesti(TESTI);
   return (
     <ContainerScroll
       titleComponent={
@@ -66,12 +73,12 @@ export default function TransizioneScroll() {
           >
             <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
               <motion.span className="block" variants={riveloMascherato(0)}>
-                Ogni attività
+                {t.titolo[0]}
               </motion.span>
             </span>
             <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
               <motion.span className="block" variants={riveloMascherato(0.12)}>
-                ha una storia.
+                {t.titolo[1]}
               </motion.span>
             </span>
           </h2>
@@ -80,7 +87,7 @@ export default function TransizioneScroll() {
             className="text-xl md:text-2xl text-pietra mt-1"
             style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
           >
-            Il tuo sito deve saperla raccontare.
+            {t.sottotitolo}
           </motion.p>
         </motion.div>
       }

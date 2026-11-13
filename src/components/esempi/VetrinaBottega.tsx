@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTesti } from "@/components/providers/LinguaProvider";
 import { motion, useReducedMotion } from "framer-motion";
 
 
@@ -16,97 +17,196 @@ const C = {
 };
 
 type Fiore = {
-  nome: string;
-  nota: string;
-  prezzo: string;
+  prezzo: number;
   petali: string;
   cuore: string;
   stelo: string;
 };
 
+// Colori dei fiori disegnati; nomi e note sono in TESTI, per indice.
 const banco: Fiore[] = [
-  {
-    nome: "Mazzo del mattino",
-    nota: "fiori di stagione, carta avana e spago",
-    prezzo: "18",
-    petali: "#C94F4F",
-    cuore: "#E8B04B",
-    stelo: "#7C8B6F",
-  },
-  {
-    nome: "Peonie di maggio",
-    nota: "rosa cipria, sei steli abbondanti",
-    prezzo: "25",
-    petali: "#E5A3A3",
-    cuore: "#C94F4F",
-    stelo: "#8B9B7E",
-  },
-  {
-    nome: "Rose antiche",
-    nota: "color crema, profumo di giardino",
-    prezzo: "22",
-    petali: "#EFE3CC",
-    cuore: "#D9B36A",
-    stelo: "#7C8B6F",
-  },
-  {
-    nome: "Ranuncoli e salvia",
-    nota: "rosso acceso e foglia argentata",
-    prezzo: "20",
-    petali: "#B5443F",
-    cuore: "#7A2E2B",
-    stelo: "#9AA88B",
-  },
-  {
-    nome: "Orchidea in vaso",
-    nota: "bianco latte, vaso di coccio",
-    prezzo: "32",
-    petali: "#F4F0E6",
-    cuore: "#C9A0C4",
-    stelo: "#5F6E54",
-  },
-  {
-    nome: "Lavanda di campo",
-    nota: "mazzetto essiccato, dura mesi",
-    prezzo: "9",
-    petali: "#9B8AB8",
-    cuore: "#6E5E91",
-    stelo: "#8B9B7E",
-  },
+  { prezzo: 18, petali: "#C94F4F", cuore: "#E8B04B", stelo: "#7C8B6F" },
+  { prezzo: 25, petali: "#E5A3A3", cuore: "#C94F4F", stelo: "#8B9B7E" },
+  { prezzo: 22, petali: "#EFE3CC", cuore: "#D9B36A", stelo: "#7C8B6F" },
+  { prezzo: 20, petali: "#B5443F", cuore: "#7A2E2B", stelo: "#9AA88B" },
+  { prezzo: 32, petali: "#F4F0E6", cuore: "#C9A0C4", stelo: "#5F6E54" },
+  { prezzo: 9, petali: "#9B8AB8", cuore: "#6E5E91", stelo: "#8B9B7E" },
 ];
 
-const storia = [
-  {
-    anno: "1962",
-    titolo: "Nonna Iole apre la bottega",
-    testo:
-      "Un bancone di marmo, due secchi di zinco e i gladioli del mercato di Porta Portese. Il quartiere imparò presto che da Iole i fiori duravano una settimana in più.",
+const TESTI = {
+  it: {
+    fiori: [
+      { nome: "Mazzo del mattino", nota: "fiori di stagione, carta avana e spago" },
+      { nome: "Peonie di maggio", nota: "rosa cipria, sei steli abbondanti" },
+      { nome: "Rose antiche", nota: "color crema, profumo di giardino" },
+      { nome: "Ranuncoli e salvia", nota: "rosso acceso e foglia argentata" },
+      { nome: "Orchidea in vaso", nota: "bianco latte, vaso di coccio" },
+      { nome: "Lavanda di campo", nota: "mazzetto essiccato, dura mesi" },
+    ],
+    prezzo: (p: number) => `${p} €`,
+    storia: [
+      {
+        anno: "1962",
+        titolo: "Nonna Iole apre la bottega",
+        testo:
+          "Un bancone di marmo, due secchi di zinco e i gladioli del mercato di Porta Portese. Il quartiere imparò presto che da Iole i fiori duravano una settimana in più.",
+      },
+      {
+        anno: "1989",
+        titolo: "Arrivano le piante da appartamento",
+        testo:
+          "Marco, il figlio, riempie la vetrina di felci e fichi d'India. I clienti entrano per un mazzo ed escono con un vaso sottobraccio.",
+      },
+      {
+        anno: "2014",
+        titolo: "Chiara e i matrimoni",
+        testo:
+          "La nipote porta le composizioni fuori dalla bottega: prima i matrimoni degli amici, poi quelli degli sconosciuti. Trastevere si riempie dei nostri archi di fiori.",
+      },
+      {
+        anno: "Oggi",
+        titolo: "Tre generazioni dietro al banco",
+        testo:
+          "Iole sceglie ancora i colori, Marco tiene i conti, Chiara lega i mazzi. Il bancone di marmo è sempre lo stesso del 1962.",
+      },
+    ],
+    orari: [
+      { giorni: "Lunedì", ore: "riposo", chiuso: true },
+      { giorni: "Da martedì a sabato", ore: "8:00 – 13:00 · 15:30 – 19:30", chiuso: false },
+      { giorni: "Domenica", ore: "8:00 – 13:00", chiuso: false },
+    ],
+    insegna: ["· FIORI DI TRASTEVERE", "· BOTTEGA DAL 1962"],
+    spaziaturaInsegna: "0.26em",
+    mappaEtichetta: "Mappa stilizzata: la bottega si trova in Vicolo del Cinque, vicino al Tevere",
+    tevere: "il Tevere",
+    piazzetta: "la piazzetta",
+    siamoQui: "siamo qui",
+    sinistra: ["Bottega di fiori", "in Trastevere"],
+    destra: ["Vicolo del Cinque 12", "Roma"],
+    navEtichetta: "Navigazione Fiori di Trastevere",
+    nav: ["Il banco", "La storia", "Orari", "Dove siamo", "Ordina un mazzo"],
+    titolo: ["Fiori freschi,", "parole gentili."],
+    intro:
+      "Dal 1962 leghiamo mazzi dietro lo stesso bancone di marmo. Entra, dicci per chi sono, e al resto pensiamo noi.",
+    bancoEyebrow: "Il banco di oggi",
+    bancoTitolo: "Ogni mazzo ha il suo cartellino",
+    bancoTesto:
+      "Prezzi scritti a mano, come si è sempre fatto. Quello che vedi al banco cambia con le stagioni e con l'umore di Iole.",
+    storiaEyebrow: "La storia",
+    storiaTitolo: "Tre generazioni, un bancone",
+    orariEyebrow: "Orari",
+    orariTitolo: "Quando trovarci",
+    orariNota:
+      "La mattina presto trovi i fiori appena arrivati dal mercato. Se il mazzo ti serve per cena, passa entro le 19.",
+    doveEyebrow: "Dove siamo",
+    doveTitolo: "Nel cuore di Trastevere",
+    indirizzo: "Vicolo del Cinque 12, Roma",
+    doveTesto: ", a due passi da piazza Trilussa. Telefono:",
+    ordinaEyebrow: "Ordina un mazzo",
+    ordinaTitolo: ["Scrivi il bigliettino,", "ai fiori pensiamo noi"],
+    grazie: (nome: string) => `Grazie${nome ? `, ${nome}` : ""}.`,
+    grazieTesto:
+      "In una bottega vera il mazzo sarebbe già sul bancone. Questa è una vetrina dimostrativa: nessun fiore è stato colto.",
+    perChi: "Per chi sono questi fiori?",
+    tuoNome: "Il tuo nome",
+    telefono: "Telefono",
+    occasione: "L'occasione",
+    occasioni: ["Un compleanno", "Un anniversario", "Per chiedere scusa", "Così, senza motivo"],
+    bigliettino: "Cosa scriviamo sul bigliettino",
+    phBigliettino: "«Per Anna, che riempie le stanze anche quando non c'è.»",
+    prenota: "Prenota il mazzo",
+    notaModulo: "Modulo dimostrativo: non viene inviato nulla, nessun dato viene salvato.",
+    chiusura: ["I fiori giusti esistono.", "Basta chiederli a chi li conosce."],
+    piedeIndirizzo: "Vicolo del Cinque 12, Roma · 06 580 0000",
+    piede: "Fiori di Trastevere è una vetrina dimostrativa · attività di fantasia",
   },
-  {
-    anno: "1989",
-    titolo: "Arrivano le piante da appartamento",
-    testo:
-      "Marco, il figlio, riempie la vetrina di felci e fichi d'India. I clienti entrano per un mazzo ed escono con un vaso sottobraccio.",
+  en: {
+    fiori: [
+      { nome: "Morning bouquet", nota: "seasonal flowers, brown paper and twine" },
+      { nome: "May peonies", nota: "powder pink, six generous stems" },
+      { nome: "Old roses", nota: "cream-colored, smelling of a garden" },
+      { nome: "Ranunculus and sage", nota: "bright red with silvery leaves" },
+      { nome: "Potted orchid", nota: "milk white, in a terracotta pot" },
+      { nome: "Field lavender", nota: "a dried bunch that lasts for months" },
+    ],
+    prezzo: (p: number) => `€${p}`,
+    storia: [
+      {
+        anno: "1962",
+        titolo: "Nonna Iole opens the shop",
+        testo:
+          "A marble counter, two zinc buckets and gladioli from the Porta Portese market. The neighborhood soon learned that Iole's flowers lasted a week longer.",
+      },
+      {
+        anno: "1989",
+        titolo: "The house plants arrive",
+        testo:
+          "Marco, her son, fills the window with ferns and prickly pears. People come in for a bouquet and leave with a pot under their arm.",
+      },
+      {
+        anno: "2014",
+        titolo: "Chiara and the weddings",
+        testo:
+          "Her granddaughter takes the arrangements beyond the shop: first friends' weddings, then strangers'. Trastevere fills up with our flower arches.",
+      },
+      {
+        anno: "Today",
+        titolo: "Three generations behind the counter",
+        testo:
+          "Iole still picks the colors, Marco keeps the books, Chiara ties the bouquets. The marble counter is the same one from 1962.",
+      },
+    ],
+    orari: [
+      { giorni: "Monday", ore: "closed", chiuso: true },
+      { giorni: "Tuesday to Saturday", ore: "8:00 – 13:00 · 15:30 – 19:30", chiuso: false },
+      { giorni: "Sunday", ore: "8:00 – 13:00", chiuso: false },
+    ],
+    insegna: ["· FIORI DI TRASTEVERE", "· FLORIST SINCE 1962"],
+    spaziaturaInsegna: "0.2em",
+    mappaEtichetta: "Stylized map: the shop is on Vicolo del Cinque, near the Tiber",
+    tevere: "the Tiber",
+    piazzetta: "the little square",
+    siamoQui: "we're here",
+    sinistra: ["Flower shop", "in Trastevere"],
+    destra: ["Vicolo del Cinque 12", "Rome"],
+    navEtichetta: "Fiori di Trastevere navigation",
+    nav: ["The counter", "Our story", "Hours", "Find us", "Order a bouquet"],
+    titolo: ["Fresh flowers,", "kind words."],
+    intro:
+      "Since 1962 we've been tying bouquets behind the same marble counter. Come in, tell us who they're for, and leave the rest to us.",
+    bancoEyebrow: "Today's counter",
+    bancoTitolo: "Every bouquet has its own tag",
+    bancoTesto:
+      "Prices written by hand, the way it's always been done. What you see on the counter changes with the seasons, and with Iole's mood.",
+    storiaEyebrow: "Our story",
+    storiaTitolo: "Three generations, one counter",
+    orariEyebrow: "Hours",
+    orariTitolo: "When to find us",
+    orariNota:
+      "Early in the morning you'll find flowers fresh from the market. If you need the bouquet for dinner, come by before 7 pm.",
+    doveEyebrow: "Find us",
+    doveTitolo: "In the heart of Trastevere",
+    indirizzo: "Vicolo del Cinque 12, Rome",
+    doveTesto: ", a short walk from Piazza Trilussa. Phone:",
+    ordinaEyebrow: "Order a bouquet",
+    ordinaTitolo: ["Write the card,", "we'll handle the flowers"],
+    grazie: (nome: string) => `Thank you${nome ? `, ${nome}` : ""}.`,
+    grazieTesto:
+      "In a real shop, the bouquet would already be on the counter. This is a sample site: no flowers were picked.",
+    perChi: "Who are these flowers for?",
+    tuoNome: "Your name",
+    telefono: "Phone",
+    occasione: "The occasion",
+    occasioni: ["A birthday", "An anniversary", "To say sorry", "Just because"],
+    bigliettino: "What should we write on the card",
+    phBigliettino: "“For Anna, who fills a room even when she isn't there.”",
+    prenota: "Reserve the bouquet",
+    notaModulo: "Sample form: nothing is sent and no data is saved.",
+    chiusura: ["The right flowers exist.", "Just ask someone who knows them."],
+    piedeIndirizzo: "Vicolo del Cinque 12, Rome · 06 580 0000",
+    piede: "Fiori di Trastevere is a sample site · fictional business",
   },
-  {
-    anno: "2014",
-    titolo: "Chiara e i matrimoni",
-    testo:
-      "La nipote porta le composizioni fuori dalla bottega: prima i matrimoni degli amici, poi quelli degli sconosciuti. Trastevere si riempie dei nostri archi di fiori.",
-  },
-  {
-    anno: "Oggi",
-    titolo: "Tre generazioni dietro al banco",
-    testo:
-      "Iole sceglie ancora i colori, Marco tiene i conti, Chiara lega i mazzi. Il bancone di marmo è sempre lo stesso del 1962.",
-  },
-];
-
-const orari = [
-  { giorni: "Lunedì", ore: "riposo" },
-  { giorni: "Da martedì a sabato", ore: "8:00 – 13:00 · 15:30 – 19:30" },
-  { giorni: "Domenica", ore: "8:00 – 13:00" },
-];
+};
 
 function Rivela({
   children,
@@ -214,6 +314,7 @@ function FioreDisegnato({ f, size = 96 }: { f: Fiore; size?: number }) {
 
 /** Cartellino da fioraio appeso al filo, leggermente storto. */
 function Cartellino({ f, indice, fontSecondary }: { f: Fiore; indice: number; fontSecondary: string }) {
+  const t = useTesti(TESTI);
   const inclinazione = indice % 3 === 0 ? -2.2 : indice % 3 === 1 ? 1.6 : -1;
   return (
     <motion.div
@@ -254,19 +355,19 @@ function Cartellino({ f, indice, fontSecondary }: { f: Fiore; indice: number; fo
           className="mt-4 text-2xl leading-tight"
           style={{ fontFamily: "inherit", color: C.bosco, fontWeight: 600 }}
         >
-          {f.nome}
+          {t.fiori[indice].nome}
         </h3>
         <p
           className={`${fontSecondary} mt-1.5 text-[13px] leading-relaxed`}
           style={{ color: C.terra }}
         >
-          {f.nota}
+          {t.fiori[indice].nota}
         </p>
         <p
           className="mt-4 text-xl italic"
           style={{ color: C.rosso, fontWeight: 500 }}
         >
-          {f.prezzo} €
+          {t.prezzo(f.prezzo)}
         </p>
       </div>
     </motion.div>
@@ -275,6 +376,7 @@ function Cartellino({ f, indice, fontSecondary }: { f: Fiore; indice: number; fo
 
 /** Insegna circolare con scritta che gira piano. */
 function InsegnaRotonda({ fontSecondary }: { fontSecondary: string }) {
+  const t = useTesti(TESTI);
   const riduci = useReducedMotion();
   return (
     <div className="relative w-[150px] h-[150px] md:w-[176px] md:h-[176px]">
@@ -309,14 +411,14 @@ function InsegnaRotonda({ fontSecondary }: { fontSecondary: string }) {
             startOffset="0%"
             style={{ fontSize: "7px", letterSpacing: "0.14em" }}
           >
-            · FIORI DI TRASTEVERE
+            {t.insegna[0]}
           </textPath>
           <textPath
             href="#cerchio-insegna"
             startOffset="50%"
-            style={{ fontSize: "7px", letterSpacing: "0.26em" }}
+            style={{ fontSize: "7px", letterSpacing: t.spaziaturaInsegna }}
           >
-            · BOTTEGA DAL 1962
+            {t.insegna[1]}
           </textPath>
         </text>
       </motion.svg>
@@ -342,13 +444,14 @@ function InsegnaRotonda({ fontSecondary }: { fontSecondary: string }) {
 
 /** Mappa disegnata a mano del vicolo, col fiume e il segnaposto. */
 function MappaDisegnata() {
+  const t = useTesti(TESTI);
   return (
     <svg
       viewBox="0 0 360 280"
       fill="none"
       className="w-full h-auto"
       role="img"
-      aria-label="Mappa stilizzata: la bottega si trova in Vicolo del Cinque, vicino al Tevere"
+      aria-label={t.mappaEtichetta}
     >
       <rect width="360" height="280" rx="6" fill={C.avorio} />
       {/* Tevere */}
@@ -369,7 +472,7 @@ function MappaDisegnata() {
         transform="rotate(78 296 120)"
         style={{ fontFamily: "inherit" }}
       >
-        il Tevere
+        {t.tevere}
       </text>
       {/* strade */}
       {[
@@ -384,7 +487,7 @@ function MappaDisegnata() {
       {/* piazza */}
       <rect x="96" y="96" width="46" height="38" rx="3" fill={C.salvia} opacity="0.25" />
       <text x="100" y="118" fontSize="9.5" fill={C.bosco} opacity="0.65" style={{ fontFamily: "inherit", fontStyle: "italic" }}>
-        la piazzetta
+        {t.piazzetta}
       </text>
       {/* segnaposto della bottega */}
       <motion.g
@@ -408,7 +511,7 @@ function MappaDisegnata() {
         <circle cx="218" cy="152" r="4.5" fill={C.bosco} />
       </motion.g>
       <text x="206" y="186" fontSize="11" fill={C.bosco} fontWeight="600" style={{ fontFamily: "inherit" }}>
-        siamo qui
+        {t.siamoQui}
       </text>
     </svg>
   );
@@ -419,9 +522,9 @@ interface VetrinaBottegaProps { fontBase: string; fontSecondary: string; }
 export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBottegaProps) {
   const [inviato, setInviato] = useState(false);
   const [nome, setNome] = useState("");
-  const [occasione, setOccasione] = useState("");
-
-  const occasioni = ["Un compleanno", "Un anniversario", "Per chiedere scusa", "Così, senza motivo"];
+  const [occasione, setOccasione] = useState<number | null>(null);
+  const t = useTesti(TESTI);
+  const { storia, orari, occasioni } = t;
 
   return (
     <div
@@ -435,9 +538,9 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
             className={`${fontSecondary} hidden md:block text-[11px] uppercase tracking-[0.28em] text-left`}
             style={{ color: C.terra }}
           >
-            Bottega di fiori
+            {t.sinistra[0]}
             <br />
-            in Trastevere
+            {t.sinistra[1]}
           </p>
           <div className="flex justify-center">
             <InsegnaRotonda fontSecondary={fontSecondary} />
@@ -446,21 +549,21 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
             className={`${fontSecondary} hidden md:block text-[11px] uppercase tracking-[0.28em] text-right`}
             style={{ color: C.terra }}
           >
-            Vicolo del Cinque 12
+            {t.destra[0]}
             <br />
-            Roma
+            {t.destra[1]}
           </p>
         </div>
         <nav
           className={`${fontSecondary} mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.22em]`}
-          aria-label="Navigazione Fiori di Trastevere"
+          aria-label={t.navEtichetta}
         >
           {[
-            { href: "#banco", label: "Il banco" },
-            { href: "#storia", label: "La storia" },
-            { href: "#orari", label: "Orari" },
-            { href: "#dove", label: "Dove siamo" },
-            { href: "#ordina", label: "Ordina un mazzo" },
+            { href: "#banco", label: t.nav[0] },
+            { href: "#storia", label: t.nav[1] },
+            { href: "#orari", label: t.nav[2] },
+            { href: "#dove", label: t.nav[3] },
+            { href: "#ordina", label: t.nav[4] },
           ].map((v, i, arr) => (
             <span key={v.href} className="flex items-center gap-5">
               <a
@@ -489,9 +592,9 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
             className="text-5xl md:text-7xl lg:text-[5.5rem] leading-[1.02] max-w-3xl mx-auto"
             style={{ fontWeight: 500 }}
           >
-            Fiori freschi,
+            {t.titolo[0]}
             <br />
-            <em style={{ color: C.salvia }}>parole gentili.</em>
+            <em style={{ color: C.salvia }}>{t.titolo[1]}</em>
           </h1>
         </Rivela>
         <Rivela delay={0.2}>
@@ -499,8 +602,7 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
             className={`${fontSecondary} mt-8 text-[15px] md:text-base leading-relaxed max-w-xl mx-auto`}
             style={{ color: C.terra }}
           >
-            Dal 1962 leghiamo mazzi dietro lo stesso bancone di marmo. Entra,
-            dicci per chi sono, e al resto pensiamo noi.
+            {t.intro}
           </p>
         </Rivela>
         {/* stelo disegnato che scende verso il banco */}
@@ -521,22 +623,21 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
               className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
               style={{ color: C.rosso }}
             >
-              Il banco di oggi
+              {t.bancoEyebrow}
             </p>
             <h2 className="text-4xl md:text-5xl" style={{ fontWeight: 500 }}>
-              Ogni mazzo ha il suo cartellino
+              {t.bancoTitolo}
             </h2>
             <p
               className={`${fontSecondary} mt-4 text-sm max-w-lg mx-auto leading-relaxed`}
               style={{ color: C.terra }}
             >
-              Prezzi scritti a mano, come si è sempre fatto. Quello che vedi al
-              banco cambia con le stagioni e con l&apos;umore di Iole.
+              {t.bancoTesto}
             </p>
           </Rivela>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 mt-12">
             {banco.map((f, i) => (
-              <Cartellino key={f.nome} f={f} indice={i} fontSecondary={fontSecondary} />
+              <Cartellino key={i} f={f} indice={i} fontSecondary={fontSecondary} />
             ))}
           </div>
         </div>
@@ -554,10 +655,10 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
               className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
               style={{ color: C.rosso }}
             >
-              La storia
+              {t.storiaEyebrow}
             </p>
             <h2 className="text-4xl md:text-5xl" style={{ fontWeight: 500 }}>
-              Tre generazioni, un bancone
+              {t.storiaTitolo}
             </h2>
           </Rivela>
 
@@ -572,7 +673,7 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
             <div className="flex flex-col gap-16 md:gap-20">
               {storia.map((tappa, i) => (
                 <Rivela
-                  key={tappa.anno}
+                  key={i}
                   delay={0.1}
                   className={`relative pl-14 md:pl-0 md:w-[calc(50%-3rem)] ${
                     i % 2 === 0 ? "md:mr-auto md:text-right" : "md:ml-auto"
@@ -621,10 +722,10 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                 className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
                 style={{ color: C.rosso }}
               >
-                Orari
+                {t.orariEyebrow}
               </p>
               <h2 className="text-4xl md:text-5xl mb-8" style={{ fontWeight: 500 }}>
-                Quando trovarci
+                {t.orariTitolo}
               </h2>
               <div
                 className="px-8 py-8"
@@ -637,7 +738,7 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
               >
                 {orari.map((riga, i) => (
                   <div
-                    key={riga.giorni}
+                    key={i}
                     className="flex items-baseline justify-between gap-4 py-3.5"
                     style={{
                       borderBottom:
@@ -649,11 +750,11 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                     </span>
                     <span
                       className={
-                        riga.ore === "riposo"
+                        riga.chiuso
                           ? "text-lg italic"
                           : `${fontSecondary} text-[13px]`
                       }
-                      style={{ color: riga.ore === "riposo" ? C.rosso : C.terra }}
+                      style={{ color: riga.chiuso ? C.rosso : C.terra }}
                     >
                       {riga.ore}
                     </span>
@@ -663,8 +764,7 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                   className={`${fontSecondary} mt-5 text-xs leading-relaxed`}
                   style={{ color: C.terra }}
                 >
-                  La mattina presto trovi i fiori appena arrivati dal mercato. Se
-                  il mazzo ti serve per cena, passa entro le 19.
+                  {t.orariNota}
                 </p>
               </div>
             </Rivela>
@@ -675,10 +775,10 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                 className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
                 style={{ color: C.rosso }}
               >
-                Dove siamo
+                {t.doveEyebrow}
               </p>
               <h2 className="text-4xl md:text-5xl mb-8" style={{ fontWeight: 500 }}>
-                Nel cuore di Trastevere
+                {t.doveTitolo}
               </h2>
               <div
                 className="p-3"
@@ -695,8 +795,8 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                 className={`${fontSecondary} mt-4 text-sm leading-relaxed`}
                 style={{ color: C.terra }}
               >
-                <strong style={{ color: C.bosco }}>Vicolo del Cinque 12, Roma</strong>, a
-                due passi da piazza Trilussa. Telefono:{" "}
+                <strong style={{ color: C.bosco }}>{t.indirizzo}</strong>
+                {t.doveTesto}{" "}
                 <span style={{ color: C.bosco }}>06 580 0000</span>
               </p>
             </Rivela>
@@ -712,12 +812,12 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
               className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-3`}
               style={{ color: C.rosso }}
             >
-              Ordina un mazzo
+              {t.ordinaEyebrow}
             </p>
             <h2 className="text-4xl md:text-5xl" style={{ fontWeight: 500 }}>
-              Scrivi il bigliettino,
+              {t.ordinaTitolo[0]}
               <br />
-              <em style={{ color: C.salvia }}>ai fiori pensiamo noi</em>
+              <em style={{ color: C.salvia }}>{t.ordinaTitolo[1]}</em>
             </h2>
           </Rivela>
 
@@ -733,14 +833,13 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
               >
                 <FioreDisegnato f={banco[0]} size={72} />
                 <p className="text-3xl italic mt-4" style={{ fontWeight: 500 }}>
-                  Grazie{nome ? `, ${nome}` : ""}.
+                  {t.grazie(nome)}
                 </p>
                 <p
                   className={`${fontSecondary} mt-3 text-sm leading-relaxed`}
                   style={{ color: C.terra }}
                 >
-                  In una bottega vera il mazzo sarebbe già sul bancone. Questa è
-                  una vetrina dimostrativa: nessun fiore è stato colto.
+                  {t.grazieTesto}
                 </p>
               </div>
             ) : (
@@ -770,7 +869,7 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                   className="text-2xl italic mb-7"
                   style={{ color: C.salvia, fontWeight: 500 }}
                 >
-                  Per chi sono questi fiori?
+                  {t.perChi}
                 </p>
 
                 <div className="flex flex-col gap-6">
@@ -780,7 +879,7 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                       className={`${fontSecondary} block text-[11px] uppercase tracking-[0.22em] mb-2`}
                       style={{ color: C.terra }}
                     >
-                      Il tuo nome
+                      {t.tuoNome}
                     </label>
                     <input
                       id="bottega-nome"
@@ -803,7 +902,7 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                       className={`${fontSecondary} block text-[11px] uppercase tracking-[0.22em] mb-2`}
                       style={{ color: C.terra }}
                     >
-                      Telefono
+                      {t.telefono}
                     </label>
                     <input
                       id="bottega-telefono"
@@ -823,28 +922,28 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                       className={`${fontSecondary} text-[11px] uppercase tracking-[0.22em] mb-3`}
                       style={{ color: C.terra }}
                     >
-                      L&apos;occasione
+                      {t.occasione}
                     </legend>
                     <div className="flex flex-wrap gap-x-6 gap-y-2.5">
-                      {occasioni.map((o) => (
+                      {occasioni.map((o, i) => (
                         <label
-                          key={o}
+                          key={i}
                           className="flex items-center gap-2 cursor-pointer group"
                         >
                           <input
                             type="radio"
                             name="occasione"
                             value={o}
-                            checked={occasione === o}
-                            onChange={() => setOccasione(o)}
+                            checked={occasione === i}
+                            onChange={() => setOccasione(i)}
                             className="sr-only"
                           />
                           <span
                             className="w-3.5 h-3.5 rounded-full transition-all shrink-0"
                             style={{
-                              border: `1.5px solid ${occasione === o ? C.rosso : C.terra}`,
-                              backgroundColor: occasione === o ? C.rosso : "transparent",
-                              boxShadow: occasione === o ? `inset 0 0 0 2.5px ${C.avorio}` : "none",
+                              border: `1.5px solid ${occasione === i ? C.rosso : C.terra}`,
+                              backgroundColor: occasione === i ? C.rosso : "transparent",
+                              boxShadow: occasione === i ? `inset 0 0 0 2.5px ${C.avorio}` : "none",
                             }}
                             aria-hidden="true"
                           />
@@ -861,12 +960,12 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                       className={`${fontSecondary} block text-[11px] uppercase tracking-[0.22em] mb-2`}
                       style={{ color: C.terra }}
                     >
-                      Cosa scriviamo sul bigliettino
+                      {t.bigliettino}
                     </label>
                     <textarea
                       id="bottega-messaggio"
                       rows={3}
-                      placeholder="«Per Anna, che riempie le stanze anche quando non c'è.»"
+                      placeholder={t.phBigliettino}
                       className="w-full bg-transparent text-xl italic py-2 outline-none resize-none transition-colors placeholder:opacity-50"
                       style={{
                         borderBottom: `1.5px solid ${C.terra}66`,
@@ -885,14 +984,13 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = C.rosso)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.bosco)}
                 >
-                  Prenota il mazzo
+                  {t.prenota}
                 </button>
                 <p
                   className={`${fontSecondary} mt-4 text-[11px] text-center leading-relaxed`}
                   style={{ color: C.terra }}
                 >
-                  Modulo dimostrativo: non viene inviato nulla, nessun dato viene
-                  salvato.
+                  {t.notaModulo}
                 </p>
               </form>
             )}
@@ -917,21 +1015,21 @@ export default function VetrinaBottega({ fontBase, fontSecondary }: VetrinaBotte
             className="text-4xl md:text-6xl leading-[1.08] max-w-2xl mx-auto"
             style={{ fontWeight: 500 }}
           >
-            I fiori giusti esistono.
+            {t.chiusura[0]}
             <br />
-            <em style={{ color: "#A9B89B" }}>Basta chiederli a chi li conosce.</em>
+            <em style={{ color: "#A9B89B" }}>{t.chiusura[1]}</em>
           </h2>
           <p
             className={`${fontSecondary} mt-9 text-[12px] uppercase tracking-[0.26em]`}
             style={{ color: `${C.perla}99` }}
           >
-            Vicolo del Cinque 12, Roma · 06 580 0000
+            {t.piedeIndirizzo}
           </p>
           <p
             className={`${fontSecondary} mt-10 text-[11px]`}
             style={{ color: `${C.perla}59` }}
           >
-            Fiori di Trastevere è una vetrina dimostrativa · attività di fantasia
+            {t.piede}
           </p>
         </Rivela>
       </section>

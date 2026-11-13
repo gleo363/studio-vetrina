@@ -6,6 +6,36 @@ import AnimatedSection from "@/components/ui/AnimatedSection";
 import PasswordInput from "@/components/ui/PasswordInput";
 import { registraPartner } from "@/app/actions/partner";
 import Link from "next/link";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: {
+    eyebrow: "Programma Partner",
+    titolo: "Crea il tuo account.",
+    sottotitolo: "In un minuto ricevi il tuo codice personale e il tuo QR.",
+    nome: "Nome",
+    phNome: "Mario Rossi",
+    phEmail: "mario@esempio.it",
+    phPassword: "Almeno 8 caratteri",
+    creazione: "Creazione in corso…",
+    crea: "Crea il mio codice →",
+    giàAccount: "Hai già un account?",
+    accedi: "Accedi",
+  },
+  en: {
+    eyebrow: "Partner Program",
+    titolo: "Create your account.",
+    sottotitolo: "In a minute you'll have your own code and QR.",
+    nome: "Name",
+    phNome: "Jane Smith",
+    phEmail: "jane@example.com",
+    phPassword: "At least 8 characters",
+    creazione: "Creating your account…",
+    crea: "Get my code →",
+    giàAccount: "Already have an account?",
+    accedi: "Log in",
+  },
+};
 
 const inputCls =
   "w-full bg-glass border border-inchiostro/10 rounded-xl px-4 py-3.5 text-sm text-inchiostro placeholder:text-pietra/50 outline-none focus:border-inchiostro/30 transition-colors";
@@ -14,6 +44,7 @@ const labelCls =
 
 export default function RegistratiPage() {
   const [state, action, pending] = useActionState(registraPartner, null);
+  const t = useTesti(TESTI);
 
   return (
     <div className="min-h-screen bg-travertino pt-32 pb-24 px-6">
@@ -23,19 +54,19 @@ export default function RegistratiPage() {
             className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-4"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Programma Partner
+            {t.eyebrow}
           </p>
           <h1
             className="text-3xl md:text-4xl font-medium text-inchiostro mb-3"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Crea il tuo account.
+            {t.titolo}
           </h1>
           <p
             className="text-sm text-inchiostro/60"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            In un minuto ricevi il tuo codice personale e il tuo QR.
+            {t.sottotitolo}
           </p>
         </AnimatedSection>
 
@@ -62,14 +93,14 @@ export default function RegistratiPage() {
                 className={labelCls}
                 style={{ fontFamily: "var(--font-inter)" }}
               >
-                Nome
+                {t.nome}
               </label>
               <input
                 id="nome"
                 name="nome"
                 type="text"
                 required
-                placeholder="Mario Rossi"
+                placeholder={t.phNome}
                 className={inputCls}
                 style={{ fontFamily: "var(--font-inter)" }}
               />
@@ -88,7 +119,7 @@ export default function RegistratiPage() {
                 name="email"
                 type="email"
                 required
-                placeholder="mario@esempio.it"
+                placeholder={t.phEmail}
                 className={inputCls}
                 style={{ fontFamily: "var(--font-inter)" }}
               />
@@ -107,7 +138,7 @@ export default function RegistratiPage() {
                 name="password"
                 required
                 minLength={8}
-                placeholder="Almeno 8 caratteri"
+                placeholder={t.phPassword}
                 className={inputCls}
                 style={{ fontFamily: "var(--font-inter)" }}
               />
@@ -122,7 +153,7 @@ export default function RegistratiPage() {
               whileTap={pending ? {} : { scale: 0.97 }}
               transition={{ duration: 0.2 }}
             >
-              {pending ? "Creazione in corso…" : "Crea il mio codice →"}
+              {pending ? t.creazione : t.crea}
             </motion.button>
           </form>
 
@@ -130,12 +161,12 @@ export default function RegistratiPage() {
             className="mt-6 text-sm text-pietra"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Hai già un account?{" "}
+            {t.giàAccount}{" "}
             <Link
               href="/partner/accedi"
               className="text-inchiostro hover:text-cotto transition-colors"
             >
-              Accedi
+              {t.accedi}
             </Link>
           </p>
         </AnimatedSection>

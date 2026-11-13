@@ -1,8 +1,15 @@
 "use client";
 import { motion } from "framer-motion";
 import { EASE_VETRINA, DURATA } from "@/lib/motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: { titolo: "Ogni attività merita la sua vetrina.", cta: "Parliamone davanti a un caffè" },
+  en: { titolo: "Every business deserves a window worth stopping for.", cta: "Let's talk over coffee" },
+};
 
 export default function SezioneCtaFinale() {
+  const t = useTesti(TESTI);
   return (
     // Lo sfondo rosso è sempre dipinto: il reveal vive solo sul contenuto,
     // così uno scroll veloce non lascia mai un buco color travertino.
@@ -29,7 +36,7 @@ export default function SezioneCtaFinale() {
             },
           }}
         >
-          Ogni attività merita la sua vetrina.
+          {t.titolo}
         </motion.h2>
 
         <motion.div
@@ -57,7 +64,7 @@ export default function SezioneCtaFinale() {
               className="inline-flex items-center gap-2 bg-travertino text-inchiostro rounded-[10px] px-8 py-4 text-base font-medium hover:bg-glass transition-colors"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              Parliamone davanti a un caffè
+              {t.cta}
               <span className="freccia" aria-hidden="true">
                 →
               </span>

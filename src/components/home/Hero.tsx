@@ -13,9 +13,28 @@ import {
   riveloMascherato,
   fadeUp,
 } from "@/lib/motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: {
+    eyebrow: "Studio Vetrina · Roma",
+    titolo: ["La tua vetrina", "sul mondo."],
+    sottotitolo: "Siti su misura per le attività che hanno qualcosa da mostrare.",
+    cta: "Apriamo la tua vetrina →",
+    esempi: "Guarda gli esempi",
+  },
+  en: {
+    eyebrow: "Studio Vetrina · Rome",
+    titolo: ["Your shop window", "to the world."],
+    sottotitolo: "Made-to-measure websites for businesses with something to show.",
+    cta: "Let's dress your window →",
+    esempi: "See our work",
+  },
+};
 
 export default function Hero() {
   const riduciMovimento = useReducedMotion();
+  const t = useTesti(TESTI);
   const { scrollY } = useScroll();
   // Con prefers-reduced-motion i range collassano (parallasse ferma):
   // lo stile iniziale resta identico tra server e client, niente
@@ -49,7 +68,7 @@ export default function Hero() {
           className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-8"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Studio Vetrina · Roma
+          {t.eyebrow}
         </motion.p>
 
         <h1
@@ -62,12 +81,12 @@ export default function Hero() {
           {/* Ogni riga entra "nella cornice": maschera overflow-hidden. */}
           <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
             <motion.span className="block" variants={riveloMascherato(0.15)}>
-              La tua vetrina
+              {t.titolo[0]}
             </motion.span>
           </span>
           <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
             <motion.span className="block" variants={riveloMascherato(0.27)}>
-              sul mondo.
+              {t.titolo[1]}
             </motion.span>
           </span>
         </h1>
@@ -80,7 +99,7 @@ export default function Hero() {
             fontStyle: "italic",
           }}
         >
-          Siti web su misura per le piccole attività.
+          {t.sottotitolo}
         </motion.p>
 
         <motion.div
@@ -94,12 +113,12 @@ export default function Hero() {
         >
           <motion.div variants={fadeUp(14, DURATA.base)}>
             <Button href="/contatti" variant="primary" className="text-base px-7 py-4">
-              Apriamo la tua vetrina →
+              {t.cta}
             </Button>
           </motion.div>
           <motion.div variants={fadeUp(14, DURATA.base)}>
             <Button href="/esempi" variant="ghost" className="text-base px-7 py-4">
-              Guarda gli esempi
+              {t.esempi}
             </Button>
           </motion.div>
         </motion.div>

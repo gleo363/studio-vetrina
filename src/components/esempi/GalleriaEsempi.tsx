@@ -4,12 +4,11 @@ import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 import { EASE_VETRINA as ease } from "@/lib/motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
 
 interface Vetrina {
   href: string;
   nome: string;
-  settore: string;
-  descrizione: string;
   // Mini-anteprima stilizzata: i colori della vetrina, non del brand
   anteprima: {
     sfondo: string;
@@ -24,9 +23,6 @@ const vetrine: Vetrina[] = [
   {
     href: "/esempi/ristorante",
     nome: "Osteria del Vicolo",
-    settore: "Ristorazione",
-    descrizione:
-      "Una trattoria romana che fa venire fame ancora prima di sedersi: menù, orari e tavolo prenotato in due tocchi.",
     anteprima: {
       sfondo: "#FAF2E2",
       primario: "#D8501C",
@@ -38,9 +34,6 @@ const vetrine: Vetrina[] = [
   {
     href: "/esempi/salone",
     nome: "Atelier Sofia",
-    settore: "Saloni e centri estetici",
-    descrizione:
-      "Parrucchieri e trattamenti estetici con listino chiaro e prenotazione dell'appuntamento direttamente dalla pagina.",
     anteprima: {
       sfondo: "#FFFFFF",
       primario: "#1C1C1E",
@@ -52,9 +45,6 @@ const vetrine: Vetrina[] = [
   {
     href: "/esempi/bottega",
     nome: "Fiori di Trastevere",
-    settore: "Botteghe e negozi",
-    descrizione:
-      "Una bottega di fiori con la vetrina dei prodotti in bella mostra, la storia della famiglia e gli orari sempre aggiornati.",
     anteprima: {
       sfondo: "#F7F5F0",
       primario: "#7C8B6F",
@@ -66,9 +56,6 @@ const vetrine: Vetrina[] = [
   {
     href: "/esempi/studio",
     nome: "Falegnameria Marini",
-    settore: "Artigiani e professionisti",
-    descrizione:
-      "Un laboratorio artigiano che si presenta con i lavori fatti, le competenze e un modulo per chiedere un preventivo.",
     anteprima: {
       sfondo: "#161412",
       primario: "#F5F3EF",
@@ -78,6 +65,73 @@ const vetrine: Vetrina[] = [
     },
   },
 ];
+
+const TESTI = {
+  it: {
+    eyebrow: "Esempi",
+    titolo: "Quattro vetrine, quattro mondi.",
+    intro:
+      "Abbiamo allestito quattro vetrine dimostrative. Le attività sono di fantasia, la cura è quella vera: ogni vetrina ha colori, caratteri e atmosfera scelti su misura, perché è questo il nostro mestiere.",
+    schede: [
+      {
+        settore: "Ristorazione",
+        descrizione:
+          "Una trattoria romana che fa venire fame ancora prima di sedersi: menù, orari e tavolo prenotato in due tocchi.",
+      },
+      {
+        settore: "Saloni e centri estetici",
+        descrizione:
+          "Parrucchieri e trattamenti estetici con listino chiaro e prenotazione dell'appuntamento direttamente dalla pagina.",
+      },
+      {
+        settore: "Botteghe e negozi",
+        descrizione:
+          "Una bottega di fiori con la vetrina dei prodotti in bella mostra, la storia della famiglia e gli orari sempre aggiornati.",
+      },
+      {
+        settore: "Artigiani e professionisti",
+        descrizione:
+          "Un laboratorio artigiano che si presenta con i lavori fatti, le competenze e un modulo per chiedere un preventivo.",
+      },
+    ],
+    visita: "Visita la vetrina",
+    nota: "Vetrina dimostrativa · attività di fantasia",
+    chiusura: "La tua vetrina sarà diversa da tutte queste. Sarà la tua.",
+    cta: "Apriamo la tua vetrina",
+  },
+  en: {
+    eyebrow: "Our work",
+    titolo: "Four windows, four worlds.",
+    intro:
+      "We dressed four sample windows. The businesses are made up, but the care is real: each one has its own colors, type and mood, chosen to fit. That's our craft.",
+    schede: [
+      {
+        settore: "Restaurants",
+        descrizione:
+          "A Roman trattoria that makes you hungry before you even sit down: menu, opening hours and a table booked in two taps.",
+      },
+      {
+        settore: "Hair and beauty",
+        descrizione:
+          "A hair and beauty salon with a clear price list and appointments booked straight from the page.",
+      },
+      {
+        settore: "Shops and boutiques",
+        descrizione:
+          "A family flower shop with its bouquets on show, the story behind it and opening hours that are always current.",
+      },
+      {
+        settore: "Trades and craftspeople",
+        descrizione:
+          "A carpentry workshop that lets its finished work do the talking, with a simple form to ask for a quote.",
+      },
+    ],
+    visita: "Take a look",
+    nota: "Sample site · fictional business",
+    chiusura: "Yours won't look like any of these. It'll look like you.",
+    cta: "Let's dress your window",
+  },
+};
 
 /** Miniatura astratta del sito: piccola gerarchia di blocchi nei colori della vetrina. */
 function Anteprima({ v }: { v: Vetrina }) {
@@ -138,6 +192,7 @@ function Anteprima({ v }: { v: Vetrina }) {
 }
 
 export default function GalleriaEsempi() {
+  const t = useTesti(TESTI);
   return (
     <div className="bg-travertino">
       {/* Hero */}
@@ -148,22 +203,19 @@ export default function GalleriaEsempi() {
               className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-6"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              Esempi
+              {t.eyebrow}
             </p>
             <h1
               className="text-4xl md:text-6xl lg:text-7xl font-medium text-inchiostro leading-[0.95] tracking-tight mb-8 max-w-3xl"
               style={{ fontFamily: "var(--font-fraunces)" }}
             >
-              Quattro vetrine, quattro mondi.
+              {t.titolo}
             </h1>
             <p
               className="text-lg md:text-xl text-pietra max-w-2xl leading-relaxed"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              Abbiamo allestito quattro vetrine dimostrative. Le attività sono
-              di fantasia, la cura è quella vera: ogni vetrina ha colori,
-              caratteri e atmosfera scelti su misura, perché è questo il nostro
-              mestiere.
+              {t.intro}
             </p>
           </AnimatedSection>
         </div>
@@ -173,7 +225,7 @@ export default function GalleriaEsempi() {
       <section className="px-6 pb-28">
         <div className="max-w-6xl mx-auto">
           <StaggerContainer className="grid sm:grid-cols-2 gap-6">
-            {vetrine.map((v) => (
+            {vetrine.map((v, i) => (
               <StaggerItem key={v.href}>
                 <Link href={v.href} className="block h-full" data-cursor="pointer">
                   <motion.article
@@ -190,7 +242,7 @@ export default function GalleriaEsempi() {
                         className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cotto mb-3"
                         style={{ fontFamily: "var(--font-inter)" }}
                       >
-                        {v.settore}
+                        {t.schede[i].settore}
                       </p>
                       <h2
                         className="text-2xl font-medium text-inchiostro mb-3"
@@ -202,14 +254,14 @@ export default function GalleriaEsempi() {
                         className="text-sm text-pietra leading-relaxed mb-5 flex-1"
                         style={{ fontFamily: "var(--font-inter)" }}
                       >
-                        {v.descrizione}
+                        {t.schede[i].descrizione}
                       </p>
                       <div className="flex items-center justify-between">
                         <span
                           className="text-sm font-medium text-inchiostro inline-flex items-center gap-1.5"
                           style={{ fontFamily: "var(--font-inter)" }}
                         >
-                          Visita la vetrina
+                          {t.visita}
                           <span className="freccia" aria-hidden="true">
                             →
                           </span>
@@ -218,7 +270,7 @@ export default function GalleriaEsempi() {
                           className="text-[10px] text-pietra/80"
                           style={{ fontFamily: "var(--font-inter)" }}
                         >
-                          Vetrina dimostrativa · attività di fantasia
+                          {t.nota}
                         </span>
                       </div>
                     </div>
@@ -263,7 +315,7 @@ export default function GalleriaEsempi() {
                 },
               }}
             >
-              La tua vetrina sarà diversa da tutte queste. Sarà la tua.
+              {t.chiusura}
             </motion.h2>
 
             <motion.div
@@ -288,7 +340,7 @@ export default function GalleriaEsempi() {
                   style={{ fontFamily: "var(--font-inter)" }}
                   data-cursor="pointer"
                 >
-                  Apriamo la tua vetrina
+                  {t.cta}
                   <span className="freccia" aria-hidden="true">
                     →
                   </span>

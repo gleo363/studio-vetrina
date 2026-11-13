@@ -5,60 +5,125 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { EASE_VETRINA, DURATA } from "@/lib/motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
 
 // Bozza dei testi di Assistenza e Rinnovo: da rivedere prima della pubblicazione.
-const pacchetti: {
+type Pacchetto = {
   nome: string;
   descrizione: string;
   voci: string[];
   extraTitolo?: string;
   extra?: string[];
   evidenziata: boolean;
-}[] = [
-  {
-    nome: "Assistenza",
-    descrizione: "Per chi ha già un sito online e vuole che resti sempre in ordine.",
-    voci: [
-      "Modifiche a testi, foto e pagine",
-      "Aggiornamenti e controlli di sicurezza",
-      "Verifica di funzionamento e velocità",
-      "Risposta alle tue richieste",
-      "Una persona di riferimento",
+};
+
+const TESTI: Record<"it" | "en", {
+  titolo: string;
+  piùScelto: string;
+  cta: string;
+  pacchetti: Pacchetto[];
+}> = {
+  it: {
+    titolo: "Tre pacchetti, zero sorprese.",
+    piùScelto: "Più scelto",
+    cta: "Parliamone →",
+    pacchetti: [
+      {
+        nome: "Assistenza",
+        descrizione: "Per chi ha già un sito online e vuole che resti sempre in ordine.",
+        voci: [
+          "Modifiche a testi, foto e pagine",
+          "Aggiornamenti e controlli di sicurezza",
+          "Verifica di funzionamento e velocità",
+          "Risposta alle tue richieste",
+          "Una persona di riferimento",
+        ],
+        evidenziata: false,
+      },
+      {
+        nome: "Vetrina da zero",
+        descrizione: "Il tuo sito nasce da una pagina bianca, costruito attorno alla tua attività.",
+        voci: [
+          "Hosting e un anno di dominio",
+          "Supporto per un mese",
+          "Ottimizzazione SEO",
+          "Design personalizzato",
+        ],
+        extraTitolo: "In base alle tue necessità aggiungiamo anche:",
+        extra: [
+          "Prenotazioni integrate",
+          "Blog integrato",
+          "Aree riservate",
+          "Integrazioni personalizzate",
+          "...e molto altro ancora!",
+        ],
+        evidenziata: true,
+      },
+      {
+        nome: "Rinnovo",
+        descrizione: "Per chi ha già un sito che non rappresenta più la sua attività.",
+        voci: [
+          "Nuovo design su misura",
+          "Testi e immagini rinnovati",
+          "Contenuti esistenti mantenuti",
+          "SEO rivista per non perdere posizioni",
+          "Sito veloce e curato su ogni schermo",
+        ],
+        evidenziata: false,
+      },
     ],
-    evidenziata: false,
   },
-  {
-    nome: "Vetrina da zero",
-    descrizione: "Il tuo sito nasce da una pagina bianca, costruito attorno alla tua attività.",
-    voci: [
-      "Hosting e un anno di dominio",
-      "Supporto per un mese",
-      "Ottimizzazione SEO",
-      "Design personalizzato",
+  en: {
+    titolo: "Three packages. No surprises.",
+    piùScelto: "Most popular",
+    cta: "Let's talk →",
+    pacchetti: [
+      {
+        nome: "Care",
+        descrizione: "Your site is already live and you want it kept in good shape.",
+        voci: [
+          "Changes to text, photos and pages",
+          "Updates and security checks",
+          "Regular speed and uptime checks",
+          "Quick answers to your requests",
+          "One person you can always reach",
+        ],
+        evidenziata: false,
+      },
+      {
+        nome: "From scratch",
+        descrizione: "Your site starts from a blank page and is built around your business.",
+        voci: [
+          "Hosting and a year of your domain",
+          "A month of support",
+          "Built to be found on Google (SEO)",
+          "Design made to measure",
+        ],
+        extraTitolo: "Depending on what you need, we can also add:",
+        extra: [
+          "Online booking",
+          "A blog",
+          "Private login areas",
+          "Connections to the tools you already use",
+          "...and plenty more!",
+        ],
+        evidenziata: true,
+      },
+      {
+        nome: "Redesign",
+        descrizione: "You have a site, but it no longer reflects your business.",
+        voci: [
+          "A fresh design, made to measure",
+          "New text and images",
+          "Your existing content, kept",
+          "SEO reviewed so you keep your rankings",
+          "Fast and polished on every screen",
+        ],
+        evidenziata: false,
+      },
     ],
-    extraTitolo: "In base alle tue necessità aggiungiamo anche:",
-    extra: [
-      "Prenotazioni integrate",
-      "Blog integrato",
-      "Aree riservate",
-      "Integrazioni personalizzate",
-      "...e molto altro ancora!",
-    ],
-    evidenziata: true,
   },
-  {
-    nome: "Rinnovo",
-    descrizione: "Per chi ha già un sito che non rappresenta più la sua attività.",
-    voci: [
-      "Nuovo design su misura",
-      "Testi e immagini rinnovati",
-      "Contenuti esistenti mantenuti",
-      "SEO rivista per non perdere posizioni",
-      "Sito veloce e curato su ogni schermo",
-    ],
-    evidenziata: false,
-  },
-];
+};
 
 // Le voci del listino "si compongono" una alla volta dentro la card.
 const vociContainer = {
@@ -78,6 +143,7 @@ const voceItem = {
 };
 
 export default function SezioneServizi() {
+  const t = useTesti(TESTI);
   return (
     <section className="bg-travertino px-6 py-28">
       <div className="max-w-6xl mx-auto">
@@ -86,13 +152,13 @@ export default function SezioneServizi() {
             className="text-3xl md:text-4xl lg:text-[44px] font-medium leading-[1.1] text-inchiostro"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Tre pacchetti, zero sorprese.
+            {t.titolo}
           </h2>
         </AnimatedSection>
 
         <StaggerContainer className="grid md:grid-cols-3 gap-6 items-start">
-          {pacchetti.map((p) => (
-            <StaggerItem key={p.nome}>
+          {t.pacchetti.map((p, indice) => (
+            <StaggerItem key={indice}>
               <motion.div
                 className={`rounded-2xl p-8 h-full flex flex-col cursor-default ${
                   p.evidenziata
@@ -123,7 +189,7 @@ export default function SezioneServizi() {
                     className="text-xs font-medium text-cotto uppercase tracking-widest mb-4 block"
                     style={{ fontFamily: "var(--font-inter)" }}
                   >
-                    Più scelto
+                    {t.piùScelto}
                   </span>
                 )}
                 <h3
@@ -212,7 +278,7 @@ export default function SezioneServizi() {
                     !p.evidenziata ? "border-inchiostro/20" : ""
                   }`}
                 >
-                  Parliamone →
+                  {t.cta}
                 </Button>
               </motion.div>
             </StaggerItem>

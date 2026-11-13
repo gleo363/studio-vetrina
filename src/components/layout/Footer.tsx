@@ -1,18 +1,42 @@
+"use client";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import SelettoreLingua from "@/components/ui/SelettoreLingua";
+import { useTesti } from "@/components/providers/LinguaProvider";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/esempi", label: "Esempi" },
-  { href: "/studio", label: "Studio" },
-  { href: "/perche-sceglierci", label: "Perché noi" },
-  { href: "/qa", label: "Q&A" },
-  { href: "/partner", label: "Partner" },
-  { href: "/partner/accedi", label: "Accedi" },
-];
+const TESTI = {
+  it: {
+    nav: [
+      { href: "/", label: "Home" },
+      { href: "/esempi", label: "Esempi" },
+      { href: "/studio", label: "Studio" },
+      { href: "/perche-sceglierci", label: "Perché noi" },
+      { href: "/qa", label: "Q&A" },
+      { href: "/partner", label: "Partner" },
+      { href: "/partner/accedi", label: "Accedi" },
+    ],
+    città: "Roma",
+    motto: "Un solo segno, tre significati.",
+  },
+  en: {
+    nav: [
+      { href: "/", label: "Home" },
+      { href: "/esempi", label: "Work" },
+      { href: "/studio", label: "Studio" },
+      { href: "/perche-sceglierci", label: "Why us" },
+      { href: "/qa", label: "FAQ" },
+      { href: "/partner", label: "Partners" },
+      { href: "/partner/accedi", label: "Log in" },
+    ],
+    città: "Rome",
+    motto: "One mark, three meanings.",
+  },
+};
 
 export default function Footer() {
+  const t = useTesti(TESTI);
+  const navLinks = t.nav;
   return (
     <footer className="bg-inchiostro alone-cotto text-travertino border-t border-travertino/10 px-6 py-16">
       <div className="max-w-6xl mx-auto">
@@ -43,13 +67,16 @@ export default function Footer() {
               ))}
             </nav>
 
-            {/* Copyright */}
-            <p
-              className="text-sm text-travertino/40 whitespace-nowrap"
-              style={{ fontFamily: "var(--font-inter)" }}
-            >
-              © {new Date().getFullYear()} Studio Vetrina · Roma
-            </p>
+            {/* Lingua + copyright */}
+            <div className="flex flex-col gap-4 md:items-end">
+              <SelettoreLingua tono="chiaro" />
+              <p
+                className="text-sm text-travertino/40 whitespace-nowrap"
+                style={{ fontFamily: "var(--font-inter)" }}
+              >
+                © {new Date().getFullYear()} Studio Vetrina · {t.città}
+              </p>
+            </div>
           </div>
         </AnimatedSection>
 
@@ -58,7 +85,7 @@ export default function Footer() {
             className="text-travertino/25 text-sm"
             style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
           >
-            Un solo segno, tre significati.
+            {t.motto}
           </p>
         </AnimatedSection>
       </div>

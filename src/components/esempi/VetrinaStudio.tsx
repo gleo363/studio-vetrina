@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
 
 
 const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
@@ -26,77 +27,214 @@ type Lavoro = {
   descrizione: string;
 };
 
-const lavori: Lavoro[] = [
-  {
-    numero: "01",
-    nome: "Cucina in rovere di Slavonia",
-    luogo: "Appartamento in Oltrarno",
-    anno: "2025",
-    essenza: "Rovere massello",
-    finitura: "Olio naturale opaco",
-    tempi: "Nove settimane",
-    descrizione:
-      "Sette metri lineari senza una sola maniglia: le ante si aprono con la gola scavata nel pieno. Il piano è un'unica tavola di rovere giuntata a pettine, levigata fino a grana mille.",
+const TESTI = {
+  it: {
+    lavori: [
+      {
+        numero: "01",
+        nome: "Cucina in rovere di Slavonia",
+        luogo: "Appartamento in Oltrarno",
+        anno: "2025",
+        essenza: "Rovere massello",
+        finitura: "Olio naturale opaco",
+        tempi: "Nove settimane",
+        descrizione:
+          "Sette metri lineari senza una sola maniglia: le ante si aprono con la gola scavata nel pieno. Il piano è un'unica tavola di rovere giuntata a pettine, levigata fino a grana mille.",
+      },
+      {
+        numero: "02",
+        nome: "Libreria a tutta parete",
+        luogo: "Studio di un notaio, centro storico",
+        anno: "2024",
+        essenza: "Noce nazionale",
+        finitura: "Gommalacca a tampone",
+        tempi: "Sei settimane",
+        descrizione:
+          "Quattro metri e mezzo di altezza, scala a carrello compresa. Ogni ripiano regge ottanta chili di faldoni: lo abbiamo verificato caricandoli noi, prima della consegna.",
+      },
+      {
+        numero: "03",
+        nome: "Restauro di un portone del Seicento",
+        luogo: "Palazzo in via Maggio",
+        anno: "2024",
+        essenza: "Castagno originale",
+        finitura: "Cera d'api e terre naturali",
+        tempi: "Quattro mesi",
+        descrizione:
+          "Smontato pezzo per pezzo, documentato chiodo per chiodo. Le parti marce sono state sostituite con castagno stagionato vent'anni; tutto il resto è ancora quello del 1640.",
+      },
+      {
+        numero: "04",
+        nome: "Infissi per una casa colonica",
+        luogo: "Campagna di Fiesole",
+        anno: "2023",
+        essenza: "Larice termotrattato",
+        finitura: "Velatura grigio cenere",
+        tempi: "Dieci settimane",
+        descrizione:
+          "Diciotto finestre e quattro portefinestre, tutte fuori squadra come le mura che le ospitano. Ogni telaio è stato rilevato a dima sul posto, nessuno è uguale all'altro.",
+      },
+    ] as Lavoro[],
+    voci: { essenza: "Essenza", finitura: "Finitura", tempi: "Tempi" },
+    competenze: [
+      { codice: "A", nome: "Arredo su misura", nota: "Cucine, librerie, armadi a muro, tavoli. Dal rilievo alla posa." },
+      { codice: "B", nome: "Restauro conservativo", nota: "Mobili e serramenti d'epoca. Si conserva tutto il conservabile." },
+      { codice: "C", nome: "Serramenti", nota: "Finestre, porte e portoni in essenza, anche per edifici vincolati." },
+      { codice: "D", nome: "Scale e soppalchi", nota: "Strutture portanti in legno, calcolate e certificate." },
+    ],
+    tipiLavoro: ["Arredo su misura", "Restauro", "Serramenti", "Altro"],
+    indice: ["Lavori", "Mestiere", "Competenze", "Preventivo"],
+    indiceEtichetta: "Indice delle sezioni",
+    sottotitolo: "Bottega in San Frediano, Firenze · dal 1974",
+    eyebrow: "Falegnami da tre generazioni",
+    titolo: ["Legno, misura,", "pazienza.", "Il resto lo mettono", "le mani."],
+    quota: "dal rilievo alla posa · 51 anni di banco",
+    lavoriScelti: "Lavori scelti",
+    suggerimento: "Premi una riga per aprire la scheda del lavoro",
+    mestiere: "Il mestiere",
+    mestiereTesto: "Ogni tavola ha un verso. Il nostro lavoro è ascoltarlo prima di tagliare:",
+    mestiereEvidenza: "il legno che viene rispettato non si imbarca, non si fessura, non cambia idea.",
+    principi: [
+      {
+        voce: "Materiale",
+        testo:
+          "Compriamo tavole, non pannelli. Le essenze stagionano nel nostro magazzino almeno due anni prima di salire sul banco.",
+      },
+      {
+        voce: "Disegno",
+        testo:
+          "Ogni lavoro parte da un rilievo fatto da noi e da una tavola quotata che firmi prima dell'avvio. Niente sorprese in corso d'opera.",
+      },
+      {
+        voce: "Garanzia",
+        testo:
+          "Dieci anni su struttura e movimenti. Se un'anta cala, torniamo a registrarla. È capitato due volte in cinquant'anni.",
+      },
+    ],
+    cosaFacciamo: "Cosa facciamo",
+    preventivo: "Richiedi un preventivo",
+    preventivoTitolo: ["Compila la scheda,", "ti rispondiamo con una quota."],
+    preventivoTesto:
+      "Più dettagli ci dai, più il preventivo sarà preciso. Per i rilievi veniamo noi, senza impegno, in tutta la provincia di Firenze.",
+    ricevuta: "Scheda ricevuta",
+    grazie: ["Grazie. In bottega una richiesta così", "riceverebbe risposta entro due giorni."],
+    demoInviato: "Questa è una vetrina dimostrativa: nessun dato è stato inviato o salvato.",
+    campoNome: "A. Nome",
+    campoTelefono: "B. Telefono",
+    tipoLegenda: "Tipo di lavoro",
+    campoLavoro: "C. Lavoro",
+    campoDescrizione: "D. Descrizione",
+    phDescrizione: "Misure indicative, ambiente, essenza preferita se ne hai una…",
+    invia: "Invia la scheda",
+    notaModulo: "Modulo dimostrativo: non viene inviato nulla e nessun dato viene salvato.",
+    indirizzo: "Via dell'Orto 27, Firenze · 055 22 0000",
+    orari: "Dal lunedì al venerdì, 7:30 – 17:30",
+    piede: "Vetrina dimostrativa · attività di fantasia",
   },
-  {
-    numero: "02",
-    nome: "Libreria a tutta parete",
-    luogo: "Studio di un notaio, centro storico",
-    anno: "2024",
-    essenza: "Noce nazionale",
-    finitura: "Gommalacca a tampone",
-    tempi: "Sei settimane",
-    descrizione:
-      "Quattro metri e mezzo di altezza, scala a carrello compresa. Ogni ripiano regge ottanta chili di faldoni: lo abbiamo verificato caricandoli noi, prima della consegna.",
+  en: {
+    lavori: [
+      {
+        numero: "01",
+        nome: "Slavonian oak kitchen",
+        luogo: "Apartment in Oltrarno",
+        anno: "2025",
+        essenza: "Solid oak",
+        finitura: "Natural matte oil",
+        tempi: "Nine weeks",
+        descrizione:
+          "Seven meters of cabinets without a single handle: the doors open with a groove cut into the solid wood. The worktop is one finger-jointed oak board, sanded to a thousand grit.",
+      },
+      {
+        numero: "02",
+        nome: "Floor-to-ceiling bookcase",
+        luogo: "A notary's office, historic center",
+        anno: "2024",
+        essenza: "Italian walnut",
+        finitura: "Hand-padded shellac",
+        tempi: "Six weeks",
+        descrizione:
+          "Four and a half meters tall, rolling ladder included. Every shelf holds eighty kilos of files: we checked by loading them ourselves before handing it over.",
+      },
+      {
+        numero: "03",
+        nome: "Restoring a 17th-century front door",
+        luogo: "Palazzo on Via Maggio",
+        anno: "2024",
+        essenza: "Original chestnut",
+        finitura: "Beeswax and natural earth pigments",
+        tempi: "Four months",
+        descrizione:
+          "Taken apart piece by piece and documented nail by nail. The rotten parts were replaced with chestnut seasoned for twenty years; everything else is still the wood from 1640.",
+      },
+      {
+        numero: "04",
+        nome: "Windows for a farmhouse",
+        luogo: "Countryside near Fiesole",
+        anno: "2023",
+        essenza: "Heat-treated larch",
+        finitura: "Ash-gray stain",
+        tempi: "Ten weeks",
+        descrizione:
+          "Eighteen windows and four French doors, all as out of square as the walls around them. Every frame was templated on site, and no two are alike.",
+      },
+    ] as Lavoro[],
+    voci: { essenza: "Wood", finitura: "Finish", tempi: "Time" },
+    competenze: [
+      { codice: "A", nome: "Furniture made to measure", nota: "Kitchens, bookcases, built-in wardrobes, tables. From the first measurements to installation." },
+      { codice: "B", nome: "Conservation", nota: "Period furniture, windows and doors. Whatever can be saved, we save." },
+      { codice: "C", nome: "Windows and doors", nota: "Solid-wood windows, doors and main entrances, including for listed buildings." },
+      { codice: "D", nome: "Stairs and mezzanines", nota: "Load-bearing timber structures, engineered and certified." },
+    ],
+    tipiLavoro: ["Furniture", "Restoration", "Windows and doors", "Something else"],
+    indice: ["Work", "Craft", "Services", "Quote"],
+    indiceEtichetta: "Section index",
+    sottotitolo: "Workshop in San Frediano, Florence · since 1974",
+    eyebrow: "Carpenters for three generations",
+    titolo: ["Wood, measure,", "patience.", "Our hands do", "the rest."],
+    quota: "from measurements to installation · 51 years at the bench",
+    lavoriScelti: "Selected work",
+    suggerimento: "Tap a row to open the project sheet",
+    mestiere: "The craft",
+    mestiereTesto: "Every board has a grain. Our job is to listen to it before we cut:",
+    mestiereEvidenza: "wood that's treated with respect doesn't warp, doesn't crack, doesn't change its mind.",
+    principi: [
+      {
+        voce: "Material",
+        testo:
+          "We buy boards, not panels. Every wood seasons in our storeroom for at least two years before it reaches the bench.",
+      },
+      {
+        voce: "Drawing",
+        testo:
+          "Every job starts with measurements we take ourselves and a dimensioned drawing you sign before we begin. No surprises halfway through.",
+      },
+      {
+        voce: "Guarantee",
+        testo:
+          "Ten years on the structure and moving parts. If a door drops, we come back and adjust it. It has happened twice in fifty years.",
+      },
+    ],
+    cosaFacciamo: "What we do",
+    preventivo: "Request a quote",
+    preventivoTitolo: ["Fill in the sheet,", "we'll come back with a quote."],
+    preventivoTesto:
+      "The more detail you give us, the more accurate the quote. We come out to measure for free, anywhere in the province of Florence.",
+    ricevuta: "Sheet received",
+    grazie: ["Thank you. In the workshop, a request like this", "would get an answer within two days."],
+    demoInviato: "This is a sample site: no data was sent or saved.",
+    campoNome: "A. Name",
+    campoTelefono: "B. Phone",
+    tipoLegenda: "Type of job",
+    campoLavoro: "C. Job",
+    campoDescrizione: "D. Details",
+    phDescrizione: "Rough measurements, the room, a preferred wood if you have one…",
+    invia: "Send the sheet",
+    notaModulo: "Sample form: nothing is sent and no data is saved.",
+    indirizzo: "Via dell'Orto 27, Florence · 055 22 0000",
+    orari: "Monday to Friday, 7:30 – 17:30",
+    piede: "Sample site · fictional business",
   },
-  {
-    numero: "03",
-    nome: "Restauro di un portone del Seicento",
-    luogo: "Palazzo in via Maggio",
-    anno: "2024",
-    essenza: "Castagno originale",
-    finitura: "Cera d'api e terre naturali",
-    tempi: "Quattro mesi",
-    descrizione:
-      "Smontato pezzo per pezzo, documentato chiodo per chiodo. Le parti marce sono state sostituite con castagno stagionato vent'anni; tutto il resto è ancora quello del 1640.",
-  },
-  {
-    numero: "04",
-    nome: "Infissi per una casa colonica",
-    luogo: "Campagna di Fiesole",
-    anno: "2023",
-    essenza: "Larice termotrattato",
-    finitura: "Velatura grigio cenere",
-    tempi: "Dieci settimane",
-    descrizione:
-      "Diciotto finestre e quattro portefinestre, tutte fuori squadra come le mura che le ospitano. Ogni telaio è stato rilevato a dima sul posto, nessuno è uguale all'altro.",
-  },
-];
-
-const competenze = [
-  {
-    codice: "A",
-    nome: "Arredo su misura",
-    nota: "Cucine, librerie, armadi a muro, tavoli. Dal rilievo alla posa.",
-  },
-  {
-    codice: "B",
-    nome: "Restauro conservativo",
-    nota: "Mobili e serramenti d'epoca. Si conserva tutto il conservabile.",
-  },
-  {
-    codice: "C",
-    nome: "Serramenti",
-    nota: "Finestre, porte e portoni in essenza, anche per edifici vincolati.",
-  },
-  {
-    codice: "D",
-    nome: "Scale e soppalchi",
-    nota: "Strutture portanti in legno, calcolate e certificate.",
-  },
-];
-
-const tipiLavoro = ["Arredo su misura", "Restauro", "Serramenti", "Altro"];
+};
 
 function Rivela({
   children,
@@ -210,6 +348,7 @@ function RigaLavoro({
   onToggle: () => void;
   fontSecondary: string;
 }) {
+  const t = useTesti(TESTI);
   return (
     <div style={{ borderTop: `1px solid ${C.osso}1F` }}>
       <button
@@ -281,9 +420,9 @@ function RigaLavoro({
               </p>
               <div className={`${fontSecondary} grid grid-cols-1 sm:grid-cols-3 gap-5 content-start`}>
                 {[
-                  { voce: "Essenza", valore: lavoro.essenza },
-                  { voce: "Finitura", valore: lavoro.finitura },
-                  { voce: "Tempi", valore: lavoro.tempi },
+                  { voce: t.voci.essenza, valore: lavoro.essenza },
+                  { voce: t.voci.finitura, valore: lavoro.finitura },
+                  { voce: t.voci.tempi, valore: lavoro.tempi },
                 ].map((r) => (
                   <div key={r.voce} style={{ borderTop: `1px solid ${C.legno}59` }} className="pt-3">
                     <p
@@ -314,13 +453,14 @@ interface VetrinaStudioProps {
 export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudioProps) {
   const [apertoIdx, setApertoIdx] = useState<number | null>(null);
   const [inviato, setInviato] = useState(false);
-  const [tipo, setTipo] = useState("");
-
+  const [tipo, setTipo] = useState<number | null>(null);
+  const t = useTesti(TESTI);
+  const { lavori, competenze, tipiLavoro } = t;
   const indice = [
-    { n: "01", href: "#lavori", label: "Lavori" },
-    { n: "02", href: "#mestiere", label: "Mestiere" },
-    { n: "03", href: "#competenze", label: "Competenze" },
-    { n: "04", href: "#preventivo", label: "Preventivo" },
+    { n: "01", href: "#lavori", label: t.indice[0] },
+    { n: "02", href: "#mestiere", label: t.indice[1] },
+    { n: "03", href: "#competenze", label: t.indice[2] },
+    { n: "04", href: "#preventivo", label: t.indice[3] },
   ];
 
   return (
@@ -338,13 +478,13 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
             className={`${fontSecondary} hidden md:block text-[10px] uppercase tracking-[0.2em]`}
             style={{ color: C.grigio }}
           >
-            Bottega in San Frediano, Firenze · dal 1974
+            {t.sottotitolo}
           </p>
         </div>
         <nav
           className={`${fontSecondary} px-6 md:px-12 flex items-center gap-6 md:gap-10 overflow-x-auto`}
           style={{ borderTop: `1px solid ${C.osso}14` }}
-          aria-label="Indice delle sezioni"
+          aria-label={t.indiceEtichetta}
         >
           {indice.map((v) => (
             <a
@@ -370,24 +510,24 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
               className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-10`}
               style={{ color: C.legno }}
             >
-              Falegnami da tre generazioni
+              {t.eyebrow}
             </p>
           </Rivela>
           <Rivela delay={0.1}>
             <h1 className="text-[2.6rem] leading-[1.12] md:text-7xl md:leading-[1.08] font-extralight tracking-tight max-w-4xl">
-              Legno, misura,
+              {t.titolo[0]}
               <br />
-              pazienza.
+              {t.titolo[1]}
               <br />
               <span style={{ color: C.grigio }}>
-                Il resto lo mettono
+                {t.titolo[2]}
                 <br />
-                le mani.
+                {t.titolo[3]}
               </span>
             </h1>
           </Rivela>
           <Rivela delay={0.25} className="mt-14 max-w-md">
-            <QuotaMisura etichetta="dal rilievo alla posa · 51 anni di banco" fontSecondary={fontSecondary} />
+            <QuotaMisura etichetta={t.quota} fontSecondary={fontSecondary} />
           </Rivela>
         </div>
         <Rivela delay={0.3}>
@@ -401,7 +541,7 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
           <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em]`}>
             <span style={{ color: C.legno }}>01</span>
             <span className="ml-3" style={{ color: C.grigio }}>
-              Lavori scelti
+              {t.lavoriScelti}
             </span>
           </p>
         </Rivela>
@@ -420,7 +560,7 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
           className={`${fontSecondary} px-6 md:px-12 mt-6 text-[10px] uppercase tracking-[0.2em]`}
           style={{ color: `${C.grigio}99` }}
         >
-          Premi una riga per aprire la scheda del lavoro
+          {t.suggerimento}
         </p>
       </section>
 
@@ -435,39 +575,19 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
             <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-12`}>
               <span style={{ color: C.legnoscuro }}>02</span>
               <span className="ml-3" style={{ color: `${C.nero}80` }}>
-                Il mestiere
+                {t.mestiere}
               </span>
             </p>
           </Rivela>
           <Rivela delay={0.1}>
             <p className="text-3xl md:text-5xl font-extralight leading-[1.25] tracking-tight max-w-4xl">
-              Ogni tavola ha un verso. Il nostro lavoro è ascoltarlo prima di
-              tagliare:{" "}
-              <span style={{ color: C.legnoscuro }}>
-                il legno che viene rispettato non si imbarca, non si fessura, non
-                cambia idea.
-              </span>
+              {t.mestiereTesto}{" "}
+              <span style={{ color: C.legnoscuro }}>{t.mestiereEvidenza}</span>
             </p>
           </Rivela>
           <div className="grid md:grid-cols-3 gap-10 md:gap-14 mt-16 md:mt-24">
-            {[
-              {
-                voce: "Materiale",
-                testo:
-                  "Compriamo tavole, non pannelli. Le essenze stagionano nel nostro magazzino almeno due anni prima di salire sul banco.",
-              },
-              {
-                voce: "Disegno",
-                testo:
-                  "Ogni lavoro parte da un rilievo fatto da noi e da una tavola quotata che firmi prima dell'avvio. Niente sorprese in corso d'opera.",
-              },
-              {
-                voce: "Garanzia",
-                testo:
-                  "Dieci anni su struttura e movimenti. Se un'anta cala, torniamo a registrarla. È capitato due volte in cinquant'anni.",
-              },
-            ].map((b, i) => (
-              <Rivela key={b.voce} delay={0.1 + i * 0.1}>
+            {t.principi.map((b, i) => (
+              <Rivela key={i} delay={0.1 + i * 0.1}>
                 <div className="pt-5" style={{ borderTop: `1px solid ${C.nero}33` }}>
                   <p
                     className={`${fontSecondary} text-[10px] uppercase tracking-[0.25em] mb-4`}
@@ -492,7 +612,7 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
             <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-12`}>
               <span style={{ color: C.legno }}>03</span>
               <span className="ml-3" style={{ color: C.grigio }}>
-                Cosa facciamo
+                {t.cosaFacciamo}
               </span>
             </p>
           </Rivela>
@@ -530,17 +650,16 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
             <p className={`${fontSecondary} text-[11px] uppercase tracking-[0.3em] mb-6`}>
               <span style={{ color: C.legno }}>04</span>
               <span className="ml-3" style={{ color: C.grigio }}>
-                Richiedi un preventivo
+                {t.preventivo}
               </span>
             </p>
             <h2 className="text-3xl md:text-5xl font-extralight tracking-tight leading-[1.15] mb-4">
-              Compila la scheda,
+              {t.preventivoTitolo[0]}
               <br />
-              ti rispondiamo con una quota.
+              {t.preventivoTitolo[1]}
             </h2>
             <p className="text-sm font-light leading-relaxed max-w-lg mb-12" style={{ color: C.grigio }}>
-              Più dettagli ci dai, più il preventivo sarà preciso. Per i rilievi
-              veniamo noi, senza impegno, in tutta la provincia di Firenze.
+              {t.preventivoTesto}
             </p>
           </Rivela>
 
@@ -551,14 +670,14 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
                 style={{ border: `1px solid ${C.legno}` }}
               >
                 <p className={`${fontSecondary} text-[10px] uppercase tracking-[0.3em] mb-5`} style={{ color: C.legno }}>
-                  Scheda ricevuta
+                  {t.ricevuta}
                 </p>
                 <p className="text-2xl md:text-3xl font-extralight leading-snug">
-                  Grazie. In bottega una richiesta così
-                  <br className="hidden md:block" /> riceverebbe risposta entro due giorni.
+                  {t.grazie[0]}
+                  <br className="hidden md:block" /> {t.grazie[1]}
                 </p>
                 <p className="mt-6 text-xs font-light" style={{ color: C.grigio }}>
-                  Questa è una vetrina dimostrativa: nessun dato è stato inviato o salvato.
+                  {t.demoInviato}
                 </p>
               </div>
             ) : (
@@ -576,7 +695,7 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
                     className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                   >
-                    A. Nome
+                    {t.campoNome}
                   </label>
                   <input
                     id="studio-nome"
@@ -593,7 +712,7 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
                     className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                   >
-                    B. Telefono
+                    {t.campoTelefono}
                   </label>
                   <input
                     id="studio-contatto"
@@ -605,34 +724,34 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
                 </div>
                 {/* riga C — tipo di lavoro */}
                 <fieldset className="grid md:grid-cols-[8rem_1fr]" style={{ borderBottom: `1px solid ${C.osso}26` }}>
-                  <legend className="sr-only">Tipo di lavoro</legend>
+                  <legend className="sr-only">{t.tipoLegenda}</legend>
                   <span
                     className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-center`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                     aria-hidden="true"
                   >
-                    C. Lavoro
+                    {t.campoLavoro}
                   </span>
                   <div className="flex flex-wrap gap-2.5 px-5 py-4">
-                    {tipiLavoro.map((t) => (
-                      <label key={t} className="cursor-pointer">
+                    {tipiLavoro.map((voce, i) => (
+                      <label key={i} className="cursor-pointer">
                         <input
                           type="radio"
                           name="tipo-lavoro"
-                          value={t}
-                          checked={tipo === t}
-                          onChange={() => setTipo(t)}
+                          value={voce}
+                          checked={tipo === i}
+                          onChange={() => setTipo(i)}
                           className="sr-only"
                         />
                         <span
                           className={`${fontSecondary} inline-block px-4 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors`}
                           style={{
-                            border: `1px solid ${tipo === t ? C.legno : `${C.osso}33`}`,
-                            backgroundColor: tipo === t ? C.legno : "transparent",
-                            color: tipo === t ? C.nero : C.grigio,
+                            border: `1px solid ${tipo === i ? C.legno : `${C.osso}33`}`,
+                            backgroundColor: tipo === i ? C.legno : "transparent",
+                            color: tipo === i ? C.nero : C.grigio,
                           }}
                         >
-                          {t}
+                          {voce}
                         </span>
                       </label>
                     ))}
@@ -645,13 +764,13 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
                     className={`${fontSecondary} px-5 py-4 text-[10px] uppercase tracking-[0.2em] flex items-start pt-5`}
                     style={{ color: C.legno, borderRight: `1px solid ${C.osso}26` }}
                   >
-                    D. Descrizione
+                    {t.campoDescrizione}
                   </label>
                   <textarea
                     id="studio-descrizione"
                     rows={4}
                     required
-                    placeholder="Misure indicative, ambiente, essenza preferita se ne hai una…"
+                    placeholder={t.phDescrizione}
                     className="bg-transparent px-5 py-4 text-base font-light outline-none resize-none focus:bg-white/[0.04] transition-colors placeholder:text-white/25"
                     style={{ color: C.osso }}
                   />
@@ -663,7 +782,7 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = C.osso)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.legno)}
                 >
-                  Invia la scheda
+                  {t.invia}
                   <svg width="18" height="10" viewBox="0 0 18 10" fill="none" aria-hidden="true">
                     <path d="M0 5 H16 M12 1 L17 5 L12 9" stroke="currentColor" strokeWidth="1.2" />
                   </svg>
@@ -672,7 +791,7 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
             )}
             {!inviato && (
               <p className={`${fontSecondary} mt-4 text-[10px] tracking-[0.15em]`} style={{ color: `${C.grigio}99` }}>
-                Modulo dimostrativo: non viene inviato nulla e nessun dato viene salvato.
+                {t.notaModulo}
               </p>
             )}
           </Rivela>
@@ -687,13 +806,13 @@ export default function VetrinaStudio({ fontBase, fontSecondary }: VetrinaStudio
               Falegnameria Marini
             </p>
             <p className={`${fontSecondary} text-[10px] uppercase tracking-[0.2em] leading-loose`} style={{ color: C.grigio }}>
-              Via dell&apos;Orto 27, Firenze · 055 22 0000
+              {t.indirizzo}
               <br />
-              Dal lunedì al venerdì, 7:30 – 17:30
+              {t.orari}
             </p>
           </div>
           <p className={`${fontSecondary} text-[10px] tracking-[0.15em]`} style={{ color: `${C.grigio}99` }}>
-            Vetrina dimostrativa · attività di fantasia
+            {t.piede}
           </p>
         </div>
       </footer>

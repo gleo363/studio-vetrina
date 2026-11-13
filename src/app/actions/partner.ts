@@ -6,6 +6,40 @@ import { inviaEmailBenvenutoPartner } from "@/lib/email";
 import { SITE_URL } from "@/lib/site";
 import { consentiRichiesta, ipClient } from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
+import { getLingua } from "@/lib/i18n/server";
+
+const ERRORI = {
+  it: {
+    tuttiObbligatori: "Tutti i campi sono obbligatori.",
+    passwordCorta: "La password deve essere di almeno 8 caratteri.",
+    rete: "Errore di rete. Riprova.",
+    troppiTentativi: "Troppi tentativi. Riprova tra qualche minuto.",
+    sospese: "Registrazioni momentaneamente sospese. Riprova più tardi.",
+    giàRegistrata: "Questa email è già registrata. Prova ad accedere.",
+    registrazione: "Errore durante la registrazione. Riprova.",
+    profilo: "Errore durante la creazione del profilo. Riprova.",
+    nomeObbligatorio: "Il nome è obbligatorio.",
+    ibanFormato: "IBAN non valido. Verifica il formato.",
+    ibanPaese: "IBAN non valido. Deve iniziare con il codice paese (es. IT).",
+    nonAutorizzato: "Non autorizzato.",
+    salvataggio: "Errore durante il salvataggio. Riprova.",
+  },
+  en: {
+    tuttiObbligatori: "Please fill in every field.",
+    passwordCorta: "Your password needs at least 8 characters.",
+    rete: "Network error. Please try again.",
+    troppiTentativi: "Too many attempts. Try again in a few minutes.",
+    sospese: "Sign-ups are paused for now. Please try again later.",
+    giàRegistrata: "This email is already registered. Try logging in instead.",
+    registrazione: "Something went wrong while signing you up. Please try again.",
+    profilo: "Something went wrong while creating your profile. Please try again.",
+    nomeObbligatorio: "Your name is required.",
+    ibanFormato: "That IBAN doesn't look right. Please check the format.",
+    ibanPaese: "That IBAN doesn't look right. It should start with a country code (e.g. IT).",
+    nonAutorizzato: "Not authorized.",
+    salvataggio: "Something went wrong while saving. Please try again.",
+  },
+};
 
 function generaCodiceBase(nome: string): string {
   const prefisso = nome
@@ -23,22 +57,24 @@ export async function registraPartner(
   const nome = (formData.get("nome") as string)?.trim();
   const email = (formData.get("email") as string)?.trim();
   const password = formData.get("password") as string;
+  const lingua = await getLingua();
+  const e = ERRORI[lingua];
 
   if (!nome || !email || !password) {
-    return { errore: "Tutti i campi sono obbligatori." };
+    return { errore: e.tuttiObbligatori };
   }
   if (password.length < 8) {
-    return { errore: "La password deve essere di almeno 8 caratteri." };
+    return { errore: e.passwordCorta };
   }
 
   // Honeypot: i bot riempiono questo campo, gli umani no
   const honeypot = (formData.get("website") as string) ?? "";
-  if (honeypot) return { errore: "Errore di rete. Riprova." };
+  if (honeypot) return { errore: e.rete };
 
   // Max 3 registrazioni l'ora dallo stesso IP
   const ip = await ipClient();
   if (!consentiRichiesta(`registrazione:${ip}`, 3, 60 * 60 * 1000)) {
-    return { errore: "Troppi tentativi. Riprova tra qualche minuto." };
+    return { errore: e.troppiTentativi };
   }
 
   const admin = createAdminClient();
@@ -50,7 +86,7 @@ export async function registraPartner(
     .select("*", { count: "exact", head: true })
     .gte("creato_il", da24h);
   if ((registrazioniRecenti ?? 0) >= 20) {
-    return { errore: "Registrazioni momentaneamente sospese. Riprova più tardi." };
+    return { errore: e.sospese };
   }
 
   // Crea utente con email già confermata — bypassa SMTP di Supabase completamente
@@ -58,13 +94,15 @@ export async function registraPartner(
     email,
     password,
     email_confirm: true,
+    // Lingua delle email future (cambi di stato delle segnalazioni)
+    user_metadata: { lingua },
   });
 
   if (adminError || !adminData?.user) {
     if (adminError?.message.toLowerCase().includes("already")) {
-      return { errore: "Questa email è già registrata. Prova ad accedere." };
+      return { errore: e.giàRegistrata };
     }
-    return { errore: adminError?.message ?? "Errore durante la registrazione. Riprova." };
+    return { errore: adminError?.message ?? e.registrazione };
   }
 
   let codice = generaCodiceBase(nome);
@@ -88,7 +126,7 @@ export async function registraPartner(
 
   if (partnerError) {
     await admin.auth.admin.deleteUser(adminData.user.id);
-    return { errore: "Errore durante la creazione del profilo. Riprova." };
+    return { errore: e.profilo };
   }
 
   // Logga l'utente subito — nessuna email di conferma necessaria
@@ -101,6 +139,7 @@ export async function registraPartner(
     email,
     codice,
     linkPartner: `${siteUrl}/partner/area-partner`,
+    lingua,
   });
 
   redirect("/partner/area-partner");
@@ -128,15 +167,16 @@ export async function aggiornaProfilo(
 ): Promise<{ errore?: string; successo?: boolean }> {
   const nome = (formData.get("nome") as string)?.trim();
   const iban = (formData.get("iban") as string)?.trim().replace(/\s/g, "");
+  const e = ERRORI[await getLingua()];
 
-  if (!nome) return { errore: "Il nome è obbligatorio." };
+  if (!nome) return { errore: e.nomeObbligatorio };
 
   if (iban) {
     if (iban.length < 15 || iban.length > 34) {
-      return { errore: "IBAN non valido. Verifica il formato." };
+      return { errore: e.ibanFormato };
     }
     if (!/^[A-Z]{2}[0-9]{2}[A-Z0-9]+$/.test(iban)) {
-      return { errore: "IBAN non valido. Deve iniziare con il codice paese (es. IT)." };
+      return { errore: e.ibanPaese };
     }
   }
 
@@ -144,7 +184,7 @@ export async function aggiornaProfilo(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { errore: "Non autorizzato." };
+  if (!user) return { errore: e.nonAutorizzato };
 
   const admin = createAdminClient();
   const aggiornamento: Record<string, string> = { nome };
@@ -155,7 +195,7 @@ export async function aggiornaProfilo(
     .update(aggiornamento)
     .eq("user_id", user.id);
 
-  if (error) return { errore: "Errore durante il salvataggio. Riprova." };
+  if (error) return { errore: e.salvataggio };
 
   return { successo: true };
 }

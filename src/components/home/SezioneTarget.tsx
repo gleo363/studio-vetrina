@@ -5,31 +5,34 @@ import { motion } from "framer-motion";
 import { EASE_VETRINA } from "@/lib/motion";
 import { UtensilsCrossed, Scissors, ShoppingBag, Wrench } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useTesti } from "@/components/providers/LinguaProvider";
 
-const categorie: { icon: LucideIcon; nome: string; bisogno: string }[] = [
-  {
-    icon: UtensilsCrossed,
-    nome: "Ristoranti e bar",
-    bisogno: "Essere trovati su Google e mostrare il menu online.",
+const ICONE: LucideIcon[] = [UtensilsCrossed, Scissors, ShoppingBag, Wrench];
+
+const TESTI = {
+  it: {
+    titolo: "Le attività che danno anima a Roma.",
+    categorie: [
+      { nome: "Ristoranti e bar", bisogno: "Essere trovati su Google e mostrare il menu online." },
+      { nome: "Saloni e centri estetici", bisogno: "Prenotazioni online e calendario sempre aggiornato." },
+      { nome: "Boutique e negozi", bisogno: "Una presenza digitale all'altezza del negozio fisico." },
+      { nome: "Artigiani e professionisti", bisogno: "Credibilità online per acquisire nuovi clienti." },
+    ],
   },
-  {
-    icon: Scissors,
-    nome: "Saloni e centri estetici",
-    bisogno: "Prenotazioni online e calendario sempre aggiornato.",
+  en: {
+    titolo: "The businesses that give a city its character.",
+    categorie: [
+      { nome: "Restaurants and bars", bisogno: "Show up on Google and put the menu online." },
+      { nome: "Hair and beauty salons", bisogno: "Online booking and a calendar that's always up to date." },
+      { nome: "Boutiques and shops", bisogno: "An online presence that lives up to the shop itself." },
+      { nome: "Trades and professionals", bisogno: "Credibility online that brings in new clients." },
+    ],
   },
-  {
-    icon: ShoppingBag,
-    nome: "Boutique e negozi",
-    bisogno: "Una presenza digitale all'altezza del negozio fisico.",
-  },
-  {
-    icon: Wrench,
-    nome: "Artigiani e professionisti",
-    bisogno: "Credibilità online per acquisire nuovi clienti.",
-  },
-];
+};
 
 export default function SezioneTarget() {
+  const t = useTesti(TESTI);
+  const categorie = t.categorie.map((c, i) => ({ ...c, icon: ICONE[i] }));
   return (
     <section className="bg-glass px-6 py-28">
       <div className="max-w-6xl mx-auto">
@@ -38,13 +41,13 @@ export default function SezioneTarget() {
             className="text-3xl md:text-4xl lg:text-[44px] font-medium leading-[1.1] text-inchiostro max-w-xl"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Le attività che danno anima a Roma.
+            {t.titolo}
           </h2>
         </AnimatedSection>
 
         <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {categorie.map((cat) => (
-            <StaggerItem key={cat.nome}>
+          {categorie.map((cat, i) => (
+            <StaggerItem key={i}>
               <motion.div
                 className="group bg-travertino border border-linea rounded-2xl p-7 h-full cursor-default"
                 whileHover={{

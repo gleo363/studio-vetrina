@@ -1,21 +1,25 @@
 "use client";
 
-const BADGE: Record<string, { label: string; cls: string }> = {
-  segnalato: {
-    label: "Segnalato",
-    cls: "bg-pietra/15 text-pietra",
+import { useLingua } from "@/components/providers/LinguaProvider";
+import { LOCALE_INTL } from "@/lib/i18n/config";
+
+const BADGE_CLS: Record<string, string> = {
+  segnalato: "bg-pietra/15 text-pietra",
+  firmato: "bg-ocra/20 text-[#9a6b20]",
+  pagato: "bg-[#dcf5e8] text-[#1a6b3a]",
+  rifiutato: "bg-inchiostro/10 text-inchiostro/50",
+};
+
+const TESTI = {
+  it: {
+    stati: { segnalato: "Segnalato", firmato: "Firmato", pagato: "Pagato", rifiutato: "Rifiutato" } as Record<string, string>,
+    intestazioni: ["Attività", "Stato", "Valore", "Tua commissione", "Data"],
+    vuota: "Nessuna segnalazione ancora. Condividi il tuo codice per iniziare.",
   },
-  firmato: {
-    label: "Firmato",
-    cls: "bg-ocra/20 text-[#9a6b20]",
-  },
-  pagato: {
-    label: "Pagato",
-    cls: "bg-[#dcf5e8] text-[#1a6b3a]",
-  },
-  rifiutato: {
-    label: "Rifiutato",
-    cls: "bg-inchiostro/10 text-inchiostro/50",
+  en: {
+    stati: { segnalato: "Referred", firmato: "Signed", pagato: "Paid", rifiutato: "Declined" } as Record<string, string>,
+    intestazioni: ["Business", "Status", "Value", "Your commission", "Date"],
+    vuota: "No referrals yet. Share your code to get started.",
   },
 };
 
@@ -35,13 +39,16 @@ interface TabellaSegnalazioniProps {
 export default function TabellaSegnalazioni({
   segnalazioni,
 }: TabellaSegnalazioniProps) {
+  const lingua = useLingua();
+  const t = TESTI[lingua];
+  const locale = LOCALE_INTL[lingua];
   if (segnalazioni.length === 0) {
     return (
       <p
         className="text-pietra text-sm italic"
         style={{ fontFamily: "var(--font-fraunces)" }}
       >
-        Nessuna segnalazione ancora. Condividi il tuo codice per iniziare.
+        {t.vuota}
       </p>
     );
   }
@@ -51,7 +58,7 @@ export default function TabellaSegnalazioni({
       <table className="w-full text-sm" style={{ fontFamily: "var(--font-inter)" }}>
         <thead>
           <tr className="border-b border-inchiostro/10">
-            {["Attività", "Stato", "Valore", "Tua commissione", "Data"].map(
+            {t.intestazioni.map(
               (h) => (
                 <th
                   key={h}
@@ -65,7 +72,8 @@ export default function TabellaSegnalazioni({
         </thead>
         <tbody>
           {segnalazioni.map((s) => {
-            const badge = BADGE[s.stato] ?? BADGE.segnalato;
+            const stato = BADGE_CLS[s.stato] ? s.stato : "segnalato";
+            const badge = { label: t.stati[stato], cls: BADGE_CLS[stato] };
             return (
               <tr
                 key={s.id}
@@ -83,16 +91,16 @@ export default function TabellaSegnalazioni({
                 </td>
                 <td className="py-3 pr-4 text-inchiostro">
                   {s.valore_progetto > 0
-                    ? `€ ${s.valore_progetto.toLocaleString("it-IT")}`
+                    ? `€ ${s.valore_progetto.toLocaleString(locale)}`
                     : "—"}
                 </td>
                 <td className="py-3 pr-4 text-inchiostro font-medium">
                   {s.commissione_maturata > 0
-                    ? `€ ${s.commissione_maturata.toLocaleString("it-IT")}`
+                    ? `€ ${s.commissione_maturata.toLocaleString(locale)}`
                     : "—"}
                 </td>
                 <td className="py-3 text-pietra">
-                  {new Date(s.creato_il).toLocaleDateString("it-IT")}
+                  {new Date(s.creato_il).toLocaleDateString(locale)}
                 </td>
               </tr>
             );

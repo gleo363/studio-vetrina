@@ -9,8 +9,35 @@ import LogoutButton from "./LogoutButton";
 import CopiaCodiceClient from "./CopiaCodiceClient";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
+import { getLingua } from "@/lib/i18n/server";
+import { metadatiLocalizzati } from "@/lib/i18n/metadata";
+
+export const generateMetadata = metadatiLocalizzati({
+  it: { title: "Area partner" },
+  en: { title: "Partner area" },
+});
+
+const TESTI = {
+  it: {
+    eyebrow: "Area Partner",
+    ciao: "Ciao",
+    profilo: "Modifica profilo →",
+    codice: "Il tuo codice",
+    guadagni: "I tuoi guadagni",
+    segnalazioni: "Le tue segnalazioni",
+  },
+  en: {
+    eyebrow: "Partner area",
+    ciao: "Hi",
+    profilo: "Edit profile →",
+    codice: "Your code",
+    guadagni: "Your earnings",
+    segnalazioni: "Your referrals",
+  },
+};
 
 export default async function AreaPartnerPage() {
+  const t = TESTI[await getLingua()];
   const supabase = await createClient();
   const {
     data: { user },
@@ -63,13 +90,13 @@ export default async function AreaPartnerPage() {
               className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-3"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              Area Partner
+              {t.eyebrow}
             </p>
             <h1
               className="text-3xl md:text-4xl font-medium text-inchiostro"
               style={{ fontFamily: "var(--font-fraunces)" }}
             >
-              Ciao, {partner.nome.split(" ")[0]}.
+              {t.ciao}, {partner.nome.split(" ")[0]}.
             </h1>
           </div>
           <div className="flex items-center gap-3">
@@ -78,7 +105,7 @@ export default async function AreaPartnerPage() {
               className="text-sm text-pietra hover:text-inchiostro transition-colors duration-200"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              Modifica profilo →
+              {t.profilo}
             </Link>
             <LogoutButton />
           </div>
@@ -91,7 +118,7 @@ export default async function AreaPartnerPage() {
               className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-6"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              Il tuo codice
+              {t.codice}
             </p>
             <div className="flex flex-col md:flex-row gap-10 items-start">
               <div className="flex-1 flex flex-col gap-5">
@@ -114,7 +141,7 @@ export default async function AreaPartnerPage() {
             className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-6"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            I tuoi guadagni
+            {t.guadagni}
           </p>
           <CardGuadagni
             maturate={maturate}
@@ -129,7 +156,7 @@ export default async function AreaPartnerPage() {
             className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-6"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Le tue segnalazioni
+            {t.segnalazioni}
           </p>
           <TabellaSegnalazioni segnalazioni={lista} />
         </AnimatedSection>
