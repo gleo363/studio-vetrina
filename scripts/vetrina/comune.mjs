@@ -14,8 +14,10 @@ export const DATI = path.join(RADICE, "src/components/home/vetrina/dati");
 
 /** Valori dal piano (Vincoli globali). */
 export const FORMATI = {
-  desktop: { larghezza: 1920, altezza: 1080, n: 120, n1: 59, tetto: 7_000_000, tettoCopertina: 150_000 },
-  mobile: { larghezza: 506, altezza: 900, n: 100, n1: 49, tetto: 3_500_000, tettoCopertina: 80_000 },
+  // obiettivoCopertina: più basso del tetto, perché su rete lenta la copertina contende
+  // la banda al JavaScript dell'idratazione (e Chrome non la conta come LCP: copre tutta la finestra).
+  desktop: { larghezza: 1920, altezza: 1080, n: 120, n1: 59, tetto: 7_000_000, tettoCopertina: 150_000, obiettivoCopertina: 80_000 },
+  mobile: { larghezza: 506, altezza: 900, n: 100, n1: 49, tetto: 3_500_000, tettoCopertina: 80_000, obiettivoCopertina: 40_000 },
 };
 
 /** Stessi tempi di src/components/home/vetrina/sequenza.ts (TEMPI). */

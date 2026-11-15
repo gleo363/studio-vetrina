@@ -125,13 +125,14 @@ export default function SezioneVetrina() {
           <source media={RITRATTO} type="image/avif" srcSet="/vetrina-copertina/mobile.avif" />
           <source media={RITRATTO} type="image/webp" srcSet="/vetrina-copertina/mobile.webp" />
           <source type="image/avif" srcSet="/vetrina-copertina/desktop.avif" />
-          {/* Immagine decorativa già ottimizzata (AVIF/WebP a misura): next/image non serve. */}
+          {/* Immagine decorativa già ottimizzata (AVIF/WebP a misura): next/image non serve.
+              Priorità normale, non alta: copre tutta la finestra, quindi Chrome non la conta
+              come LCP, e su rete lenta toglierebbe banda al JavaScript dell'idratazione. */}
           <img
             ref={copertina}
             src="/vetrina-copertina/desktop.webp"
             alt=""
             aria-hidden="true"
-            fetchPriority="high"
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />

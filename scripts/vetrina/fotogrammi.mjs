@@ -127,7 +127,7 @@ fs.mkdirSync(cartellaCop, { recursive: true });
 const png0 = fs.readFileSync(master(0));
 for (const fmt of ["avif", "webp"]) {
   let q = 90, buf;
-  do { buf = await codifica(png0, fmt, q); q -= 4; } while (buf.length > F.tettoCopertina && q > 20);
+  do { buf = await codifica(png0, fmt, q); q -= 4; } while (buf.length > F.obiettivoCopertina && q > 20);
   fs.writeFileSync(path.join(cartellaCop, `${formato}.${fmt}`), buf);
   console.log(`copertina ${formato}.${fmt}: ${(buf.length / 1000).toFixed(1)} KB (q${q + 4})`);
 }

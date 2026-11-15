@@ -43,7 +43,7 @@ export default function Hero({ progresso, richiama }: HeroProps) {
 
   return (
     <div
-      className="absolute inset-0 z-30 flex items-center portrait:items-start [&_*:focus-visible]:outline-travertino"
+      className="absolute inset-0 z-30 flex items-center portrait:items-start"
       onFocusCapture={richiama}
     >
       <motion.div

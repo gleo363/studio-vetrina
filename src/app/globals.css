@@ -145,6 +145,11 @@ button:hover > .freccia {
   }
 }
 
+/* Anello di focus chiaro sopra la foto scura (fuori dai layer, come :focus-visible). */
+[data-stage-vetrina] :focus-visible {
+  outline-color: var(--color-travertino);
+}
+
 /* Grana fine e statica sopra i fotogrammi (generati puliti per pesare meno). */
 .grana-vetrina {
   opacity: 0.05;
