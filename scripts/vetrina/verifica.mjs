@@ -188,7 +188,12 @@ if (tutte || arg.resize) {
   const { ctx, page } = await apri("desktop");
   const errori = [];
   page.on("pageerror", (e) => errori.push(String(e)));
-  page.on("console", (m) => m.type() === "error" && errori.push(m.text()));
+  // Lo script di Vercel Analytics esiste solo su Vercel: in locale dà 404, non conta.
+  page.on("console", (m) => {
+    if (m.type() !== "error") return;
+    if ((m.location()?.url ?? "").includes("/_vercel/") || m.text().includes("/_vercel/")) return;
+    errori.push(m.text());
+  });
   await caricaHome(page);
   const g = await geometria(page);
   await vaiA(page, g.top + 0.5 * g.corsa);
@@ -231,7 +236,7 @@ if (tutte || arg.perf) {
     });
     const g = await geometria(page);
     const traccia = path.join(OUT, `traccia-scroll-${v}.json`);
-    await browser.startTracing(page, { path: traccia, screenshots: false });
+    if (!arg["senza-traccia"]) await browser.startTracing(page, { path: traccia, screenshots: false });
     await page.evaluate(() => (window.__misure.attivo = true));
     await page.mouse.move(200, 400);
     const passo = Math.round((g.corsa + 300) / 180); // ~3 s per verso a 60 Hz
@@ -239,7 +244,7 @@ if (tutte || arg.perf) {
     for (let i = 0; i < 180; i++) { await page.mouse.wheel(0, -passo); await page.waitForTimeout(16); }
     await page.waitForTimeout(800);
     await page.evaluate(() => (window.__misure.attivo = false));
-    await browser.stopTracing();
+    if (!arg["senza-traccia"]) await browser.stopTracing();
     const m = await page.evaluate(() => window.__misure);
     const frame = 1000 / 60;
     const attesi = m.intervalli.reduce((a, b) => a + b, 0) / frame;

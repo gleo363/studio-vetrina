@@ -119,7 +119,7 @@ export default function SezioneVetrina() {
       <div
         ref={stage}
         data-stage-vetrina=""
-        className="sticky top-0 h-lvh overflow-hidden bg-inchiostro motion-reduce:h-svh"
+        className="sticky top-0 h-lvh overflow-hidden bg-inchiostro [contain:strict] motion-reduce:h-svh"
       >
         <picture>
           <source media={RITRATTO} type="image/avif" srcSet="/vetrina-copertina/mobile.avif" />

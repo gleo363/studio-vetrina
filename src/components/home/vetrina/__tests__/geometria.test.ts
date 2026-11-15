@@ -7,6 +7,7 @@ import {
   angoliZoom,
   altezzaFascia,
   trasformaZoom,
+  quasiFinestra,
   type Quad,
 } from "../geometria.ts";
 
@@ -128,6 +129,15 @@ for (const [vw, vh] of finestre) {
     m.forEach((v, i) => vicino(v, IDENTITA[i], 1e-9));
   });
 }
+
+test("quasiFinestra: vero solo quando ogni angolo è entro mezzo pixel dalla finestra", () => {
+  const vw = 1440, vh = 900;
+  // Un pixel di scroll prima del passaggio lo zoom è a t ≈ 0,99986: va agganciato.
+  assert.equal(quasiFinestra(angoliZoom(0.99986, schermo, vw, vh), vw, vh), true);
+  assert.equal(quasiFinestra(angoliZoom(1, schermo, vw, vh), vw, vh), true);
+  assert.equal(quasiFinestra(angoliZoom(0.99, schermo, vw, vh), vw, vh), false);
+  assert.equal(quasiFinestra(angoliZoom(0.5, schermo, vw, vh), vw, vh), false);
+});
 
 test("altezzaFascia va dall'altezza proporzionale dello schermo a vh", () => {
   // schermo largo ~862 e alto ~544: a t=0 la fascia ha le sue proporzioni

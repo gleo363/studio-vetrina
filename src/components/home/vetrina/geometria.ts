@@ -119,6 +119,23 @@ export function altezzaFascia(
   return h0 + (vh - h0) * t;
 }
 
+/**
+ * Vero quando ogni angolo del quad è entro mezzo pixel dalla finestra vw × vh:
+ * lì la copia si mette a `transform: none` (scarto invisibile) e il suo testo
+ * torna con l'antialiasing a sottopixel, identico a quello della pagina vera.
+ */
+export function quasiFinestra(q: Quad, vw: number, vh: number): boolean {
+  const finestra: Quad = [
+    [0, 0],
+    [vw, 0],
+    [vw, vh],
+    [0, vh],
+  ];
+  return q.every(
+    (p, i) => Math.abs(p[0] - finestra[i][0]) < 0.5 && Math.abs(p[1] - finestra[i][1]) < 0.5
+  );
+}
+
 const lerp = (a: Punto, b: Punto, t: number): Punto => [
   a[0] + (b[0] - a[0]) * t,
   a[1] + (b[1] - a[1]) * t,

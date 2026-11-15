@@ -26,6 +26,7 @@ import {
   angoliZoom,
   altezzaFascia,
   trasformaZoom,
+  quasiFinestra,
   type Quad,
 } from "./geometria";
 
@@ -121,11 +122,13 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
           opacita = Math.min(1, Math.max(0, (sv - TEMPI.schermoInizio) / DISSOLVENZA_COPIA));
         }
       }
-      if (!quad || t >= 1) {
-        // All'identità: prima dello schermo (invisibile) e alla fine dello zoom (nitida).
+      const arrivata = quad !== null && t > 0 && quasiFinestra(quad, vw, vh);
+      if (!quad || arrivata) {
+        // All'identità: prima dello schermo (invisibile) e a fine zoom, quando lo
+        // scarto è sotto il mezzo pixel (testo nitido come quello della pagina vera).
         inv!.style.transform = "";
         inv!.style.height = `${vh}px`;
-        inv!.style.opacity = t >= 1 ? "1" : "0";
+        inv!.style.opacity = arrivata ? "1" : "0";
         return;
       }
       inv!.style.height = `${h}px`;
@@ -221,7 +224,8 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
         aria-hidden="true"
         inert
         className="pointer-events-none absolute left-0 top-0 z-[2] w-full origin-top-left overflow-hidden opacity-0"
-        style={{ height: "100lvh" }}
+        // Dimensioni esplicite: il layout della copia resta isolato dal resto della pagina.
+        style={{ height: "100lvh", contain: "strict" }}
       >
         {/* Dove SezioneProblema è più bassa della finestra, sotto si vede già
             SezioneSoluzione: la copia deve mostrare entrambe per coincidere al pixel. */}
