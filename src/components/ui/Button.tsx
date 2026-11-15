@@ -6,7 +6,7 @@ import { EASE_VETRINA, DURATA } from "@/lib/motion";
 interface ButtonProps {
   href?: string;
   onClick?: () => void;
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "ghost" | "ghost-chiaro";
   children: React.ReactNode;
   className?: string;
 }
@@ -39,6 +39,8 @@ export default function Button({
   const styles = {
     primary: "bg-cotto text-travertino hover:bg-[#a8431f]",
     ghost: "border border-inchiostro/20 text-inchiostro hover:bg-inchiostro/5",
+    // Su fondi fotografici scuri (Hero sopra la scena della vetrina).
+    "ghost-chiaro": "border border-travertino/35 text-travertino hover:bg-travertino/10",
   };
   const cls = `${base} ${styles[variant]} ${className}`;
   const transizione = { duration: DURATA.micro, ease: EASE_VETRINA };

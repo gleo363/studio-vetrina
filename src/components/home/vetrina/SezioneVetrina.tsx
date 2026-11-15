@@ -1,0 +1,161 @@
+"use client";
+/**
+ * "La vetrina che si accende": sezione della home lunga 300 lvh che ingloba l'Hero.
+ * - Lo stage resta fisso a schermo (sticky) per i 200 lvh utili; il progresso p va da 0 a 1.
+ * - La copertina (primo fotogramma) è nell'HTML del server: è l'LCP e lo sfondo dell'Hero.
+ * - La sequenza a fotogrammi si carica solo dopo il load, a riposo, e mai con reduced-motion.
+ * - A p = 1 la copia di SezioneProblema coincide con quella vera (sotto, sovrapposta agli
+ *   ultimi 100 lvh): lo stage si nasconde e resta il sito vero.
+ */
+import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import {
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import Hero from "@/components/home/Hero";
+import { TEMPI } from "./sequenza";
+import type { Formato } from "./SequenzaVetrina";
+
+const SequenzaVetrina = dynamic(() => import("./SequenzaVetrina"), { ssr: false });
+
+const RITRATTO = "(orientation: portrait)";
+
+export default function SezioneVetrina() {
+  const sezione = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const copertina = useRef<HTMLImageElement>(null);
+  const misure = useRef({ top: 0, corsa: 0 });
+  const progresso = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const [formato, setFormato] = useState<Formato | null>(null);
+
+  const aggiorna = useCallback(
+    (y: number) => {
+      const { top, corsa } = misure.current;
+      // corsa < 1: sezione alta quanto lo stage (reduced-motion), niente scena.
+      const p = corsa < 1 ? 0 : Math.min(1, Math.max(0, (y - top) / corsa));
+      progresso.set(p);
+      const st = stage.current;
+      if (st) st.style.visibility = corsa >= 1 && p >= 1 ? "hidden" : "";
+    },
+    [progresso]
+  );
+
+  useMotionValueEvent(scrollY, "change", aggiorna);
+
+  useEffect(() => {
+    const el = sezione.current;
+    const st = stage.current;
+    if (!el || !st) return;
+    const misura = () => {
+      misure.current = {
+        top: el.getBoundingClientRect().top + window.scrollY,
+        corsa: el.offsetHeight - st.offsetHeight,
+      };
+      aggiorna(window.scrollY);
+    };
+    const ro = new ResizeObserver(misura);
+    ro.observe(el);
+    ro.observe(st);
+    misura();
+    return () => ro.disconnect();
+  }, [aggiorna]);
+
+  // Avvio della sequenza: dopo il load e la copertina, a riposo, mai con reduced-motion.
+  useEffect(() => {
+    const movimento = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const ritratto = window.matchMedia(RITRATTO);
+    if (movimento.matches) return;
+    let annullato = false;
+    let idle = 0;
+    const scegli = () => setFormato(ritratto.matches ? "mobile" : "desktop");
+    const avvia = () => {
+      if (annullato) return;
+      if ("requestIdleCallback" in window) {
+        idle = window.requestIdleCallback(scegli, { timeout: 2000 });
+      } else {
+        idle = Number(setTimeout(scegli, 200));
+      }
+    };
+    const img = copertina.current;
+    const dopoCopertina = () => {
+      if (img && !img.complete) img.addEventListener("load", avvia, { once: true });
+      else avvia();
+    };
+    if (document.readyState === "complete") dopoCopertina();
+    else window.addEventListener("load", dopoCopertina, { once: true });
+    // Rotazione del telefono: si passa all'altro insieme di fotogrammi.
+    const cambio = () => setFormato((f) => (f ? (ritratto.matches ? "mobile" : "desktop") : f));
+    ritratto.addEventListener("change", cambio);
+    return () => {
+      annullato = true;
+      window.removeEventListener("load", dopoCopertina);
+      img?.removeEventListener("load", avvia);
+      ritratto.removeEventListener("change", cambio);
+      if ("cancelIdleCallback" in window) window.cancelIdleCallback(idle);
+      clearTimeout(idle);
+    };
+  }, []);
+
+  // Il focus da tastiera su un pulsante dell'Hero già sparito riporta in cima alla sezione.
+  const richiama = useCallback(() => {
+    if (progresso.get() > TEMPI.titoloFine) {
+      window.scrollTo({ top: misure.current.top, behavior: "smooth" });
+    }
+  }, [progresso]);
+
+  const grana = useTransform(progresso, [TEMPI.zoomInizio, 1], [1, 0]);
+
+  return (
+    <section
+      ref={sezione}
+      data-scena-vetrina=""
+      className="relative z-10 h-[300lvh] motion-reduce:h-svh"
+    >
+      <div
+        ref={stage}
+        data-stage-vetrina=""
+        className="sticky top-0 h-lvh overflow-hidden bg-inchiostro motion-reduce:h-svh"
+      >
+        <picture>
+          <source media={RITRATTO} type="image/avif" srcSet="/vetrina-copertina/mobile.avif" />
+          <source media={RITRATTO} type="image/webp" srcSet="/vetrina-copertina/mobile.webp" />
+          <source type="image/avif" srcSet="/vetrina-copertina/desktop.avif" />
+          {/* Immagine decorativa già ottimizzata (AVIF/WebP a misura): next/image non serve. */}
+          <img
+            ref={copertina}
+            src="/vetrina-copertina/desktop.webp"
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </picture>
+
+        {formato && (
+          <SequenzaVetrina
+            key={formato}
+            progresso={progresso}
+            copertina={copertina}
+            formato={formato}
+          />
+        )}
+
+        <Hero progresso={progresso} richiama={richiama} />
+
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-40"
+          style={{ opacity: grana }}
+        >
+          <div className="grana-vetrina absolute inset-0" />
+        </motion.div>
+      </div>
+    </section>
+  );
+}

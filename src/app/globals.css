@@ -121,3 +121,33 @@ button:hover > .freccia {
     transition: none;
   }
 }
+
+/* Scena "La vetrina che si accende" (home). */
+/* Velatura dal lato del testo dell'Hero: leggibilità sopra la foto scura. */
+.velatura-vetrina {
+  background-image: linear-gradient(
+    90deg,
+    rgba(27, 26, 24, 0.62) 0%,
+    rgba(27, 26, 24, 0.3) 45%,
+    rgba(27, 26, 24, 0) 72%
+  );
+}
+
+@media (orientation: portrait) {
+  .velatura-vetrina {
+    background-image: linear-gradient(
+      180deg,
+      rgba(27, 26, 24, 0.7) 0%,
+      rgba(27, 26, 24, 0.58) 42%,
+      rgba(27, 26, 24, 0.22) 66%,
+      rgba(27, 26, 24, 0) 82%
+    );
+  }
+}
+
+/* Grana fine e statica sopra i fotogrammi (generati puliti per pesare meno). */
+.grana-vetrina {
+  opacity: 0.05;
+  background-size: 220px 220px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+}

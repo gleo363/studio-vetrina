@@ -1,59 +1,72 @@
 "use client";
 import {
-  useScroll,
-  useTransform,
-  useReducedMotion,
+  cubicBezier,
   motion,
+  useReducedMotion,
+  useTransform,
+  type MotionValue,
 } from "framer-motion";
-import Logo from "@/components/ui/Logo";
 import Button from "@/components/ui/Button";
-import {
-  EASE_VETRINA,
-  DURATA,
-  riveloMascherato,
-  fadeUp,
-} from "@/lib/motion";
+import { EASE_VETRINA, DURATA, riveloMascherato, fadeUp } from "@/lib/motion";
+import { TEMPI } from "@/components/home/vetrina/sequenza";
 
-export default function Hero() {
+const easeUscita = cubicBezier(...EASE_VETRINA);
+
+interface HeroProps {
+  /** Progresso della sezione "La vetrina che si accende" (0 → 1). */
+  progresso: MotionValue<number>;
+  /** Riporta in cima alla sezione (focus da tastiera dopo che il testo è sparito). */
+  richiama: () => void;
+}
+
+/**
+ * Hero sopra il primo fotogramma della scena: entra una volta al caricamento e
+ * sparisce nel primo 10% dello scroll della sezione (opacità e leggero salto in alto).
+ */
+export default function Hero({ progresso, richiama }: HeroProps) {
   const riduciMovimento = useReducedMotion();
-  const { scrollY } = useScroll();
-  // Con prefers-reduced-motion i range collassano (parallasse ferma):
-  // lo stile iniziale resta identico tra server e client, niente
-  // mismatch di hydration.
-  const titleY = useTransform(
-    scrollY,
-    [0, 500],
-    riduciMovimento ? [0, 0] : [0, -120]
+  // Con prefers-reduced-motion i range collassano: testo fermo e visibile,
+  // stile iniziale identico tra server e client.
+  const opacity = useTransform(
+    progresso,
+    [0, TEMPI.titoloFine],
+    riduciMovimento ? [1, 1] : [1, 0],
+    { ease: easeUscita }
   );
-  const titleOpacity = useTransform(
-    scrollY,
-    [0, 300],
-    riduciMovimento ? [1, 1] : [1, 0]
+  const y = useTransform(
+    progresso,
+    [0, TEMPI.titoloFine],
+    riduciMovimento ? [0, 0] : [0, -32],
+    { ease: easeUscita }
   );
-  const watermarkY = useTransform(
-    scrollY,
-    [0, 600],
-    riduciMovimento ? [0, 0] : [0, 60]
-  );
+  const pointerEvents = useTransform(opacity, (v) => (v < 0.05 ? "none" : "auto"));
 
   return (
-    <section className="relative h-svh min-h-[640px] bg-travertino alone-ocra flex items-center overflow-hidden">
+    <div
+      className="absolute inset-0 z-30 flex items-center portrait:items-start [&_*:focus-visible]:outline-travertino"
+      onFocusCapture={richiama}
+    >
       <motion.div
-        className="relative z-10 max-w-6xl mx-auto px-6 w-full pt-20"
-        style={{ y: titleY, opacity: titleOpacity }}
+        aria-hidden="true"
+        className="velatura-vetrina pointer-events-none absolute inset-0"
+        style={{ opacity }}
+      />
+      <motion.div
+        className="relative z-10 max-w-6xl mx-auto px-6 w-full pt-20 portrait:pt-28"
+        style={{ y, opacity, pointerEvents }}
         initial="hidden"
         animate="visible"
       >
         <motion.p
           variants={fadeUp(12, DURATA.base)}
-          className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-8"
+          className="text-xs font-medium uppercase tracking-[0.2em] text-travertino/70 mb-8"
           style={{ fontFamily: "var(--font-inter)" }}
         >
           Studio Vetrina · Roma
         </motion.p>
 
         <h1
-          className="text-[clamp(56px,9vw,108px)] font-medium text-inchiostro leading-[0.92] mb-7 tracking-tight"
+          className="text-[clamp(56px,9vw,108px)] font-medium text-travertino leading-[0.92] mb-7 tracking-tight"
           style={{
             fontFamily: "var(--font-fraunces)",
             fontOpticalSizing: "auto",
@@ -74,7 +87,7 @@ export default function Hero() {
 
         <motion.p
           variants={fadeUp(16, 0.6, 0.65)}
-          className="text-xl md:text-2xl text-pietra mb-12 max-w-lg leading-snug"
+          className="text-xl md:text-2xl text-travertino/80 mb-12 max-w-lg leading-snug"
           style={{
             fontFamily: "var(--font-fraunces)",
             fontStyle: "italic",
@@ -98,23 +111,12 @@ export default function Hero() {
             </Button>
           </motion.div>
           <motion.div variants={fadeUp(14, DURATA.base)}>
-            <Button href="/esempi" variant="ghost" className="text-base px-7 py-4">
+            <Button href="/esempi" variant="ghost-chiaro" className="text-base px-7 py-4">
               Guarda gli esempi
             </Button>
           </motion.div>
         </motion.div>
       </motion.div>
-
-      {/* Watermark decorativo: solo dissolvenza, mai trasformazioni sul marchio. */}
-      <motion.div
-        className="absolute bottom-0 right-0 pointer-events-none select-none"
-        style={{ y: watermarkY }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.065 }}
-        transition={{ duration: DURATA.scena, ease: EASE_VETRINA, delay: 0.3 }}
-      >
-        <Logo variant="color" size={240} />
-      </motion.div>
-    </section>
+    </div>
   );
 }
