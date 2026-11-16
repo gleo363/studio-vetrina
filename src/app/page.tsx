@@ -11,11 +11,12 @@ export default function HomePage() {
     <>
       {/* Scena a scroll che ingloba l'Hero: finisce dentro lo schermo del laptop. */}
       <SezioneVetrina />
-      {/* Sovrapposta agli ultimi 100 lvh della scena: a fine scroll è già al suo posto. */}
-      <div className="relative z-0 -mt-[100lvh] motion-reduce:mt-0">
+      {/* Sovrapposta agli ultimi 100 lvh della scena: a fine scroll è già al suo posto.
+          Contiene anche SezioneSoluzione, che al passaggio può essere già in vista. */}
+      <div data-dopo-scena="" className="relative z-0 -mt-[100lvh] motion-reduce:mt-0">
         <SezioneProblema />
+        <SezioneSoluzione />
       </div>
-      <SezioneSoluzione />
       <SezioneTarget />
       <SezioneServizi />
       <SezioneRecensioni />

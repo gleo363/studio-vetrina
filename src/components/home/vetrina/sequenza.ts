@@ -133,6 +133,39 @@ export function piuVicinoCaricato(i: number, pronti: ReadonlySet<number>): numbe
   return migliore;
 }
 
+/** La copia compare nello schermo in s 0,85 → 0,90. */
+const DISSOLVENZA_COPIA = 0.05;
+/** Se lo spring è ancora indietro quando parte lo zoom, la copia entra nel primo 15% dello zoom. */
+const INGRESSO_IN_ZOOM = 0.15;
+
+/**
+ * Fotogramma da disegnare. Lo zoom segue p (grezzo), i fotogrammi s (spring): con uno scroll
+ * svelto s resta indietro, quindi durante lo zoom si mostra sempre l'ultimo fotogramma, quello
+ * su cui sono misurati gli angoli usati dallo zoom.
+ */
+export function fotogrammaDaMostrare(s: number, p: number, n: number, n1: number): number {
+  return progressoZoom(p) > 0 ? n - 1 : indiceFotogramma(s, n, n1);
+}
+
+/** Opacità della copia di SezioneProblema nello schermo. */
+export function opacitaCopia(s: number, p: number): number {
+  const daSpring = limita((s - TEMPI.schermoInizio) / DISSOLVENZA_COPIA);
+  const daZoom = limita(progressoZoom(p) / INGRESSO_IN_ZOOM);
+  return Math.max(daSpring, daZoom);
+}
+
+/**
+ * Quale fotogramma pronto disegnare per l'indice voluto i, sapendo che a schermo c'è già
+ * `attuale` (−1 se niente). Restituisce −1 per lasciare il canvas com'è: mai sostituire
+ * il fotogramma a schermo con uno più lontano da i (per esempio la copertina a metà scena).
+ */
+export function sceltaFotogramma(i: number, pronti: ReadonlySet<number>, attuale: number): number {
+  const j = piuVicinoCaricato(i, pronti);
+  if (j < 0 || j === attuale) return -1;
+  if (attuale >= 0 && Math.abs(j - i) >= Math.abs(attuale - i)) return -1;
+  return j;
+}
+
 /** Avanzamento dello zoom (0 → 1) su p 0,92 → 1, con ingresso e uscita morbidi. */
 export function progressoZoom(p: number): number {
   const u = limita((p - TEMPI.zoomInizio) / (1 - TEMPI.zoomInizio));

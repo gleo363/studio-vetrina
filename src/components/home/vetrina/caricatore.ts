@@ -1,11 +1,15 @@
 /**
  * Scarica e decodifica i fotogrammi della scena.
  * - I file compressi (blob) si tengono tutti: sono pochi MB.
- * - Le bitmap decodificate solo in una finestra attorno al fotogramma corrente,
- *   perché a 1920 px ognuna pesa ~8 MB in memoria.
+ * - Le bitmap decodificate solo in una finestra attorno al fotogramma corrente, e alla misura
+ *   del disegno sul canvas (non a 1920 px), per tenere bassa la memoria.
  * - Il fotogramma 0 è l'immagine di copertina già a schermo: non si riscarica.
  */
-import { ordineCaricamento, piuVicinoCaricato, type DatiSequenza } from "./sequenza";
+import {
+  ordineCaricamento,
+  sceltaFotogramma,
+  type DatiSequenza,
+} from "./sequenza";
 
 const CONCORRENZA = 6;
 
@@ -19,6 +23,7 @@ export class Caricatore {
   private readonly controllo = new AbortController();
   private corrente = 0;
   private chiuso = false;
+  private misura: { w: number; h: number } | null = null;
 
   constructor(
     private readonly base: string,
@@ -26,14 +31,31 @@ export class Caricatore {
     private readonly copertina: HTMLImageElement,
     private readonly finestra: number,
     private readonly quandoPronto: () => void
-  ) {}
+  ) {
+    // Dopo una rotazione il browser carica l'altra copertina: quando arriva si ridisegna.
+    copertina.addEventListener("load", this.copertinaCaricata);
+  }
+
+  private readonly copertinaCaricata = () => {
+    if (!this.chiuso) this.quandoPronto();
+  };
 
   private url(i: number) {
     return `${this.base}${String(i + 1).padStart(4, "0")}.${this.dati.estensione}`;
   }
 
+  /** La copertina vale come fotogramma 0 solo se è quella di questo formato, già decodificata. */
   private copertinaPronta() {
-    return this.copertina.complete && this.copertina.naturalWidth > 0;
+    return (
+      this.copertina.complete &&
+      this.copertina.naturalWidth === this.dati.larghezza &&
+      this.copertina.naturalHeight === this.dati.altezza
+    );
+  }
+
+  /** Misura (pixel del canvas) a cui decodificare i prossimi fotogrammi. */
+  impostaMisura(w: number, h: number) {
+    this.misura = { w: Math.max(1, Math.round(w)), h: Math.max(1, Math.round(h)) };
   }
 
   /** Avvia i download. Con `partenza` > 0 (pagina ricaricata a metà) si parte dai vicini. */
@@ -64,12 +86,27 @@ export class Caricatore {
     for (let k = 0; k < CONCORRENZA; k++) void lavora();
   }
 
+  private async bitmapDa(b: Blob): Promise<ImageBitmap> {
+    if (this.misura && this.misura.w < this.dati.larghezza) {
+      try {
+        return await createImageBitmap(b, {
+          resizeWidth: this.misura.w,
+          resizeHeight: this.misura.h,
+          resizeQuality: "high",
+        });
+      } catch {
+        // Browser senza opzioni di ridimensionamento: si decodifica a piena misura.
+      }
+    }
+    return createImageBitmap(b);
+  }
+
   private decodifica(i: number) {
     if (this.chiuso || this.bitmap.has(i) || this.inDecodifica.has(i)) return;
     const b = this.blob.get(i);
     if (!b) return;
     this.inDecodifica.add(i);
-    createImageBitmap(b)
+    this.bitmapDa(b)
       .then((bmp) => {
         this.inDecodifica.delete(i);
         if (this.chiuso || Math.abs(i - this.corrente) > this.finestra) {
@@ -99,17 +136,28 @@ export class Caricatore {
     }
   }
 
-  /** Il fotogramma disegnabile più vicino a i, oppure null se non c'è niente di pronto. */
-  sorgente(i: number): { indice: number; immagine: Sorgente } | null {
+  /**
+   * Il fotogramma da disegnare per l'indice i, sapendo che a schermo c'è `attuale` (−1 se il
+   * canvas è vuoto). null = lasciare il canvas com'è: non si torna mai a un fotogramma più
+   * lontano di quello già visibile (per esempio alla copertina a metà scena).
+   */
+  sorgente(i: number, attuale: number): { indice: number; immagine: Sorgente } | null {
     const disponibili = this.copertinaPronta() ? new Set([...this.pronti, 0]) : this.pronti;
-    const j = piuVicinoCaricato(i, disponibili);
+    const j = sceltaFotogramma(i, disponibili, attuale);
     if (j < 0) return null;
     return { indice: j, immagine: j === 0 ? this.copertina : this.bitmap.get(j)! };
+  }
+
+  /** Il fotogramma già decodificato, se c'è (per ridisegnare lo stesso a un'altra misura). */
+  ancora(j: number): Sorgente | null {
+    if (j === 0) return this.copertinaPronta() ? this.copertina : null;
+    return this.bitmap.get(j) ?? null;
   }
 
   chiudi() {
     this.chiuso = true;
     this.controllo.abort();
+    this.copertina.removeEventListener("load", this.copertinaCaricata);
     for (const bmp of this.bitmap.values()) bmp.close();
     this.bitmap.clear();
     this.pronti.clear();

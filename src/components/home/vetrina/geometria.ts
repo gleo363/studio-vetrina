@@ -136,6 +136,49 @@ export function quasiFinestra(q: Quad, vw: number, vh: number): boolean {
   );
 }
 
+export interface Rett {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export type Lato =
+  | "alto"
+  | "basso"
+  | "sinistra"
+  | "destra"
+  | "altoSinistra"
+  | "altoDestra"
+  | "bassoSinistra"
+  | "bassoDestra";
+
+/**
+ * Durante lo zoom il fotogramma (rettangolo r) può non coprire tutta la tela W × H:
+ * sul telefono il bordo basso sale, nelle finestre quasi quadrate si scoprono i lati.
+ * Restituisce le zone scoperte, ognuna da riempire allungando il bordo (o l'angolo)
+ * corrispondente del fotogramma. Insieme a r coprono la tela esattamente una volta.
+ */
+export function riempimenti(r: Rett, W: number, H: number): { lato: Lato; dest: Rett }[] {
+  const x0 = Math.min(W, Math.max(0, r.x));
+  const x1 = Math.max(0, Math.min(W, r.x + r.w));
+  const y0 = Math.min(H, Math.max(0, r.y));
+  const y1 = Math.max(0, Math.min(H, r.y + r.h));
+  const fasce: [Lato, Rett][] = [
+    ["alto", { x: x0, y: 0, w: x1 - x0, h: y0 }],
+    ["basso", { x: x0, y: y1, w: x1 - x0, h: H - y1 }],
+    ["sinistra", { x: 0, y: y0, w: x0, h: y1 - y0 }],
+    ["destra", { x: x1, y: y0, w: W - x1, h: y1 - y0 }],
+    ["altoSinistra", { x: 0, y: 0, w: x0, h: y0 }],
+    ["altoDestra", { x: x1, y: 0, w: W - x1, h: y0 }],
+    ["bassoSinistra", { x: 0, y: y1, w: x0, h: H - y1 }],
+    ["bassoDestra", { x: x1, y: y1, w: W - x1, h: H - y1 }],
+  ];
+  return fasce
+    .filter(([, d]) => d.w > 0 && d.h > 0)
+    .map(([lato, dest]) => ({ lato, dest }));
+}
+
 const lerp = (a: Punto, b: Punto, t: number): Punto => [
   a[0] + (b[0] - a[0]) * t,
   a[1] + (b[1] - a[1]) * t,

@@ -8,6 +8,8 @@ import {
   altezzaFascia,
   trasformaZoom,
   quasiFinestra,
+  riempimenti,
+  type Rett,
   type Quad,
 } from "../geometria.ts";
 
@@ -158,3 +160,26 @@ test("trasformaZoom: identità a t=0, schermo a tutta larghezza a t=1", () => {
   vicino(z1.k * y0 + z1.ty, 0, 1e-6);
   vicino(z1.k * x1 + z1.tx, 1440, 1e-6);
 });
+
+const area = (r: Rett) => Math.max(0, r.w) * Math.max(0, r.h);
+const interseca = (r: Rett, W: number, H: number): Rett => {
+  const x0 = Math.max(0, r.x), y0 = Math.max(0, r.y);
+  const x1 = Math.min(W, r.x + r.w), y1 = Math.min(H, r.y + r.h);
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+};
+for (const [nome, r] of [
+  ["zoom telefono: il fotogramma sale e lascia scoperto il fondo", { x: -120, y: -900, w: 700, h: 1400 }],
+  ["finestra quadrata: zoom che rimpicciolisce, scoperti i lati", { x: 60, y: -20, w: 880, h: 495 }],
+  ["scoperti un angolo e due lati", { x: 30, y: 40, w: 300, h: 600 }],
+  ["copre tutto", { x: -10, y: -10, w: 2000, h: 2000 }],
+] as [string, Rett][]) {
+  test("riempimenti: " + nome + ", la tela è coperta esattamente una volta", () => {
+    const W = 390, H = 844;
+    const parti = riempimenti(r, W, H);
+    const totale = area(interseca(r, W, H)) + parti.reduce((a, p) => a + area(p.dest), 0);
+    vicino(totale, W * H, 1e-6);
+    for (const p of parti) {
+      assert.ok(p.dest.x >= -1e-9 && p.dest.y >= -1e-9 && p.dest.x + p.dest.w <= W + 1e-9 && p.dest.y + p.dest.h <= H + 1e-9);
+    }
+  });
+}

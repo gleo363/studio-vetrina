@@ -11,12 +11,13 @@ import SezioneProblema from "@/components/home/SezioneProblema";
 import SezioneSoluzione from "@/components/home/SezioneSoluzione";
 import datiDesktop from "./dati/desktop.json";
 import datiMobile from "./dati/mobile.json";
-import { Caricatore } from "./caricatore";
+import { Caricatore, type Sorgente } from "./caricatore";
 import {
-  TEMPI,
   indiceFotogramma,
   angoliPerProgresso,
   progressoZoom,
+  fotogrammaDaMostrare,
+  opacitaCopia,
   type DatiSequenza,
 } from "./sequenza";
 import {
@@ -27,7 +28,9 @@ import {
   altezzaFascia,
   trasformaZoom,
   quasiFinestra,
+  riempimenti,
   type Quad,
+  type Rett,
 } from "./geometria";
 
 export type Formato = "desktop" | "mobile";
@@ -38,15 +41,14 @@ const DATI: Record<Formato, DatiSequenza> = {
 };
 
 /** Fotogrammi decodificati tenuti in memoria attorno a quello corrente. */
-const FINESTRA: Record<Formato, number> = { desktop: 8, mobile: 12 };
-
-/** La copia compare nello schermo in s 0,85 → 0,90. */
-const DISSOLVENZA_COPIA = 0.05;
+const FINESTRA: Record<Formato, number> = { desktop: 6, mobile: 12 };
 
 interface Props {
   progresso: MotionValue<number>;
   copertina: RefObject<HTMLImageElement | null>;
   formato: Formato;
+  /** Il browser decodifica AVIF (deciso una volta, prima del primo montaggio). */
+  avif: boolean;
 }
 
 function ultimoQuad(dati: DatiSequenza): Quad | null {
@@ -55,7 +57,13 @@ function ultimoQuad(dati: DatiSequenza): Quad | null {
   return dati.angoli[String(Math.max(...chiavi))];
 }
 
-export default function SequenzaVetrina({ progresso, copertina, formato }: Props) {
+function misureSorgente(img: Sorgente): [number, number] {
+  return img instanceof HTMLImageElement
+    ? [img.naturalWidth, img.naturalHeight]
+    : [img.width, img.height];
+}
+
+export default function SequenzaVetrina({ progresso, copertina, formato, avif }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const involucro = useRef<HTMLDivElement>(null);
   const [copiaMontata, setCopiaMontata] = useState(false);
@@ -84,8 +92,7 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
     const stage = cv?.parentElement;
     if (!cv || !inv || !img || !stage) return;
     const dati = DATI[formato];
-    // Senza supporto AVIF il browser ha scelto la copertina WebP: resta l'immagine statica.
-    if (dati.estensione === "avif" && !img.currentSrc.endsWith(".avif")) return;
+    if (dati.estensione === "avif" && !avif) return;
     const ctx = cv.getContext("2d");
     if (!ctx) return;
 
@@ -96,6 +103,8 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
     let cop = adattaCopertura(dati.larghezza, dati.altezza, 1, 1);
     let schermoFinale: Quad | null = null;
     let disegnato = -1;
+    let zoomDisegnato = -1;
+    let daRidisegnare = true;
     let raf = 0;
 
     const caricatore = new Caricatore(
@@ -106,24 +115,57 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
       () => pianifica()
     );
 
-    function aggiornaCopia(sv: number, t: number) {
+    /**
+     * Disegna il fotogramma con lo zoom t. Le zone che il fotogramma non copre (sul telefono il
+     * fondo, nelle finestre quasi quadrate i lati) si riempiono allungando il bordo del
+     * fotogramma: la copertina sotto il canvas non deve mai vedersi.
+     */
+    function disegnaTela(immagine: Sorgente, t: number) {
+      const W = cv!.width;
+      const H = cv!.height;
+      let k = 1;
+      let tx = 0;
+      let ty = 0;
+      if (t > 0 && schermoFinale) ({ k, tx, ty } = trasformaZoom(t, schermoFinale, vw));
+      const r: Rett = {
+        x: (cop.dx * k + tx) * dpr,
+        y: (cop.dy * k + ty) * dpr,
+        w: dati.larghezza * cop.scala * k * dpr,
+        h: dati.altezza * cop.scala * k * dpr,
+      };
+      const [sw, sh] = misureSorgente(immagine);
+      ctx!.drawImage(immagine, 0, 0, sw, sh, r.x, r.y, r.w, r.h);
+      const sx = (x: number) => Math.min(sw - 1, Math.max(0, ((x - r.x) / r.w) * sw));
+      const sy = (y: number) => Math.min(sh - 1, Math.max(0, ((y - r.y) / r.h) * sh));
+      for (const { lato, dest } of riempimenti(r, W, H)) {
+        let src: [number, number, number, number];
+        if (lato === "alto" || lato === "basso") {
+          src = [sx(dest.x), lato === "alto" ? 0 : sh - 1, Math.max(1, (dest.w / r.w) * sw), 1];
+        } else if (lato === "sinistra" || lato === "destra") {
+          src = [lato === "sinistra" ? 0 : sw - 1, sy(dest.y), 1, Math.max(1, (dest.h / r.h) * sh)];
+        } else {
+          src = [lato.endsWith("Sinistra") ? 0 : sw - 1, lato.startsWith("alto") ? 0 : sh - 1, 1, 1];
+        }
+        ctx!.drawImage(immagine, ...src, dest.x, dest.y, dest.w, dest.h);
+      }
+    }
+
+    function aggiornaCopia(sv: number, pv: number, t: number) {
       let quad: Quad | null = null;
       let h = vh;
-      let opacita = 0;
       if (t > 0 && schermoFinale) {
         quad = angoliZoom(t, schermoFinale, vw, vh);
         h = altezzaFascia(t, schermoFinale, vw, vh);
-        opacita = 1;
       } else {
         const q = angoliPerProgresso(sv, dati);
         if (q) {
           quad = fotogrammaInFinestra(q, cop);
           h = altezzaFascia(0, quad, vw, vh);
-          opacita = Math.min(1, Math.max(0, (sv - TEMPI.schermoInizio) / DISSOLVENZA_COPIA));
         }
       }
+      const opacita = quad ? opacitaCopia(sv, pv) : 0;
       const arrivata = quad !== null && t > 0 && quasiFinestra(quad, vw, vh);
-      if (!quad || arrivata) {
+      if (!quad || arrivata || opacita === 0) {
         // All'identità: prima dello schermo (invisibile) e a fine zoom, quando lo
         // scarto è sotto il mezzo pixel (testo nitido come quello della pagina vera).
         inv!.style.transform = "";
@@ -145,35 +187,30 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
     }
 
     function disegna() {
+      if (raf) cancelAnimationFrame(raf);
       raf = 0;
       const sv = s.get();
       const pv = progresso.get();
-      const i = indiceFotogramma(sv, dati.fotogrammi, dati.primaClip);
-      caricatore.imposta(i);
-      const src = caricatore.sorgente(i);
-      if (src && src.indice !== disegnato) {
-        ctx!.drawImage(
-          src.immagine,
-          0,
-          0,
-          dati.larghezza,
-          dati.altezza,
-          cop.dx * dpr,
-          cop.dy * dpr,
-          dati.larghezza * cop.scala * dpr,
-          dati.altezza * cop.scala * dpr
-        );
-        disegnato = src.indice;
-        cv!.dataset.fotogramma = String(src.indice);
-      }
       const t = progressoZoom(pv);
-      if (t > 0 && schermoFinale) {
-        const z = trasformaZoom(t, schermoFinale, vw);
-        cv!.style.transform = `matrix(${z.k},0,0,${z.k},${z.tx},${z.ty})`;
-      } else {
-        cv!.style.transform = "";
+      const i = fotogrammaDaMostrare(sv, pv, dati.fotogrammi, dati.primaClip);
+      caricatore.imposta(i);
+      // Canvas appena svuotato (resize) e fotogramma non più in memoria: si riparte dal più vicino.
+      if (daRidisegnare && !caricatore.ancora(disegnato)) disegnato = -1;
+      const nuovo = caricatore.sorgente(i, disegnato);
+      let immagine: Sorgente | null = null;
+      if (nuovo) {
+        immagine = nuovo.immagine;
+        disegnato = nuovo.indice;
+        cv!.dataset.fotogramma = String(nuovo.indice);
+      } else if (daRidisegnare || t !== zoomDisegnato) {
+        immagine = caricatore.ancora(disegnato);
       }
-      aggiornaCopia(sv, t);
+      if (immagine) {
+        disegnaTela(immagine, t);
+        zoomDisegnato = t;
+        daRidisegnare = false;
+      }
+      aggiornaCopia(sv, pv, t);
     }
 
     function pianifica() {
@@ -189,9 +226,11 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
       dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 1 / cop.scala));
       cv!.width = Math.round(vw * dpr);
       cv!.height = Math.round(vh * dpr);
+      caricatore.impostaMisura(dati.larghezza * cop.scala * dpr, dati.altezza * cop.scala * dpr);
       schermoFinale = ultimo ? fotogrammaInFinestra(ultimo, cop) : null;
-      disegnato = -1;
-      pianifica();
+      daRidisegnare = true;
+      // Subito, non al prossimo rAF: il canvas appena ridimensionato è vuoto.
+      disegna();
     }
 
     const ro = new ResizeObserver(misura);
@@ -207,18 +246,13 @@ export default function SequenzaVetrina({ progresso, copertina, formato }: Props
       ro.disconnect();
       if (raf) cancelAnimationFrame(raf);
       caricatore.chiudi();
-      cv.style.transform = "";
       cv.removeAttribute("data-fotogramma");
     };
-  }, [formato, progresso, s, copertina]);
+  }, [formato, avif, progresso, s, copertina]);
 
   return (
     <>
-      <canvas
-        ref={canvas}
-        aria-hidden="true"
-        className="absolute inset-0 z-[1] h-full w-full origin-top-left"
-      />
+      <canvas ref={canvas} aria-hidden="true" className="absolute inset-0 z-[1] h-full w-full" />
       <div
         ref={involucro}
         aria-hidden="true"

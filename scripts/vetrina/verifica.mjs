@@ -11,7 +11,7 @@ const arg = argomenti();
 const URL = (arg.url ?? "http://localhost:3100").replace(/\/$/, "");
 const OUT = path.join(RADICE, ".verifiche/e2e");
 fs.mkdirSync(OUT, { recursive: true });
-const tutte = !arg.scatti && !arg.c4 && !arg.c5 && !arg.c7 && !arg.perf && !arg.resize;
+const tutte = !arg.scatti && !arg.c4 && !arg.c5 && !arg.c7 && !arg.perf && !arg.resize && !arg.robustezza;
 const esito = {};
 
 const VISTE = {
@@ -207,6 +207,80 @@ if (tutte || arg.resize) {
   esito.resize = { errori, ok: errori.length === 0 };
   console.log("RESIZE", JSON.stringify(esito.resize));
   await ctx.close();
+}
+
+if (tutte || arg.robustezza) {
+  esito.robustezza = {};
+
+  // Rotazione: da orizzontale a verticale la sequenza riparte con l'altro insieme.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+    await ctx.addInitScript(() => { try { localStorage.setItem("vetrina_consent", "denied"); } catch {} });
+    const page = await ctx.newPage();
+    const mobili = [];
+    page.on("request", (r) => r.url().includes("/sequenza-vetrina/mobile/") && mobili.push(r.url()));
+    await caricaHome(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForTimeout(5000);
+    const g = await geometria(page);
+    const f = await vaiA(page, g.top + 0.5 * g.corsa);
+    esito.robustezza.rotazione = { richiesteMobile: mobili.length, fotogrammaA50: f, ok: mobili.length > 0 && f !== null && Number(f) > 40 };
+    await ctx.close();
+  }
+
+  // Telefono in orizzontale: l'Hero sta tutto nello schermo, sotto l'header.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+    await ctx.addInitScript(() => { try { localStorage.setItem("vetrina_consent", "denied"); } catch {} });
+    const page = await ctx.newPage();
+    await page.goto(URL + "/", { waitUntil: "networkidle" });
+    await page.waitForTimeout(2000);
+    const m = await page.evaluate(() => {
+      const stage = document.querySelector("[data-stage-vetrina]");
+      const header = document.querySelector("header").getBoundingClientRect();
+      const fuoriCopia = (el) => !el.closest("[inert]");
+      const pulsanti = [...stage.querySelectorAll("a")].filter(fuoriCopia).map((a) => a.getBoundingClientRect().bottom);
+      const occhiello = [...stage.querySelectorAll("p")]
+        .find((p) => fuoriCopia(p) && p.textContent.includes("Studio Vetrina"))
+        .getBoundingClientRect().top;
+      return { altezza: innerHeight, fondoPulsanti: Math.max(...pulsanti), occhiello, fondoHeader: header.bottom };
+    });
+    fs.writeFileSync(path.join(OUT, "hero-orizzontale.png"), await page.screenshot());
+    esito.robustezza.heroOrizzontale = { ...m, ok: m.fondoPulsanti <= m.altezza && m.occhiello >= m.fondoHeader };
+    await ctx.close();
+  }
+
+  // Dopo il passaggio la pagina vera riceve il puntatore (selezione, clic, hover).
+  {
+    const { ctx, page } = await apri("desktop");
+    await caricaHome(page);
+    const g = await geometria(page);
+    await vaiA(page, g.top + g.corsa + 10);
+    const sotto = await page.evaluate(() => {
+      const h2 = [...document.querySelectorAll("h2")].find((h) => !h.closest("[inert]"));
+      const r = h2.getBoundingClientRect();
+      const el = document.elementFromPoint(r.left + 20, r.top + r.height / 2);
+      return { tag: el?.tagName, dentroScena: !!el?.closest("[data-scena-vetrina]") };
+    });
+    esito.robustezza.puntatore = { ...sotto, ok: !sotto.dentroScena };
+    await ctx.close();
+  }
+
+  // Scroll svelto dentro lo zoom: il canvas mostra già l'ultimo fotogramma.
+  for (const v of ["desktop", "mobile"]) {
+    const { ctx, page } = await apri(v);
+    await caricaHome(page);
+    const g = await geometria(page);
+    await vaiA(page, g.top + 0.75 * g.corsa);
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), g.top + 0.95 * g.corsa);
+    await page.waitForTimeout(120);
+    const f = await page.evaluate(() => Number(document.querySelector("canvas")?.dataset.fotogramma));
+    const n = v === "desktop" ? 120 : 100;
+    fs.writeFileSync(path.join(OUT, `zoom-veloce-${v}.png`), await page.screenshot());
+    esito.robustezza[`zoomVeloce-${v}`] = { fotogramma: f, atteso: n - 1, ok: f === n - 1 };
+    await ctx.close();
+  }
+  console.log("ROBUSTEZZA", JSON.stringify(esito.robustezza, null, 1));
 }
 
 if (tutte || arg.perf) {

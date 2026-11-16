@@ -7,6 +7,9 @@ import {
   ordineCaricamento,
   piuVicinoCaricato,
   progressoZoom,
+  fotogrammaDaMostrare,
+  opacitaCopia,
+  sceltaFotogramma,
   type DatiSequenza,
 } from "../sequenza.ts";
 
@@ -108,4 +111,30 @@ test("progressoZoom: 0 fino a 0,92, 1 a 1, monotono", () => {
     assert.ok(z >= prec);
     prec = z;
   }
+});
+
+test("fotogrammaDaMostrare: durante lo zoom sempre l'ultimo, anche se lo spring è indietro", () => {
+  assert.equal(fotogrammaDaMostrare(0.5, 0.5, 120, 59), indiceFotogramma(0.5, 120, 59));
+  assert.equal(fotogrammaDaMostrare(0.8, 0.95, 120, 59), 119);
+  assert.equal(fotogrammaDaMostrare(0.6, 1, 100, 49), 99);
+  assert.equal(fotogrammaDaMostrare(0.91, 0.92, 120, 59), indiceFotogramma(0.91, 120, 59));
+});
+
+test("opacitaCopia: dissolvenza su s, ma mai a scatto quando lo zoom parte con lo spring indietro", () => {
+  assert.equal(opacitaCopia(0.5, 0.5), 0);
+  assert.equal(opacitaCopia(0.9, 0.9), 1);
+  assert.ok(opacitaCopia(0.875, 0.88) > 0.4 && opacitaCopia(0.875, 0.88) < 0.6);
+  // spring indietro (s=0,7) appena dentro lo zoom: la copia entra gradualmente, non a 1
+  const appena = opacitaCopia(0.7, 0.925);
+  assert.ok(appena > 0 && appena < 0.5, String(appena));
+  assert.equal(opacitaCopia(0.7, 1), 1);
+});
+
+test("sceltaFotogramma: mai più lontano di quello già a schermo", () => {
+  assert.equal(sceltaFotogramma(50, new Set([0]), 48), -1); // resta il 48 già disegnato
+  assert.equal(sceltaFotogramma(50, new Set([0, 49]), 48), 49);
+  assert.equal(sceltaFotogramma(50, new Set([0]), -1), 0); // niente a schermo: il più vicino
+  assert.equal(sceltaFotogramma(1, new Set([0]), 30), 0);
+  assert.equal(sceltaFotogramma(50, new Set([50]), 50), -1); // già disegnato
+  assert.equal(sceltaFotogramma(50, new Set(), 12), -1);
 });

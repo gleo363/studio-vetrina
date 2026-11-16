@@ -65,14 +65,21 @@ export default function SezioneVetrina() {
     return () => ro.disconnect();
   }, [aggiorna]);
 
-  // Avvio della sequenza: dopo il load e la copertina, a riposo, mai con reduced-motion.
+  // Avvio della sequenza: dopo il load e la copertina, a riposo; mai con reduced-motion,
+  // con il risparmio dati attivo o senza AVIF (i fotogrammi sono AVIF).
   useEffect(() => {
     const movimento = window.matchMedia("(prefers-reduced-motion: reduce)");
     const ritratto = window.matchMedia(RITRATTO);
-    if (movimento.matches) return;
+    const connessione = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (movimento.matches || connessione?.saveData) return;
     let annullato = false;
     let idle = 0;
-    const scegli = () => setFormato(ritratto.matches ? "mobile" : "desktop");
+    const scegli = () => {
+      // Il supporto AVIF si legge una volta sola, dalla copertina scelta dal browser:
+      // dopo una rotazione currentSrc è vuoto finché non arriva l'altra copertina.
+      if (!copertina.current?.currentSrc.endsWith(".avif")) return;
+      setFormato(ritratto.matches ? "mobile" : "desktop");
+    };
     const avvia = () => {
       if (annullato) return;
       if ("requestIdleCallback" in window) {
@@ -101,6 +108,38 @@ export default function SezioneVetrina() {
     };
   }, []);
 
+  // Le sezioni vere sotto la scena devono essere già "entrate" (contatori finiti) quando la
+  // copia nello schermo lascia il posto a loro. Al primo scroll, con la scena ancora davanti
+  // (p < 0,5), le si porta per un attimo dentro la finestra, coperte dallo stage opaco: le loro
+  // animazioni d'entrata partono ora, come quelle della copia. Un transform non sposta il
+  // layout (niente CLS); farlo solo dopo il primo scroll lascia fuori il suo titolo dall'LCP.
+  const sezioniPreparate = useRef(false);
+  useEffect(() => {
+    if (!formato || sezioniPreparate.current) return;
+    let id = 0;
+    let dopo: HTMLElement | null = null;
+    const prova = (v: number) => {
+      if (sezioniPreparate.current || v <= 0) return;
+      sezioniPreparate.current = true;
+      // Non disiscriversi durante la notifica: framer-motion salterebbe l'iscritto
+      // successivo (lo spring della sequenza) e il canvas resterebbe fermo.
+      queueMicrotask(via);
+      if (v >= 0.5) return;
+      dopo = document.querySelector<HTMLElement>("[data-dopo-scena]");
+      if (!dopo) return;
+      dopo.style.transform = `translateY(${-dopo.getBoundingClientRect().top}px)`;
+      id = window.setTimeout(() => {
+        if (dopo) dopo.style.transform = "";
+      }, 400);
+    };
+    const via = progresso.on("change", prova);
+    return () => {
+      via();
+      clearTimeout(id);
+      if (dopo) dopo.style.transform = "";
+    };
+  }, [formato, progresso]);
+
   // Il focus da tastiera su un pulsante dell'Hero già sparito riporta in cima alla sezione.
   const richiama = useCallback(() => {
     if (progresso.get() > TEMPI.titoloFine) {
@@ -114,20 +153,23 @@ export default function SezioneVetrina() {
     <section
       ref={sezione}
       data-scena-vetrina=""
-      className="relative z-10 h-[300lvh] motion-reduce:h-svh"
+      // La sezione si sovrappone agli ultimi 100 lvh di SezioneProblema: solo lo stage
+      // riceve il puntatore, così dopo il passaggio la pagina vera resta cliccabile.
+      className="pointer-events-none relative z-10 h-[300lvh] motion-reduce:h-svh"
     >
       <div
         ref={stage}
         data-stage-vetrina=""
-        className="sticky top-0 h-lvh overflow-hidden bg-inchiostro [contain:strict] motion-reduce:h-svh"
+        className="pointer-events-auto sticky top-0 h-lvh overflow-hidden bg-inchiostro [contain:strict] motion-reduce:h-svh"
       >
         <picture>
           <source media={RITRATTO} type="image/avif" srcSet="/vetrina-copertina/mobile.avif" />
           <source media={RITRATTO} type="image/webp" srcSet="/vetrina-copertina/mobile.webp" />
           <source type="image/avif" srcSet="/vetrina-copertina/desktop.avif" />
           {/* Immagine decorativa già ottimizzata (AVIF/WebP a misura): next/image non serve.
-              Priorità normale, non alta: copre tutta la finestra, quindi Chrome non la conta
-              come LCP, e su rete lenta toglierebbe banda al JavaScript dell'idratazione. */}
+              Senza fetchPriority alta: copre tutta la finestra, quindi Chrome non la conta come
+              LCP (l'LCP è il titolo dell'Hero, già visibile nell'HTML); Chrome la alza comunque
+              a High quando è nella finestra, ma senza scavalcare CSS e font. */}
           <img
             ref={copertina}
             src="/vetrina-copertina/desktop.webp"
@@ -144,6 +186,7 @@ export default function SezioneVetrina() {
             progresso={progresso}
             copertina={copertina}
             formato={formato}
+            avif
           />
         )}
 

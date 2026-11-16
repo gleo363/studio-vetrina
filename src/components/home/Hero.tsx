@@ -7,10 +7,16 @@ import {
   type MotionValue,
 } from "framer-motion";
 import Button from "@/components/ui/Button";
-import { EASE_VETRINA, DURATA, riveloMascherato, fadeUp } from "@/lib/motion";
+import { EASE_VETRINA, DURATA, fadeUp } from "@/lib/motion";
 import { TEMPI } from "@/components/home/vetrina/sequenza";
 
 const easeUscita = cubicBezier(...EASE_VETRINA);
+
+/** Il titolo resta visibile anche prima dell'animazione: solo un leggero movimento verso l'alto. */
+const titoloEntra = {
+  hidden: { y: 16 },
+  visible: { y: 0, transition: { duration: DURATA.rivelo, ease: EASE_VETRINA, delay: 0.15 } },
+};
 
 interface HeroProps {
   /** Progresso della sezione "La vetrina che si accende" (0 → 1). */
@@ -52,42 +58,37 @@ export default function Hero({ progresso, richiama }: HeroProps) {
         style={{ opacity }}
       />
       <motion.div
-        className="relative z-10 max-w-6xl mx-auto px-6 w-full pt-20 portrait:pt-28"
+        className="relative z-10 max-w-6xl mx-auto px-6 w-full pt-20 portrait:pt-28 [@media(max-height:500px)]:pt-14"
         style={{ y, opacity, pointerEvents }}
         initial="hidden"
         animate="visible"
       >
         <motion.p
           variants={fadeUp(12, DURATA.base)}
-          className="text-xs font-medium uppercase tracking-[0.2em] text-travertino/70 mb-8"
+          className="text-xs font-medium uppercase tracking-[0.2em] text-travertino/70 mb-8 [@media(max-height:500px)]:mb-3"
           style={{ fontFamily: "var(--font-inter)" }}
         >
           Studio Vetrina · Roma
         </motion.p>
 
-        <h1
-          className="text-[clamp(56px,9vw,108px)] font-medium text-travertino leading-[0.92] mb-7 tracking-tight"
+        {/* Titolo già visibile nell'HTML del server e in un solo blocco: è l'LCP della home
+            (una maschera per riga lo nasconderebbe fino all'idratazione). Entra salendo appena. */}
+        <motion.h1
+          variants={titoloEntra}
+          className="text-[clamp(56px,9vw,108px)] font-medium text-travertino leading-[0.92] mb-7 tracking-tight [@media(max-height:500px)]:text-[44px] [@media(max-height:500px)]:mb-3"
           style={{
             fontFamily: "var(--font-fraunces)",
             fontOpticalSizing: "auto",
           } as React.CSSProperties}
         >
-          {/* Ogni riga entra "nella cornice": maschera overflow-hidden. */}
-          <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
-            <motion.span className="block" variants={riveloMascherato(0.15)}>
-              La tua vetrina
-            </motion.span>
-          </span>
-          <span className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
-            <motion.span className="block" variants={riveloMascherato(0.27)}>
-              sul mondo.
-            </motion.span>
-          </span>
-        </h1>
+          La tua vetrina
+          <br />
+          sul mondo.
+        </motion.h1>
 
         <motion.p
           variants={fadeUp(16, 0.6, 0.65)}
-          className="text-xl md:text-2xl text-travertino/80 mb-12 max-w-lg leading-snug"
+          className="text-xl md:text-2xl text-travertino/80 mb-12 max-w-lg leading-snug [@media(max-height:500px)]:text-lg [@media(max-height:500px)]:mb-5"
           style={{
             fontFamily: "var(--font-fraunces)",
             fontStyle: "italic",
@@ -106,12 +107,12 @@ export default function Hero({ progresso, richiama }: HeroProps) {
           }}
         >
           <motion.div variants={fadeUp(14, DURATA.base)}>
-            <Button href="/contatti" variant="primary" className="text-base px-7 py-4">
+            <Button href="/contatti" variant="primary" className="text-base px-7 py-4 [@media(max-height:500px)]:py-3">
               Apriamo la tua vetrina →
             </Button>
           </motion.div>
           <motion.div variants={fadeUp(14, DURATA.base)}>
-            <Button href="/esempi" variant="ghost-chiaro" className="text-base px-7 py-4">
+            <Button href="/esempi" variant="ghost-chiaro" className="text-base px-7 py-4 [@media(max-height:500px)]:py-3">
               Guarda gli esempi
             </Button>
           </motion.div>
