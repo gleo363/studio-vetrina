@@ -8,6 +8,25 @@ import { consentiRichiesta, ipClient } from "@/lib/ratelimit";
 import { isAdminEmail } from "@/lib/admin";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { getLingua } from "@/lib/i18n/server";
+import { èLingua, type Lingua } from "@/lib/i18n/config";
+
+const ERRORI_CONTATTO = {
+  it: {
+    obbligatori: "Nome, attività e email sono obbligatori.",
+    rete: "Errore di rete. Riprova.",
+    troppiInvii: "Troppi invii ravvicinati. Attendi qualche minuto e riprova.",
+    troppiOggi: "Hai già inviato troppi messaggi oggi. Riprova domani o scrivici direttamente.",
+    nonDisponibile: "Servizio momentaneamente non disponibile. Scrivici direttamente via email.",
+  },
+  en: {
+    obbligatori: "Name, business and email are required.",
+    rete: "Network error. Please try again.",
+    troppiInvii: "Too many messages in a short time. Wait a few minutes and try again.",
+    troppiOggi: "You've already sent several messages today. Try again tomorrow, or email us directly.",
+    nonDisponibile: "The form is unavailable right now. Please email us directly.",
+  },
+};
 
 export async function inviaContatto(
   _prevState: { errore?: string; successo?: boolean } | null,
@@ -18,20 +37,22 @@ export async function inviaContatto(
   const email = (formData.get("email") as string)?.trim();
   const telefono = (formData.get("telefono") as string)?.trim() || null;
   const messaggio = (formData.get("messaggio") as string)?.trim() || null;
+  const lingua = await getLingua();
+  const e = ERRORI_CONTATTO[lingua];
 
   if (!nome || !attivita || !email) {
-    return { errore: "Nome, attività e email sono obbligatori." };
+    return { errore: e.obbligatori };
   }
 
   // Honeypot: i bot riempiono questo campo, gli umani no
   const honeypot = (formData.get("website") as string) ?? "";
-  if (honeypot) return { errore: "Errore di rete. Riprova." };
+  if (honeypot) return { errore: e.rete };
 
   // Rate limiting per IP: max 5 invii l'ora (l'email è dichiarata dal mittente
   // e quindi aggirabile; l'IP no)
   const ip = await ipClient();
   if (!consentiRichiesta(`contatto:${ip}`, 5, 60 * 60 * 1000)) {
-    return { errore: "Troppi invii ravvicinati. Attendi qualche minuto e riprova." };
+    return { errore: e.troppiInvii };
   }
 
   // Rate limiting: max 3 invii per email nelle ultime 24 ore
@@ -43,7 +64,7 @@ export async function inviaContatto(
     .eq("email", email)
     .gte("creato_il", since);
   if ((count ?? 0) >= 3) {
-    return { errore: "Hai già inviato troppi messaggi oggi. Riprova domani o scrivici direttamente." };
+    return { errore: e.troppiOggi };
   }
 
   // Tetto globale: max 30 segnalazioni nelle ultime 24 ore (anti-flood,
@@ -53,7 +74,7 @@ export async function inviaContatto(
     .select("*", { count: "exact", head: true })
     .gte("creato_il", since);
   if ((totale24h ?? 0) >= 30) {
-    return { errore: "Servizio momentaneamente non disponibile. Scrivici direttamente via email." };
+    return { errore: e.nonDisponibile };
   }
 
   const cookieStore = await cookies();
@@ -88,6 +109,7 @@ export async function inviaContatto(
     telefono,
     messaggio,
     codicePartner: partnerId ? ref! : null,
+    lingua,
   });
 
   return { successo: true };
@@ -153,15 +175,26 @@ export async function aggiornaSegnalazione(
   if (data.stato && ["firmato", "pagato", "rifiutato"].includes(data.stato)) {
     const { data: seg } = await admin
       .from("segnalazione")
-      .select("nome_attivita, partner:partner_id(email, nome)")
+      .select("nome_attivita, partner:partner_id(email, nome, user_id)")
       .eq("id", id)
       .single();
 
     if (seg) {
       const rawPartner = Array.isArray(seg.partner) ? seg.partner[0] : seg.partner;
-      const partnerInfo = rawPartner as { email: string; nome: string } | null;
+      const partnerInfo = rawPartner as
+        | { email: string; nome: string; user_id: string | null }
+        | null;
       if (partnerInfo?.email && partnerInfo?.nome) {
+        // Lingua scelta dal partner (salvata nei metadata Supabase);
+        // i partner registrati prima del sito bilingue restano in italiano.
+        let linguaPartner: Lingua = "it";
+        if (partnerInfo.user_id) {
+          const { data: utente } = await admin.auth.admin.getUserById(partnerInfo.user_id);
+          const salvata = utente?.user?.user_metadata?.lingua;
+          if (èLingua(salvata)) linguaPartner = salvata;
+        }
         await inviaEmailStatoSegnalazione({
+          lingua: linguaPartner,
           partnerEmail: partnerInfo.email,
           partnerNome: partnerInfo.nome,
           nomeAttivita: seg.nome_attivita,

@@ -4,41 +4,55 @@ import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { StaggerContainer, StaggerItem } from "@/components/ui/StaggerCards";
 import { EASE_VETRINA, DURATA, riveloLinea } from "@/lib/motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
 
 interface StatConfig {
   value: number;
   decimals?: number;
   prefix?: string;
   suffix?: string;
-  label: string;
   staticDisplay?: string;
 }
 
 const stats: StatConfig[] = [
-  {
-    value: 4.2,
-    decimals: 1,
-    suffix: "M",
-    label: "piccole imprese senza presenza online adeguata",
-  },
-  {
-    value: 76,
-    suffix: "%",
-    label: "dei consumatori giudica un'azienda dal suo sito",
-  },
-  {
-    value: 0,
-    staticDisplay: "€0",
-    label: "guadagni online senza un sito web",
-  },
-  {
-    value: 8,
-    suffix: "″",
-    label: "secondi per perdere un visitatore",
-  },
+  { value: 4.2, decimals: 1, suffix: "M" },
+  { value: 76, suffix: "%" },
+  { value: 0, staticDisplay: "€0" },
+  { value: 8, suffix: "″" },
 ];
 
-function CountUp({ config }: { config: StatConfig }) {
+const TESTI = {
+  it: {
+    titolo:
+      "Il 68% delle attività locali in Italia non ha un sito. O ce l'ha, ma fa più danno che bene.",
+    etichette: [
+      "attività in Italia senza una presenza online adeguata",
+      "dei consumatori giudica un'azienda dal suo sito",
+      "guadagni online senza un sito web",
+      "secondi per perdere un visitatore",
+    ],
+    separatoreDecimale: ",",
+  },
+  en: {
+    titolo:
+      "68% of local businesses in Italy have no website. Or they have one that does more harm than good.",
+    etichette: [
+      "businesses in Italy without a proper online presence",
+      "of customers judge a business by its website",
+      "earned online without a website",
+      "seconds to lose a visitor",
+    ],
+    separatoreDecimale: ".",
+  },
+};
+
+function CountUp({
+  config,
+  separatoreDecimale,
+}: {
+  config: StatConfig;
+  separatoreDecimale: string;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const riduciMovimento = useReducedMotion();
@@ -49,7 +63,7 @@ function CountUp({ config }: { config: StatConfig }) {
     const formatta = (v: number) => {
       const formatted =
         config.decimals && config.decimals > 0
-          ? v.toFixed(config.decimals).replace(".", ",")
+          ? v.toFixed(config.decimals).replace(".", separatoreDecimale)
           : Math.floor(v).toString();
       return (config.prefix ?? "") + formatted + (config.suffix ?? "");
     };
@@ -69,7 +83,7 @@ function CountUp({ config }: { config: StatConfig }) {
       },
     });
     return () => controls.stop();
-  }, [inView, config, riduciMovimento]);
+  }, [inView, config, riduciMovimento, separatoreDecimale]);
 
   if (config.staticDisplay) {
     return <span ref={ref}>{config.staticDisplay}</span>;
@@ -83,6 +97,7 @@ function CountUp({ config }: { config: StatConfig }) {
 }
 
 export default function SezioneProblema() {
+  const t = useTesti(TESTI);
   return (
     <section className="bg-inchiostro alone-cotto text-travertino px-6 py-28">
       <div className="max-w-6xl mx-auto">
@@ -91,8 +106,7 @@ export default function SezioneProblema() {
             className="text-3xl md:text-4xl lg:text-[44px] font-medium leading-[1.1] text-travertino"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Il 68% delle piccole attività italiane non ha un sito. O ce
-            l&apos;ha, ma fa più danno che bene.
+            {t.titolo}
           </h2>
         </AnimatedSection>
 
@@ -104,7 +118,7 @@ export default function SezioneProblema() {
                   className="text-5xl md:text-6xl font-medium text-ocra tabular-nums"
                   style={{ fontFamily: "var(--font-fraunces)" }}
                 >
-                  <CountUp config={stat} />
+                  <CountUp config={stat} separatoreDecimale={t.separatoreDecimale} />
                 </p>
                 {/* La "mensola": eco della cornice del marchio */}
                 <motion.div
@@ -116,7 +130,7 @@ export default function SezioneProblema() {
                   className="text-sm text-travertino/50 leading-snug"
                   style={{ fontFamily: "var(--font-inter)" }}
                 >
-                  {stat.label}
+                  {t.etichette[i]}
                 </p>
               </div>
             </StaggerItem>

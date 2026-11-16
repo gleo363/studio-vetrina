@@ -1,15 +1,22 @@
-import type { Metadata } from "next";
 import { BarraEsempi, ChiusuraEsempi } from "@/components/esempi/BarraEsempi";
 import VetrinaBottega from "@/components/esempi/VetrinaBottega";
+import { metadatiLocalizzati } from "@/lib/i18n/metadata";
 
 const FONT_BASE_CLASS = "__font-cormorant";
 const FONT_SECONDARY_CLASS = "__font-mulish";
 
-export const metadata: Metadata = {
-  title: "Fiori di Trastevere · esempio per botteghe e negozi",
-  description:
-    "Vetrina dimostrativa di Studio Vetrina per botteghe e negozi: un fioraio di fantasia con il banco dei prodotti, la storia della famiglia, orari e contatti. Esempio, non un'attività reale.",
-};
+export const generateMetadata = metadatiLocalizzati({
+  it: {
+    title: "Fiori di Trastevere · esempio per botteghe e negozi",
+    description:
+      "Vetrina dimostrativa di Studio Vetrina per botteghe e negozi: un fioraio di fantasia con il banco dei prodotti, la storia della famiglia, orari e contatti. Esempio, non un'attività reale.",
+  },
+  en: {
+    title: "Fiori di Trastevere · shop example",
+    description:
+      "A Studio Vetrina sample site for shops: a fictional florist with its products on display, the family story, opening hours and contact details. An example, not a real business.",
+  },
+});
 
 export default function EsempioBottegaPage() {
   return (

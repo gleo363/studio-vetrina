@@ -7,6 +7,34 @@ import AnimatedSection from "@/components/ui/AnimatedSection";
 import PasswordInput from "@/components/ui/PasswordInput";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: {
+    eyebrow: "Programma Partner",
+    titolo: "Bentornato.",
+    sottotitolo: "Accedi alla tua area partner.",
+    credenziali: "Email o password non corretti.",
+    phEmail: "mario@esempio.it",
+    accesso: "Accesso in corso…",
+    accedi: "Accedi →",
+    nessunAccount: "Non hai ancora un account?",
+    registrati: "Registrati",
+    dimenticata: "Hai dimenticato la password?",
+  },
+  en: {
+    eyebrow: "Partner Program",
+    titolo: "Welcome back.",
+    sottotitolo: "Log in to your partner area.",
+    credenziali: "Wrong email or password.",
+    phEmail: "jane@example.com",
+    accesso: "Logging in…",
+    accedi: "Log in →",
+    nessunAccount: "Don't have an account yet?",
+    registrati: "Sign up",
+    dimenticata: "Forgot your password?",
+  },
+};
 
 const inputCls =
   "w-full bg-glass border border-inchiostro/10 rounded-xl px-4 py-3.5 text-sm text-inchiostro placeholder:text-pietra/50 outline-none focus:border-inchiostro/30 transition-colors";
@@ -17,6 +45,7 @@ export default function AccediPage() {
   const router = useRouter();
   const [errore, setErrore] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const t = useTesti(TESTI);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -36,7 +65,7 @@ export default function AccediPage() {
     if (error) {
       setErrore(
         error.message.includes("Invalid login credentials")
-          ? "Email o password non corretti."
+          ? t.credenziali
           : error.message
       );
       setLoading(false);
@@ -54,19 +83,19 @@ export default function AccediPage() {
             className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-4"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Programma Partner
+            {t.eyebrow}
           </p>
           <h1
             className="text-3xl md:text-4xl font-medium text-inchiostro mb-3"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Bentornato.
+            {t.titolo}
           </h1>
           <p
             className="text-sm text-inchiostro/60"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Accedi alla tua area partner.
+            {t.sottotitolo}
           </p>
         </AnimatedSection>
 
@@ -96,7 +125,7 @@ export default function AccediPage() {
                 name="email"
                 type="email"
                 required
-                placeholder="mario@esempio.it"
+                placeholder={t.phEmail}
                 className={inputCls}
                 style={{ fontFamily: "var(--font-inter)" }}
               />
@@ -129,20 +158,20 @@ export default function AccediPage() {
               whileTap={loading ? {} : { scale: 0.97 }}
               transition={{ duration: 0.2 }}
             >
-              {loading ? "Accesso in corso…" : "Accedi →"}
+              {loading ? t.accesso : t.accedi}
             </motion.button>
           </form>
 
           <div className="mt-6 flex flex-col gap-2">
             <p className="text-sm text-pietra" style={{ fontFamily: "var(--font-inter)" }}>
-              Non hai ancora un account?{" "}
+              {t.nessunAccount}{" "}
               <Link href="/partner/registrati" className="text-inchiostro hover:text-cotto transition-colors">
-                Registrati
+                {t.registrati}
               </Link>
             </p>
             <p className="text-sm text-pietra" style={{ fontFamily: "var(--font-inter)" }}>
               <Link href="/partner/reset-password" className="text-inchiostro hover:text-cotto transition-colors">
-                Hai dimenticato la password?
+                {t.dimenticata}
               </Link>
             </p>
           </div>

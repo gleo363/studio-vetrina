@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { useLingua } from "@/components/providers/LinguaProvider";
 
 interface QrCodePartnerProps {
   url: string;
@@ -10,6 +11,7 @@ interface QrCodePartnerProps {
 
 export default function QrCodePartner({ url, codice }: QrCodePartnerProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const lingua = useLingua();
 
   function scaricaQr() {
     const canvas = canvasRef.current?.querySelector("canvas");
@@ -34,7 +36,7 @@ export default function QrCodePartner({ url, codice }: QrCodePartnerProps) {
         style={{ fontFamily: "var(--font-inter)" }}
         data-cursor="pointer"
       >
-        Scarica QR →
+        {lingua === "en" ? "Download QR →" : "Scarica QR →"}
       </button>
     </div>
   );

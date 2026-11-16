@@ -1,15 +1,22 @@
-import type { Metadata } from "next";
 import { BarraEsempi, ChiusuraEsempi } from "@/components/esempi/BarraEsempi";
 import VetrinaRistorante from "@/components/esempi/VetrinaRistorante";
+import { metadatiLocalizzati } from "@/lib/i18n/metadata";
 
 const FONT_BASE_CLASS = "__font-karla";
 const FONT_SECONDARY_CLASS = "__font-anton";
 
-export const metadata: Metadata = {
-  title: "Osteria del Vicolo · esempio per la ristorazione",
-  description:
-    "Vetrina dimostrativa di Studio Vetrina per il settore ristorazione: una trattoria romana di fantasia con menù, orari e prenotazione del tavolo. Esempio, non un'attività reale.",
-};
+export const generateMetadata = metadatiLocalizzati({
+  it: {
+    title: "Osteria del Vicolo · esempio per la ristorazione",
+    description:
+      "Vetrina dimostrativa di Studio Vetrina per il settore ristorazione: una trattoria romana di fantasia con menù, orari e prenotazione del tavolo. Esempio, non un'attività reale.",
+  },
+  en: {
+    title: "Osteria del Vicolo · restaurant example",
+    description:
+      "A Studio Vetrina sample site for restaurants: a fictional Roman trattoria with menu, opening hours and table booking. An example, not a real business.",
+  },
+});
 
 export default function EsempioRistorantePage() {
   return (

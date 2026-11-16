@@ -5,20 +5,43 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "@/components/ui/Logo";
 import Button from "@/components/ui/Button";
+import SelettoreLingua from "@/components/ui/SelettoreLingua";
+import { useTesti } from "@/components/providers/LinguaProvider";
 import { EASE_VETRINA, DURATA } from "@/lib/motion";
 
-const navLinks = [
-  { href: "/esempi", label: "Esempi" },
-  { href: "/studio", label: "Studio" },
-  { href: "/perche-sceglierci", label: "Perché noi" },
-  { href: "/qa", label: "Q&A" },
-  { href: "/partner", label: "Partner" },
-];
+const TESTI = {
+  it: {
+    nav: [
+      { href: "/esempi", label: "Esempi" },
+      { href: "/studio", label: "Studio" },
+      { href: "/perche-sceglierci", label: "Perché noi" },
+      { href: "/qa", label: "Q&A" },
+      { href: "/partner", label: "Partner" },
+    ],
+    cta: "Parliamone",
+    apriMenu: "Apri menu",
+    chiudiMenu: "Chiudi menu",
+  },
+  en: {
+    nav: [
+      { href: "/esempi", label: "Work" },
+      { href: "/studio", label: "Studio" },
+      { href: "/perche-sceglierci", label: "Why us" },
+      { href: "/qa", label: "FAQ" },
+      { href: "/partner", label: "Partners" },
+    ],
+    cta: "Let's talk",
+    apriMenu: "Open menu",
+    chiudiMenu: "Close menu",
+  },
+};
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTesti(TESTI);
+  const navLinks = t.nav;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -66,7 +89,7 @@ export default function Header() {
           </motion.div>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -84,35 +107,39 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            <SelettoreLingua />
             <Button href="/contatti" variant="primary">
-              Parliamone
+              {t.cta}
             </Button>
           </nav>
 
-          {/* Hamburger */}
-          <button
-            className="md:hidden flex flex-col gap-1.5 p-2 -mr-2"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Chiudi menu" : "Apri menu"}
-            aria-expanded={menuOpen}
-            data-cursor="pointer"
-          >
-            <motion.span
-              className="block w-6 h-px bg-inchiostro rounded-full"
-              animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.3, ease: EASE_VETRINA }}
-            />
-            <motion.span
-              className="block w-6 h-px bg-inchiostro rounded-full"
-              animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
-              transition={{ duration: DURATA.micro, ease: EASE_VETRINA }}
-            />
-            <motion.span
-              className="block w-6 h-px bg-inchiostro rounded-full"
-              animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.3, ease: EASE_VETRINA }}
-            />
-          </button>
+          {/* Mobile: lingua sempre a portata, poi hamburger */}
+          <div className="md:hidden flex items-center gap-5">
+            <SelettoreLingua />
+            <button
+              className="flex flex-col gap-1.5 p-2 -mr-2"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? t.chiudiMenu : t.apriMenu}
+              aria-expanded={menuOpen}
+              data-cursor="pointer"
+            >
+              <motion.span
+                className="block w-6 h-px bg-inchiostro rounded-full"
+                animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.3, ease: EASE_VETRINA }}
+              />
+              <motion.span
+                className="block w-6 h-px bg-inchiostro rounded-full"
+                animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+                transition={{ duration: DURATA.micro, ease: EASE_VETRINA }}
+              />
+              <motion.span
+                className="block w-6 h-px bg-inchiostro rounded-full"
+                animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.3, ease: EASE_VETRINA }}
+              />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -174,7 +201,7 @@ export default function Header() {
                   variant="primary"
                   className="w-full justify-center"
                 >
-                  Parliamone
+                  {t.cta}
                 </Button>
               </motion.div>
             </motion.nav>

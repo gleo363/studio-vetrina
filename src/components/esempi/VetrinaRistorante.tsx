@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useLingua } from "@/components/providers/LinguaProvider";
 
 
 const ease: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
@@ -14,27 +15,131 @@ const C = {
   giallo: "#E8B04B",
 };
 
-const menu = {
-  Antipasti: [
-    { nome: "Supplì al telefono", prezzo: "3,50" },
-    { nome: "Carciofo alla romana", prezzo: "6" },
-    { nome: "Fiori di zucca ripieni", prezzo: "5" },
-  ],
-  Primi: [
-    { nome: "Cacio e pepe", prezzo: "12" },
-    { nome: "Carbonara", prezzo: "13" },
-    { nome: "Amatriciana", prezzo: "12" },
-    { nome: "Gricia", prezzo: "12" },
-  ],
-  Secondi: [
-    { nome: "Saltimbocca alla romana", prezzo: "16" },
-    { nome: "Polpette al sugo della nonna", prezzo: "14" },
-    { nome: "Puntarelle e alici", prezzo: "8" },
-  ],
-  Dolci: [
-    { nome: "Tiramisù della casa", prezzo: "6" },
-    { nome: "Maritozzo con la panna", prezzo: "5" },
-  ],
+// I nomi dei piatti restano in italiano in entrambe le lingue: è una trattoria romana.
+const menu: { categoria: { it: string; en: string }; piatti: { nome: string; prezzo: number }[] }[] = [
+  {
+    categoria: { it: "Antipasti", en: "Starters" },
+    piatti: [
+      { nome: "Supplì al telefono", prezzo: 3.5 },
+      { nome: "Carciofo alla romana", prezzo: 6 },
+      { nome: "Fiori di zucca ripieni", prezzo: 5 },
+    ],
+  },
+  {
+    categoria: { it: "Primi", en: "Pasta" },
+    piatti: [
+      { nome: "Cacio e pepe", prezzo: 12 },
+      { nome: "Carbonara", prezzo: 13 },
+      { nome: "Amatriciana", prezzo: 12 },
+      { nome: "Gricia", prezzo: 12 },
+    ],
+  },
+  {
+    categoria: { it: "Secondi", en: "Mains" },
+    piatti: [
+      { nome: "Saltimbocca alla romana", prezzo: 16 },
+      { nome: "Polpette al sugo della nonna", prezzo: 14 },
+      { nome: "Puntarelle e alici", prezzo: 8 },
+    ],
+  },
+  {
+    categoria: { it: "Dolci", en: "Desserts" },
+    piatti: [
+      { nome: "Tiramisù della casa", prezzo: 6 },
+      { nome: "Maritozzo con la panna", prezzo: 5 },
+    ],
+  },
+];
+
+const TESTI = {
+  it: {
+    striscia: "Vicolo del Forno Vecchio, Roma · aperti dal martedì alla domenica ·",
+    prenotaLink: "prenota un tavolo",
+    eyebrow: "✦ Trattoria romana ✦",
+    titolo: ["La pasta", "come Dio", "comanda."],
+    timbro: "dal 1962 · Roma",
+    intro:
+      "Tre tavoli fuori, dodici dentro, una cucina che non ha mai avuto fretta. Da tre generazioni, nel vicolo dietro la piazza.",
+    menù: "Il menù",
+    menùSotto: "poche cose, fatte bene. Il pane è compreso",
+    coperto: "pane e coperto 2 €, e l'acqua del sindaco è gratis",
+    fattoAMano: "fatto a mano",
+    citazione: "«Qui non si cambia il menù. Si cambia solo il mercato, la mattina.»",
+    firma: "Nonna Iolanda, fondatrice",
+    scatti: ["L'osteria,", "in tre scatti"],
+    polaroid: ["i tavoli nel vicolo, d'estate", "la sala, la sera", "la cucina a vista"],
+    quando: ["Quando", "ci trovi"],
+    orari: [
+      { giorni: "Da martedì a venerdì", ore: "12:30–15:00 · 19:30–23:00" },
+      { giorni: "Sabato e Domenica", ore: "12:30–15:30 · 19:30–23:30" },
+    ],
+    lunedì: "Lunedì",
+    riposo: "riposo: si riposa pure la cucina",
+    mappaEtichetta: "Mappa stilizzata: il vicolo dietro la piazza",
+    mappaTesto: "il vicolo dietro la piazza",
+    mappaDidascalia:
+      "il secondo vicolo a destra dopo la piazza. Se ti perdi, segui l'odore del sugo",
+    biglietto: "Biglietto di prenotazione",
+    tieniti: "Tieniti un tavolo",
+    ricevuto: "Ricevuto!",
+    demo:
+      "Questa è una vetrina dimostrativa: il modulo non invia nulla. Ma se l'osteria esistesse, il tavolo sarebbe già tuo.",
+    aNomeDi: "A nome di",
+    phNome: "scrivi qui il nome",
+    quanti: "Quanti siete",
+    scegli: "scegli",
+    persone: (n: number) => `${n} persone`,
+    piùDiSei: "più di 6, chiamaci!",
+    giorno: "Giorno",
+    ora: "Ora",
+    prenota: "Prenota, ti aspettiamo",
+    piede: "vetrina dimostrativa · attività di fantasia · nessuna prenotazione reale",
+    prezzo: (p: number) => `${p.toLocaleString("it-IT", { minimumFractionDigits: p % 1 ? 2 : 0 })} €`,
+  },
+  en: {
+    striscia: "Vicolo del Forno Vecchio, Rome · open Tuesday to Sunday ·",
+    prenotaLink: "book a table",
+    eyebrow: "✦ Roman trattoria ✦",
+    titolo: ["Pasta,", "as God", "intended."],
+    timbro: "since 1962 · Rome",
+    intro:
+      "Three tables outside, twelve inside, and a kitchen that has never been in a hurry. Three generations, in the alley behind the piazza.",
+    menù: "The menu",
+    menùSotto: "a few things, done well. Bread is included",
+    coperto: "bread and cover €2. Tap water, “the mayor's water”, is on the house",
+    fattoAMano: "handmade",
+    citazione: "“The menu never changes here. Only the market does, every morning.”",
+    firma: "Nonna Iolanda, founder",
+    scatti: ["The osteria,", "in three shots"],
+    polaroid: ["tables in the alley, in summer", "the dining room, at night", "the open kitchen"],
+    quando: ["When", "to find us"],
+    orari: [
+      { giorni: "Tuesday to Friday", ore: "12:30–15:00 · 19:30–23:00" },
+      { giorni: "Saturday and Sunday", ore: "12:30–15:30 · 19:30–23:30" },
+    ],
+    lunedì: "Monday",
+    riposo: "closed: even the kitchen needs a day off",
+    mappaEtichetta: "Stylized map: the alley behind the piazza",
+    mappaTesto: "the alley behind the piazza",
+    mappaDidascalia:
+      "second alley on the right after the piazza. If you get lost, follow the smell of the sauce",
+    biglietto: "Reservation card",
+    tieniti: "Save yourself a table",
+    ricevuto: "Got it!",
+    demo:
+      "This is a sample site, so the form doesn't send anything. But if the osteria were real, the table would already be yours.",
+    aNomeDi: "Name",
+    phNome: "write your name here",
+    quanti: "How many",
+    scegli: "choose",
+    persone: (n: number) => `${n} people`,
+    piùDiSei: "more than 6? call us!",
+    giorno: "Day",
+    ora: "Time",
+    prenota: "Book it, we'll be waiting",
+    piede: "sample site · fictional business · no real bookings",
+    prezzo: (p: number) => `€${p.toLocaleString("en-US", { minimumFractionDigits: p % 1 ? 2 : 0 })}`,
+  },
 };
 
 const piattiMarquee = [
@@ -114,13 +219,14 @@ function PiattoStilizzato({ size = "100%" }: { size?: string }) {
 
 /** Mappa stilizzata, incorniciata come cartolina. */
 function MappaStilizzata() {
+  const t = TESTI[useLingua()];
   return (
     <svg
       viewBox="0 0 400 280"
       className="w-full h-auto block"
       style={{ backgroundColor: "#F1E6CE" }}
       role="img"
-      aria-label="Mappa stilizzata: il vicolo dietro la piazza"
+      aria-label={t.mappaEtichetta}
     >
       <path d="M0 80 L400 60" stroke="#E0D2B4" strokeWidth="22" fill="none" />
       <path d="M120 0 L150 280" stroke="#E0D2B4" strokeWidth="18" fill="none" />
@@ -143,7 +249,7 @@ function MappaStilizzata() {
         fontSize="15"
         fill={C.marrone}
       >
-        il vicolo dietro la piazza
+        {t.mappaTesto}
       </text>
     </svg>
   );
@@ -186,6 +292,8 @@ interface VetrinaRistoranteProps { fontBase: string; fontSecondary: string; }
 
 export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRistoranteProps) {
   const [inviato, setInviato] = useState(false);
+  const lingua = useLingua();
+  const t = TESTI[lingua];
 
   return (
     <div
@@ -209,9 +317,9 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
         className="px-6 py-2 text-center text-xs tracking-wide"
         style={{ backgroundColor: C.marrone, color: `${C.crema}CC` }}
       >
-        Vicolo del Forno Vecchio, Roma · aperti dal martedì alla domenica ·{" "}
+        {t.striscia}{" "}
         <a href="#prenota" className="underline underline-offset-2" data-cursor="pointer">
-          prenota un tavolo
+          {t.prenotaLink}
         </a>
       </div>
 
@@ -224,7 +332,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          ✦ Trattoria romana ✦
+          {t.eyebrow}
         </motion.p>
         <motion.h1
           className={`${fontSecondary} uppercase leading-[0.88] text-[clamp(64px,13vw,170px)] select-none`}
@@ -232,17 +340,17 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease }}
         >
-          La pasta
+          {t.titolo[0]}
           <br />
           <span className="relative inline-block">
-            come Dio
+            {t.titolo[1]}
             {/* piatto che sbuca tra le righe */}
             <span className="absolute -right-16 sm:-right-28 top-1/2 -translate-y-1/2 w-24 sm:w-40 rotate-12 pointer-events-none hidden min-[420px]:block">
               <PiattoStilizzato />
             </span>
           </span>
           <br />
-          <span style={{ color: C.arancio }}>comanda.</span>
+          <span style={{ color: C.arancio }}>{t.titolo[2]}</span>
         </motion.h1>
 
         {/* timbro */}
@@ -263,7 +371,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                 "radial-gradient(circle at 30% 40%, black 60%, transparent 61%), radial-gradient(circle at 70% 60%, black 64%, transparent 65%), linear-gradient(black, black)",
             }}
           >
-            dal 1962 · Roma
+            {t.timbro}
           </span>
         </motion.div>
 
@@ -274,8 +382,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Tre tavoli fuori, dodici dentro, una cucina che non ha mai avuto
-          fretta. Da tre generazioni, nel vicolo dietro la piazza.
+          {t.intro}
         </motion.p>
       </header>
 
@@ -332,23 +439,23 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
               <h2
                 className={`${fontSecondary} text-center uppercase text-4xl sm:text-5xl mb-2`}
               >
-                Il menù
+                {t.menù}
               </h2>
               <p
                 className="text-center text-sm italic mb-10"
                 style={{ fontFamily: "Georgia, serif", color: `${C.marrone}99` }}
               >
-                poche cose, fatte bene. Il pane è compreso
+                {t.menùSotto}
               </p>
 
-              {Object.entries(menu).map(([categoria, piatti]) => (
-                <div key={categoria} className="mb-9 last:mb-0">
+              {menu.map(({ categoria: cat, piatti }) => (
+                <div key={cat.it} className="mb-9 last:mb-0">
                   <h3
                     className={`${fontSecondary} uppercase text-lg tracking-[0.15em] mb-4 flex items-center gap-3`}
                     style={{ color: C.arancio }}
                   >
                     <span className="h-px flex-1" style={{ backgroundColor: `${C.arancio}55` }} />
-                    {categoria}
+                    {cat[lingua]}
                     <span className="h-px flex-1" style={{ backgroundColor: `${C.arancio}55` }} />
                   </h3>
                   <ul className="flex flex-col gap-3">
@@ -360,7 +467,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                           style={{ borderColor: `${C.marrone}40` }}
                           aria-hidden="true"
                         />
-                        <span className="font-bold whitespace-nowrap">{p.prezzo} €</span>
+                        <span className="font-bold whitespace-nowrap">{t.prezzo(p.prezzo)}</span>
                       </li>
                     ))}
                   </ul>
@@ -375,7 +482,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                   borderTop: `1px solid ${C.marrone}22`,
                 }}
               >
-                pane e coperto 2 €, e l&apos;acqua del sindaco è gratis
+                {t.coperto}
               </p>
 
               {/* timbro stampato sopra il foglio, ben leggibile */}
@@ -394,7 +501,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                 viewport={{ once: true, margin: "-80px" }}
                 aria-hidden="true"
               >
-                fatto a mano
+                {t.fattoAMano}
               </motion.span>
             </div>
           </Rivela>
@@ -408,13 +515,13 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
             className="text-[clamp(24px,4vw,40px)] leading-snug"
             style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}
           >
-            «Qui non si cambia il menù. Si cambia solo il mercato, la mattina.»
+            {t.citazione}
           </p>
           <p
             className="mt-5 text-xs font-bold uppercase tracking-[0.3em]"
             style={{ color: C.arancio }}
           >
-            Nonna Iolanda, fondatrice
+            {t.firma}
           </p>
         </Rivela>
       </section>
@@ -430,24 +537,24 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
               className={`${fontSecondary} uppercase text-[clamp(32px,5vw,56px)] mb-12 text-center`}
               style={{ color: C.crema }}
             >
-              L&apos;osteria, <span style={{ color: C.giallo }}>in tre scatti</span>
+              {t.scatti[0]} <span style={{ color: C.giallo }}>{t.scatti[1]}</span>
             </h2>
           </Rivela>
           <div className="flex flex-wrap justify-center items-start gap-2 sm:-space-x-6">
             <Polaroid
               sfondo={`linear-gradient(160deg, ${C.giallo} 0%, ${C.arancio} 90%)`}
-              didascalia="i tavoli nel vicolo, d'estate"
+              didascalia={t.polaroid[0]}
               rotazione={-4}
               className="sm:mt-8"
             />
             <Polaroid
               sfondo={`linear-gradient(200deg, #5A3B24 0%, ${C.marrone} 100%)`}
-              didascalia="la sala, la sera"
+              didascalia={t.polaroid[1]}
               rotazione={2.5}
             />
             <Polaroid
               sfondo={`linear-gradient(140deg, ${C.arancio} 0%, #A33812 100%)`}
-              didascalia="la cucina a vista"
+              didascalia={t.polaroid[2]}
               rotazione={-2}
               className="sm:mt-12"
             />
@@ -460,21 +567,19 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
         <div className="max-w-4xl mx-auto grid md:grid-cols-[1fr_1.1fr] gap-14 items-center">
           <Rivela>
             <h2 className={`${fontSecondary} uppercase text-[clamp(30px,4vw,46px)] mb-8`}>
-              Quando <span style={{ color: C.arancio }}>ci trovi</span>
+              {t.quando[0]} <span style={{ color: C.arancio }}>{t.quando[1]}</span>
             </h2>
             <dl className="flex flex-col gap-5 text-base">
+              {t.orari.map((o) => (
+                <div key={o.giorni}>
+                  <dt className="font-bold">{o.giorni}</dt>
+                  <dd style={{ color: `${C.marrone}99` }}>{o.ore}</dd>
+                </div>
+              ))}
               <div>
-                <dt className="font-bold">Da martedì a venerdì</dt>
-                <dd style={{ color: `${C.marrone}99` }}>12:30–15:00 · 19:30–23:00</dd>
-              </div>
-              <div>
-                <dt className="font-bold">Sabato e Domenica</dt>
-                <dd style={{ color: `${C.marrone}99` }}>12:30–15:30 · 19:30–23:30</dd>
-              </div>
-              <div>
-                <dt className="font-bold">Lunedì</dt>
+                <dt className="font-bold">{t.lunedì}</dt>
                 <dd className="italic" style={{ fontFamily: "Georgia, serif", color: `${C.marrone}99` }}>
-                  riposo: si riposa pure la cucina
+                  {t.riposo}
                 </dd>
               </div>
             </dl>
@@ -489,8 +594,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                 className="pt-3 text-center text-sm italic"
                 style={{ fontFamily: "Georgia, serif", color: `${C.marrone}99` }}
               >
-                il secondo vicolo a destra dopo la piazza. Se ti perdi, segui
-                l&apos;odore del sugo
+                {t.mappaDidascalia}
               </figcaption>
             </figure>
           </Rivela>
@@ -525,10 +629,10 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                 className="text-center text-xs uppercase tracking-[0.35em] mb-2"
                 style={{ color: C.arancio }}
               >
-                Biglietto di prenotazione
+                {t.biglietto}
               </p>
               <h2 className={`${fontSecondary} text-center uppercase text-3xl sm:text-4xl mb-8`}>
-                Tieniti un tavolo
+                {t.tieniti}
               </h2>
 
               {inviato ? (
@@ -540,12 +644,10 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, ease: "backOut" }}
                   >
-                    Ricevuto!
+                    {t.ricevuto}
                   </motion.p>
                   <p className="text-base leading-relaxed">
-                    Questa è una vetrina dimostrativa: il modulo non invia
-                    nulla. Ma se l&apos;osteria esistesse, il tavolo sarebbe già
-                    tuo.
+                    {t.demo}
                   </p>
                 </div>
               ) : (
@@ -557,11 +659,11 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                   }}
                 >
                   <label className="flex flex-col gap-1 text-xs font-bold uppercase tracking-[0.15em]">
-                    A nome di
+                    {t.aNomeDi}
                     <input
                       type="text"
                       required
-                      placeholder="scrivi qui il nome"
+                      placeholder={t.phNome}
                       className="text-lg font-normal normal-case tracking-normal outline-none bg-transparent py-1.5 placeholder:italic"
                       style={{
                         borderBottom: `2px solid ${C.marrone}55`,
@@ -571,7 +673,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                   </label>
                   <div className="grid grid-cols-2 gap-6">
                     <label className="flex flex-col gap-1 text-xs font-bold uppercase tracking-[0.15em]">
-                      Quanti siete
+                      {t.quanti}
                       <select
                         required
                         defaultValue=""
@@ -582,18 +684,18 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                         }}
                       >
                         <option value="" disabled>
-                          scegli
+                          {t.scegli}
                         </option>
                         {[2, 3, 4, 5, 6].map((n) => (
                           <option key={n} value={n}>
-                            {n} persone
+                            {t.persone(n)}
                           </option>
                         ))}
-                        <option value="7+">più di 6, chiamaci!</option>
+                        <option value="7+">{t.piùDiSei}</option>
                       </select>
                     </label>
                     <label className="flex flex-col gap-1 text-xs font-bold uppercase tracking-[0.15em]">
-                      Giorno
+                      {t.giorno}
                       <input
                         type="date"
                         required
@@ -606,7 +708,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                     </label>
                   </div>
                   <label className="flex flex-col gap-1 text-xs font-bold uppercase tracking-[0.15em]">
-                    Ora
+                    {t.ora}
                     <select
                       required
                       defaultValue=""
@@ -617,7 +719,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                       }}
                     >
                       <option value="" disabled>
-                        scegli
+                        {t.scegli}
                       </option>
                       {["12:30", "13:00", "13:30", "19:30", "20:00", "20:30", "21:00"].map((o) => (
                         <option key={o} value={o}>
@@ -635,7 +737,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
                     transition={{ duration: 0.2 }}
                     data-cursor="pointer"
                   >
-                    Prenota, ti aspettiamo
+                    {t.prenota}
                   </motion.button>
                 </form>
               )}
@@ -652,7 +754,7 @@ export default function VetrinaRistorante({ fontBase, fontSecondary }: VetrinaRi
         <span className={`${fontSecondary} uppercase text-base block mb-2`} style={{ color: C.arancio }}>
           Osteria del Vicolo
         </span>
-        vetrina dimostrativa · attività di fantasia · nessuna prenotazione reale
+        {t.piede}
       </footer>
     </div>
   );

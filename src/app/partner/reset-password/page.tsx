@@ -5,6 +5,34 @@ import { motion } from "framer-motion";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: {
+    eyebrow: "Programma Partner",
+    titolo: "Reset password.",
+    sottotitolo: "Ti mandiamo un link per impostare una nuova password.",
+    attendi: "Attendi qualche secondo e riprova.",
+    inviata: "Email inviata.",
+    controlla: "Controlla la tua casella e clicca il link per reimpostare la password.",
+    phEmail: "mario@esempio.it",
+    invio: "Invio in corso…",
+    invia: "Invia link →",
+    torna: "← Torna al login",
+  },
+  en: {
+    eyebrow: "Partner Program",
+    titolo: "Reset your password.",
+    sottotitolo: "We'll send you a link to set a new one.",
+    attendi: "Please wait a few seconds and try again.",
+    inviata: "Email sent.",
+    controlla: "Check your inbox and click the link to reset your password.",
+    phEmail: "jane@example.com",
+    invio: "Sending…",
+    invia: "Send link →",
+    torna: "← Back to login",
+  },
+};
 
 const inputCls =
   "w-full bg-glass border border-inchiostro/10 rounded-xl px-4 py-3.5 text-sm text-inchiostro placeholder:text-pietra/50 outline-none focus:border-inchiostro/30 transition-colors";
@@ -16,6 +44,7 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [inviato, setInviato] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
+  const t = useTesti(TESTI);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,7 +61,7 @@ export default function ResetPasswordPage() {
     if (error) {
       setErrore(
         error.message.toLowerCase().includes("security purposes") || error.message.toLowerCase().includes("after")
-          ? "Attendi qualche secondo e riprova."
+          ? t.attendi
           : error.message
       );
       setLoading(false);
@@ -50,19 +79,19 @@ export default function ResetPasswordPage() {
             className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mb-4"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Programma Partner
+            {t.eyebrow}
           </p>
           <h1
             className="text-3xl md:text-4xl font-medium text-inchiostro mb-3"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Reset password.
+            {t.titolo}
           </h1>
           <p
             className="text-sm text-inchiostro/60"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Ti mandiamo un link per impostare una nuova password.
+            {t.sottotitolo}
           </p>
         </AnimatedSection>
 
@@ -74,13 +103,13 @@ export default function ResetPasswordPage() {
                 className="text-xl font-medium text-inchiostro mb-2"
                 style={{ fontFamily: "var(--font-fraunces)" }}
               >
-                Email inviata.
+                {t.inviata}
               </h2>
               <p
                 className="text-sm text-pietra"
                 style={{ fontFamily: "var(--font-inter)" }}
               >
-                Controlla la tua casella e clicca il link per reimpostare la password.
+                {t.controlla}
               </p>
             </div>
           ) : (
@@ -103,7 +132,7 @@ export default function ResetPasswordPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="mario@esempio.it"
+                  placeholder={t.phEmail}
                   className={inputCls}
                   style={{ fontFamily: "var(--font-inter)" }}
                 />
@@ -118,14 +147,14 @@ export default function ResetPasswordPage() {
                 whileTap={loading ? {} : { scale: 0.97 }}
                 transition={{ duration: 0.2 }}
               >
-                {loading ? "Invio in corso…" : "Invia link →"}
+                {loading ? t.invio : t.invia}
               </motion.button>
             </form>
           )}
 
           <p className="mt-6 text-sm text-pietra" style={{ fontFamily: "var(--font-inter)" }}>
             <Link href="/partner/accedi" className="text-inchiostro hover:text-cotto transition-colors">
-              ← Torna al login
+              {t.torna}
             </Link>
           </p>
         </AnimatedSection>

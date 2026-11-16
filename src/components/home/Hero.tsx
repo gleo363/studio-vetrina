@@ -9,6 +9,24 @@ import {
 import Button from "@/components/ui/Button";
 import { EASE_VETRINA, DURATA, fadeUp } from "@/lib/motion";
 import { TEMPI } from "@/components/home/vetrina/sequenza";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: {
+    eyebrow: "Studio Vetrina · Roma",
+    titolo: ["La tua vetrina", "sul mondo."],
+    sottotitolo: "Siti su misura per le attività che hanno qualcosa da mostrare.",
+    cta: "Apriamo la tua vetrina →",
+    esempi: "Guarda gli esempi",
+  },
+  en: {
+    eyebrow: "Studio Vetrina · Rome",
+    titolo: ["Your shop window", "to the world."],
+    sottotitolo: "Made-to-measure websites for businesses with something to show.",
+    cta: "Let's dress your window →",
+    esempi: "See our work",
+  },
+};
 
 const easeUscita = cubicBezier(...EASE_VETRINA);
 
@@ -31,6 +49,7 @@ interface HeroProps {
  */
 export default function Hero({ progresso, richiama }: HeroProps) {
   const riduciMovimento = useReducedMotion();
+  const t = useTesti(TESTI);
   // Con prefers-reduced-motion i range collassano: testo fermo e visibile,
   // stile iniziale identico tra server e client.
   const opacity = useTransform(
@@ -68,7 +87,7 @@ export default function Hero({ progresso, richiama }: HeroProps) {
           className="text-xs font-medium uppercase tracking-[0.2em] text-travertino/70 mb-8 [@media(max-height:500px)]:mb-3"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Studio Vetrina · Roma
+          {t.eyebrow}
         </motion.p>
 
         {/* Titolo già visibile nell'HTML del server e in un solo blocco: è l'LCP della home
@@ -81,9 +100,9 @@ export default function Hero({ progresso, richiama }: HeroProps) {
             fontOpticalSizing: "auto",
           } as React.CSSProperties}
         >
-          La tua vetrina
+          {t.titolo[0]}
           <br />
-          sul mondo.
+          {t.titolo[1]}
         </motion.h1>
 
         <motion.p
@@ -94,7 +113,7 @@ export default function Hero({ progresso, richiama }: HeroProps) {
             fontStyle: "italic",
           }}
         >
-          Siti web su misura per le piccole attività.
+          {t.sottotitolo}
         </motion.p>
 
         <motion.div
@@ -108,12 +127,12 @@ export default function Hero({ progresso, richiama }: HeroProps) {
         >
           <motion.div variants={fadeUp(14, DURATA.base)}>
             <Button href="/contatti" variant="primary" className="text-base px-7 py-4 [@media(max-height:500px)]:py-3">
-              Apriamo la tua vetrina →
+              {t.cta}
             </Button>
           </motion.div>
           <motion.div variants={fadeUp(14, DURATA.base)}>
             <Button href="/esempi" variant="ghost-chiaro" className="text-base px-7 py-4 [@media(max-height:500px)]:py-3">
-              Guarda gli esempi
+              {t.esempi}
             </Button>
           </motion.div>
         </motion.div>

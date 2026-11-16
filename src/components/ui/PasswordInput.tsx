@@ -2,11 +2,18 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: { mostra: "Mostra password", nascondi: "Nascondi password" },
+  en: { mostra: "Show password", nascondi: "Hide password" },
+};
 
 interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 export default function PasswordInput({ className, ...props }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
+  const t = useTesti(TESTI);
 
   return (
     <div className="relative w-full">
@@ -19,7 +26,7 @@ export default function PasswordInput({ className, ...props }: PasswordInputProp
         type="button"
         onClick={() => setVisible((v) => !v)}
         tabIndex={-1}
-        aria-label={visible ? "Nascondi password" : "Mostra password"}
+        aria-label={visible ? t.nascondi : t.mostra}
         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-pietra/50 hover:text-inchiostro transition-colors duration-200 focus:outline-none cursor-pointer"
       >
         <AnimatePresence mode="wait" initial={false}>

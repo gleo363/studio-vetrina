@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: { copiato: "✓ Copiato!", copia: "Copia link →" },
+  en: { copiato: "✓ Copied!", copia: "Copy link →" },
+};
 
 export default function CopiaCodiceClient({ link }: { link: string }) {
   const [copiato, setCopiato] = useState(false);
+  const t = useTesti(TESTI);
 
   async function copia() {
     await navigator.clipboard.writeText(link);
@@ -27,7 +34,7 @@ export default function CopiaCodiceClient({ link }: { link: string }) {
         whileTap={{ scale: 0.97 }}
         data-cursor="pointer"
       >
-        {copiato ? "✓ Copiato!" : "Copia link →"}
+        {copiato ? t.copiato : t.copia}
       </motion.button>
     </div>
   );

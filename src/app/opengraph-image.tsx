@@ -1,11 +1,19 @@
 import { ImageResponse } from "next/og";
+import { getLingua } from "@/lib/i18n/server";
 
 export const runtime = "edge";
-export const alt = "Studio Vetrina · Siti web su misura per Roma";
+// Testo alternativo statico: i crawler di solito non mandano la lingua.
+export const alt = "Studio Vetrina · Websites made to measure, from Rome";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const SOTTOTITOLO = {
+  it: "Siti web su misura per Roma",
+  en: "Websites made to measure, from Rome",
+};
+
 export default async function Image() {
+  const lingua = await getLingua();
   return new ImageResponse(
     (
       <div
@@ -61,7 +69,7 @@ export default async function Image() {
             maxWidth: "820px",
           }}
         >
-          Siti web su misura per Roma
+          {SOTTOTITOLO[lingua]}
         </div>
 
         <div

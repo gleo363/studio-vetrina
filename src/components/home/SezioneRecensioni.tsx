@@ -1,7 +1,13 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Script from "next/script";
 import AnimatedSection from "@/components/ui/AnimatedSection";
+import { useLingua } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: { invito: "Hai lavorato con noi? Raccontaci com'è andata, con una recensione su Trustpilot.", localeWidget: "it-IT" },
+  en: { invito: "Worked with us? Tell us how it went with a review on Trustpilot.", localeWidget: "en-US" },
+};
 
 declare global {
   interface Window {
@@ -11,6 +17,8 @@ declare global {
 
 export default function SezioneRecensioni() {
   const widgetRef = useRef<HTMLDivElement>(null);
+  const lingua = useLingua();
+  const t = TESTI[lingua];
 
   // Lo script di Trustpilot cerca i widget solo al primo caricamento:
   // a ogni montaggio (anche dopo una navigazione client) lo riavviamo a mano.
@@ -19,6 +27,11 @@ export default function SezioneRecensioni() {
       window.Trustpilot.loadFromElement(widgetRef.current, true);
     }
   };
+
+  // Al cambio lingua il widget viene rimontato (key): va ricaricato.
+  useEffect(() => {
+    caricaWidget();
+  }, [lingua]);
 
   return (
     <section className="bg-glass px-6 py-28">
@@ -33,14 +46,15 @@ export default function SezioneRecensioni() {
             className="text-lg md:text-xl text-pietra mb-8 leading-snug"
             style={{ fontFamily: "var(--font-fraunces)", fontStyle: "italic" }}
           >
-            Hai lavorato con noi? Raccontaci com&apos;è andata, con una recensione su Trustpilot.
+            {t.invito}
           </p>
 
           {/* TrustBox widget - Review Collector */}
           <div
+            key={lingua}
             ref={widgetRef}
             className="trustpilot-widget"
-            data-locale="en-US"
+            data-locale={t.localeWidget}
             data-template-id="56278e9abfbbba0bdcd568bc"
             data-businessunit-id="6adb6bc791bd82e6106bf5c6"
             data-style-height="52px"

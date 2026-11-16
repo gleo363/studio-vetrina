@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { logoutPartner } from "@/app/actions/partner";
+import { useLingua } from "@/components/providers/LinguaProvider";
 
 export default function LogoutButton() {
+  const lingua = useLingua();
   return (
     <form action={logoutPartner}>
       <motion.button
@@ -14,7 +16,7 @@ export default function LogoutButton() {
         whileTap={{ scale: 0.97 }}
         data-cursor="pointer"
       >
-        Esci
+        {lingua === "en" ? "Log out" : "Esci"}
       </motion.button>
     </form>
   );

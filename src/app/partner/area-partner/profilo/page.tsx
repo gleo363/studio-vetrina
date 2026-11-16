@@ -4,10 +4,21 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import Link from "next/link";
 import ProfiloForm from "./ProfiloForm";
+import { getLingua } from "@/lib/i18n/server";
+import { metadatiLocalizzati } from "@/lib/i18n/metadata";
 
-export const metadata = { title: "Profilo" };
+export const generateMetadata = metadatiLocalizzati({
+  it: { title: "Profilo" },
+  en: { title: "Profile" },
+});
+
+const TESTI = {
+  it: { torna: "← Torna alla dashboard", eyebrow: "Area Partner", titolo: "Il tuo profilo" },
+  en: { torna: "← Back to dashboard", eyebrow: "Partner area", titolo: "Your profile" },
+};
 
 export default async function ProfiloPage() {
+  const t = TESTI[await getLingua()];
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,19 +44,19 @@ export default async function ProfiloPage() {
             className="inline-flex items-center gap-2 text-sm text-pietra hover:text-inchiostro transition-colors duration-200 mb-2"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            ← Torna alla dashboard
+            {t.torna}
           </Link>
           <p
             className="text-xs font-medium uppercase tracking-[0.2em] text-pietra mt-6 mb-3"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Area Partner
+            {t.eyebrow}
           </p>
           <h1
             className="text-3xl md:text-4xl font-medium text-inchiostro"
             style={{ fontFamily: "var(--font-fraunces)" }}
           >
-            Il tuo profilo
+            {t.titolo}
           </h1>
         </AnimatedSection>
 

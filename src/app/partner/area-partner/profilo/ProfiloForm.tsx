@@ -2,6 +2,30 @@
 
 import { useActionState } from "react";
 import { aggiornaProfilo } from "@/app/actions/partner";
+import { useTesti } from "@/components/providers/LinguaProvider";
+
+const TESTI = {
+  it: {
+    aggiornato: "Profilo aggiornato con successo.",
+    nome: "Nome",
+    email: "Email",
+    cambiaEmail: "Per cambiare email contattaci direttamente.",
+    ibanNota: "(per la liquidazione commissioni)",
+    ibanAiuto: "Opzionale. Necessario solo per ricevere i pagamenti.",
+    salvataggio: "Salvataggio…",
+    salva: "Salva modifiche",
+  },
+  en: {
+    aggiornato: "Profile updated.",
+    nome: "Name",
+    email: "Email",
+    cambiaEmail: "To change your email, get in touch with us directly.",
+    ibanNota: "(for commission payouts)",
+    ibanAiuto: "Optional. Only needed to receive payments.",
+    salvataggio: "Saving…",
+    salva: "Save changes",
+  },
+};
 
 interface Props {
   nomeIniziale: string;
@@ -11,6 +35,7 @@ interface Props {
 
 export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale }: Props) {
   const [state, action, isPending] = useActionState(aggiornaProfilo, null);
+  const t = useTesti(TESTI);
 
   return (
     <form action={action} className="bg-glass rounded-2xl p-8 flex flex-col gap-6">
@@ -25,7 +50,7 @@ export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale 
       {state?.successo && (
         <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3">
           <p className="text-sm text-green-700" style={{ fontFamily: "var(--font-inter)" }}>
-            Profilo aggiornato con successo.
+            {t.aggiornato}
           </p>
         </div>
       )}
@@ -37,7 +62,7 @@ export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale 
           className="text-xs font-medium uppercase tracking-[0.15em] text-pietra"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Nome
+          {t.nome}
         </label>
         <input
           id="nome"
@@ -57,7 +82,7 @@ export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale 
           className="text-xs font-medium uppercase tracking-[0.15em] text-pietra"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Email
+          {t.email}
         </label>
         <input
           id="email"
@@ -69,7 +94,7 @@ export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale 
           style={{ fontFamily: "var(--font-inter)" }}
         />
         <p className="text-xs text-pietra/60" style={{ fontFamily: "var(--font-inter)" }}>
-          Per cambiare email contattaci direttamente.
+          {t.cambiaEmail}
         </p>
       </div>
 
@@ -80,7 +105,7 @@ export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale 
           className="text-xs font-medium uppercase tracking-[0.15em] text-pietra"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          IBAN <span className="normal-case tracking-normal font-normal text-pietra/60">(per la liquidazione commissioni)</span>
+          IBAN <span className="normal-case tracking-normal font-normal text-pietra/60">{t.ibanNota}</span>
         </label>
         <input
           id="iban"
@@ -92,7 +117,7 @@ export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale 
           className="w-full bg-travertino border border-inchiostro/15 rounded-xl px-4 py-3 text-sm text-inchiostro placeholder:text-pietra/40 focus:outline-none focus:ring-2 focus:ring-cotto/30 focus:border-cotto/50 transition-all tracking-wider font-mono"
         />
         <p className="text-xs text-pietra/60" style={{ fontFamily: "var(--font-inter)" }}>
-          Opzionale. Necessario solo per ricevere i pagamenti.
+          {t.ibanAiuto}
         </p>
       </div>
 
@@ -102,7 +127,7 @@ export default function ProfiloForm({ nomeIniziale, emailIniziale, ibanIniziale 
         className="mt-2 w-full bg-inchiostro text-travertino rounded-xl py-3.5 text-sm font-medium transition-all duration-200 hover:bg-inchiostro/85 disabled:opacity-50 disabled:cursor-not-allowed"
         style={{ fontFamily: "var(--font-inter)" }}
       >
-        {isPending ? "Salvataggio…" : "Salva modifiche"}
+        {isPending ? t.salvataggio : t.salva}
       </button>
     </form>
   );
